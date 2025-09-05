@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
 import { useAuth } from '../context/AuthContext';
 import { GoogleIcon } from '../components/icons/GoogleIcon';
+import { recordAuthAttempt, checkRateLimit } from '../services/rateLimiter';
 
 interface SignupProps {
   onSwitchToLogin: () => void;
@@ -16,11 +17,20 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setRateLimitError(null);
     setLoading(true);
+
+    const { isLimited, timeLeft } = checkRateLimit('signup');
+    if (isLimited) {
+        setRateLimitError(`Too many attempts. Please try again in ${timeLeft} seconds.`);
+        setLoading(false);
+        return;
+    }
 
     if (password.length < 6) {
         setError("Password must be at least 6 characters long.");
@@ -32,6 +42,7 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
 
     if (error) {
       setError(error.message);
+      recordAuthAttempt('signup');
     } else {
       setSuccess(true);
     }
@@ -40,6 +51,7 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
 
   const handleGoogleSignIn = async () => {
     setError(null);
+    setRateLimitError(null);
     const { error } = await signInWithGoogle();
     if (error) {
         setError(error.message);
@@ -137,7 +149,7 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
                 </div>
               </div>
               
-              {error && <p className="text-brand-pink text-sm text-center">{error}</p>}
+              {(rateLimitError || error) && <p className="text-brand-pink text-sm text-center">{rateLimitError || error}</p>}
 
               <div>
                 <button

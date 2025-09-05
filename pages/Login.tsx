@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
 import { useAuth } from '../context/AuthContext';
 import { GoogleIcon } from '../components/icons/GoogleIcon';
+import { recordAuthAttempt, checkRateLimit } from '../services/rateLimiter';
 
 interface LoginProps {
   onSwitchToSignup: () => void;
@@ -16,20 +17,31 @@ const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavig
   const [password, setPassword] = useState('password');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setRateLimitError(null);
+
+    const { isLimited, timeLeft } = checkRateLimit('login');
+    if (isLimited) {
+      setRateLimitError(`Too many attempts. Please try again in ${timeLeft} seconds.`);
+      return;
+    }
+
     setLoading(true);
     const { error } = await signIn(email, password);
     if (error) {
       setError(error.message);
+      recordAuthAttempt('login');
     }
     setLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
     setError(null);
+    setRateLimitError(null);
     const { error } = await signInWithGoogle();
     if (error) {
         setError(error.message);
@@ -122,7 +134,7 @@ const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavig
             </div>
           </div>
 
-          {error && <p className="text-brand-pink text-sm text-center">{error}</p>}
+          {(rateLimitError || error) && <p className="text-brand-pink text-sm text-center">{rateLimitError || error}</p>}
 
           <div>
             <button

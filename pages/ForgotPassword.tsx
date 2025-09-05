@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
 import { useAuth } from '../context/AuthContext';
+import { recordAuthAttempt, checkRateLimit } from '../services/rateLimiter';
 
 interface ForgotPasswordProps {
   onSwitchToLogin: () => void;
@@ -14,14 +15,24 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSwitchToLogin, onNavi
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setRateLimitError(null);
+
+    const { isLimited, timeLeft } = checkRateLimit('resetPassword');
+    if (isLimited) {
+      setRateLimitError(`Too many requests. Please try again in ${timeLeft} seconds.`);
+      return;
+    }
+
     setLoading(true);
     const { error } = await sendPasswordResetEmail(email);
     if (error) {
       setError(error.message);
+      recordAuthAttempt('resetPassword');
     } else {
       setSuccess(true);
     }
@@ -78,7 +89,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSwitchToLogin, onNavi
               </div>
             </div>
             
-            {error && <p className="text-brand-pink text-sm text-center">{error}</p>}
+            {(rateLimitError || error) && <p className="text-brand-pink text-sm text-center">{rateLimitError || error}</p>}
 
             <div>
               <button
