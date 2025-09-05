@@ -1,0 +1,5 @@
+{
+  "name": "Digital Warranty Vault 2.0",
+  "description": "A web application to store, manage, and track your product warranties. Simply upload a photo of your receipt, and the app uses AI to automatically extract product details and expiry dates, keeping all your warranties organized in one secure place.",
+  "requestFramePermissions": []
+}
