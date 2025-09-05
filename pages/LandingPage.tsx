@@ -170,7 +170,7 @@ const Hero: React.FC<LandingPageProps> = ({ onNavigateSignup, onNavigateLogin })
              <div className="mt-16 w-full max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: '0.6s' }}>
                 <div className="relative rounded-xl p-1 bg-gradient-to-br from-blue-500 to-teal-400">
                     <div className="bg-base-200 rounded-lg shadow-2xl p-4">
-                        <img src="https://i.imgur.com/rC4mYMS.png" alt="Dashboard Preview" className="rounded-md w-full" />
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1600&auto=format&fit=crop" alt="Modern dashboard preview with analytics cards and charts" className="rounded-md w-full" />
                     </div>
                 </div>
             </div>

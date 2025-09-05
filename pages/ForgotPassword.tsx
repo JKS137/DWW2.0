@@ -7,9 +7,10 @@ import { recordAuthAttempt, checkRateLimit } from '../services/rateLimiter';
 interface ForgotPasswordProps {
   onSwitchToLogin: () => void;
   onNavigateHome: () => void;
+  onNavigateDashboard?: () => void;
 }
 
-const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSwitchToLogin, onNavigateHome }) => {
+const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSwitchToLogin, onNavigateHome, onNavigateDashboard }) => {
   const { sendPasswordResetEmail } = useAuth();
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -57,10 +58,18 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSwitchToLogin, onNavi
   return (
     <main className="flex items-center justify-center min-h-screen p-4 animate-fade-in">
       <div className="w-full max-w-md p-8 space-y-8 bg-base-200/50 backdrop-blur-lg rounded-2xl shadow-2xl border border-base-300/50">
-        <div className="text-center">
+        <div className="text-center relative">
           <button onClick={onNavigateHome} className="inline-block">
             <ShieldCheckIcon className="mx-auto h-12 w-12 text-brand-primary" />
           </button>
+          {onNavigateDashboard && (
+            <button
+              onClick={onNavigateDashboard}
+              className="absolute right-0 top-0 text-sm font-medium text-brand-primary hover:text-opacity-90"
+            >
+              Go to Dashboard
+            </button>
+          )}
           <h2 className="mt-6 text-3xl font-extrabold text-content-primary">
             Reset your Password
           </h2>

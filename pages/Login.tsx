@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
 import { useAuth } from '../context/AuthContext';
@@ -9,9 +8,10 @@ interface LoginProps {
   onSwitchToSignup: () => void;
   onNavigateHome: () => void;
   onNavigateForgotPassword: () => void;
+  onNavigateDashboard?: () => void;
 }
 
-const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavigateForgotPassword }) => {
+const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavigateForgotPassword, onNavigateDashboard }) => {
   const { signIn, signInWithGoogle } = useAuth();
   const [email, setEmail] = useState('demo@example.com');
   const [password, setPassword] = useState('password');
@@ -51,10 +51,18 @@ const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavig
   return (
     <main className="flex items-center justify-center min-h-screen p-4 animate-fade-in">
       <div className="w-full max-w-md p-8 space-y-6 bg-base-200/50 backdrop-blur-lg rounded-2xl shadow-2xl border border-base-300/50">
-        <div className="text-center">
+        <div className="text-center relative">
             <button onClick={onNavigateHome} className="inline-block">
               <ShieldCheckIcon className="mx-auto h-12 w-12 text-brand-primary" />
             </button>
+            {onNavigateDashboard && (
+              <button
+                onClick={onNavigateDashboard}
+                className="absolute right-0 top-0 text-sm font-medium text-brand-primary hover:text-opacity-90"
+              >
+                Go to Dashboard
+              </button>
+            )}
             <h2 className="mt-6 text-3xl font-extrabold text-content-primary">
                 Welcome Back
             </h2>
