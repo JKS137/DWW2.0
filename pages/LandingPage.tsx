@@ -55,7 +55,7 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
     return (
         <>
             <motion.nav 
-                className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-6xl mx-auto z-50 p-3 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-between shadow-lg"
+                className="relative mt-4 w-[95%] max-w-6xl mx-auto z-50 p-3 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-between shadow-lg"
                 {...motionProps}
             >
                 {/* Left Side: Logo */}
