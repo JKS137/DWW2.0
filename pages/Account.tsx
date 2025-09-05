@@ -25,7 +25,7 @@ const Account: React.FC = () => {
                 const profileData = await getProfile(user);
                 setProfile(profileData);
             } catch (err: any) {
-                setError(err.message);
+                setError(err.message || 'An unknown error occurred.');
             } finally {
                 setLoading(false);
             }

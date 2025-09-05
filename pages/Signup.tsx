@@ -31,7 +31,7 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
     const { error } = await signUp(email, password);
 
     if (error) {
-      setError(error.message);
+      setError(error.message || 'An unknown error occurred.');
     } else {
       setSuccess(true);
     }
@@ -42,7 +42,7 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
     setError(null);
     const { error } = await signInWithGoogle();
     if (error) {
-        setError(error.message);
+        setError(error.message || 'An unknown error occurred.');
     }
   };
   

@@ -31,7 +31,7 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onPasswordUpdated }) =>
     setLoading(true);
     const { error } = await updateUserPassword(password);
     if (error) {
-      setError(error.message);
+      setError(error.message || 'An unknown error occurred.');
     } else {
       setSuccess(true);
       setTimeout(() => {

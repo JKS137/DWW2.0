@@ -21,7 +21,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSwitchToLogin, onNavi
     setLoading(true);
     const { error } = await sendPasswordResetEmail(email);
     if (error) {
-      setError(error.message);
+      setError(error.message || 'An unknown error occurred.');
     } else {
       setSuccess(true);
     }
