@@ -1,5 +1,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import WarrantyCard from '../components/WarrantyCard';
 import WarrantyList from '../components/WarrantyList';
@@ -44,6 +46,18 @@ const demoWarranties: Warranty[] = [
 ];
 
 const Dashboard: React.FC = () => {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) {
+    return <div>Loading...</div>; // Or a spinner
+  }
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isComingSoonModalOpen, setIsComingSoonModalOpen] = useState(false);
   const [editingWarranty, setEditingWarranty] = useState<Warranty | null>(null);

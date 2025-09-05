@@ -2,8 +2,8 @@
 import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://iekpbucrgxvrgrzprzim.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlla3BidWNyZ3h2cmdyenByemltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxMDU1MjAsImV4cCI6MjA3MjY4MTUyMH0.Tg1-4Ru_YAHw873nMUVa0jZ5dCT7KSG_XR2u3uXhE84';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 // Initialize client and error to null
 let supabaseClient: SupabaseClient | null = null;

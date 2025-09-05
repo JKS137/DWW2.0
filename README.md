@@ -26,10 +26,26 @@ A web application to store, manage, and track your product warranties. Simply up
 
 The project is designed to run in a web-based development environment that provides the necessary environment variables.
 
-- **Supabase URL & Anon Key**: The app connects to a Supabase project using a pre-configured URL and Anon Key.
+- **Supabase URL & Anon Key**: The app connects to a Supabase project using `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` environment variables.
 - **Google Gemini API Key**: The `API_KEY` for the Gemini AI service is also provided by the environment.
 
-No local setup is required if you are running the app in its intended environment.
+### Environment Variables
+Create a `.env.local` file in the root of your project and add the following environment variables:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+NEXT_PUBLIC_GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+```
+
+Replace the placeholder values with your actual Supabase project URL, Anon Key, and Gemini API Key.
+
+### Enabling Email Provider in Supabase
+To enable email authentication in your Supabase project:
+1. Go to your Supabase project dashboard.
+2. Navigate to **Authentication > Providers**.
+3. Enable the **Email** provider.
+4. Configure the **Email Templates** under **Authentication > Email Templates** to customize verification, password reset, and other emails.
 
 ### 2. Automated Email Reminders
 
