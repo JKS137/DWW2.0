@@ -23,7 +23,7 @@ const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavig
     setLoading(true);
     const { error } = await signIn(email, password);
     if (error) {
-      setError(error.message || 'An unknown error occurred.');
+      setError(error.message);
     }
     setLoading(false);
   };
@@ -32,7 +32,7 @@ const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavig
     setError(null);
     const { error } = await signInWithGoogle();
     if (error) {
-        setError(error.message || 'An unknown error occurred.');
+        setError(error.message);
     }
   };
 
