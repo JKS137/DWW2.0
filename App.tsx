@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
@@ -6,6 +7,7 @@ import Signup from './pages/Signup';
 import LandingPage from './pages/LandingPage';
 import ForgotPassword from './pages/ForgotPassword';
 import UpdatePassword from './pages/UpdatePassword';
+import Account from './pages/Account'; // New page
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { WarrantyProvider } from './context/WarrantyContext';
 import { Spinner } from './components/icons/Spinner';
@@ -60,13 +62,10 @@ const MainContent: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // When the route changes, send a page view event to Google Analytics.
     trackPageView(route);
   }, [route]);
 
   useEffect(() => {
-    // When Supabase auth state changes to PASSWORD_RECOVERY, navigate the user
-    // to the dedicated page to update their password.
     if (authEvent === 'PASSWORD_RECOVERY') {
         navigate('/update-password');
     }
@@ -82,23 +81,37 @@ const MainContent: React.FC = () => {
     );
   } else if (user) {
     // Authenticated user routing
-    const isPublicRoute = ['/', '/login', '/signup', '/forgot-password'].includes(route);
-    
-    // If user is on a public page, redirect to dashboard.
-    // Exception: Allow access to /update-password if in recovery mode.
-    if (isPublicRoute && route !== '/update-password') {
+    const isAuthPublicRoute = ['/', '/login', '/signup', '/forgot-password'].includes(route);
+
+    if (isAuthPublicRoute) {
         navigate('/dashboard');
-    }
-    
-    if (route === '/update-password') {
-        content = <UpdatePassword onPasswordUpdated={() => navigate('/dashboard')} />;
-    } else {
-        // All other authenticated traffic goes to the dashboard.
-        content = <Dashboard />;
+        return <div className="flex items-center justify-center min-h-screen"><Spinner className="w-10 h-10" /></div>;
     }
 
+    switch (route) {
+        case '/dashboard':
+            content = <Dashboard />;
+            break;
+        case '/account':
+            content = <Account />;
+            break;
+        case '/update-password':
+            content = <UpdatePassword onPasswordUpdated={() => navigate('/dashboard')} />;
+            break;
+        default:
+            // If route is unknown for a logged-in user, redirect to dashboard.
+            navigate('/dashboard');
+            content = <Dashboard />;
+            break;
+    }
   } else {
     // Unauthenticated user routing
+    const isProtectedRoute = route === '/dashboard' || route.startsWith('/account');
+    if (isProtectedRoute) {
+        navigate('/login');
+        return <Login onSwitchToSignup={() => navigate('/signup')} onNavigateHome={() => navigate('/')} onNavigateForgotPassword={() => navigate('/forgot-password')} />;
+    }
+
     switch (route) {
       case '/login':
         content = <Login onSwitchToSignup={() => navigate('/signup')} onNavigateHome={() => navigate('/')} onNavigateForgotPassword={() => navigate('/forgot-password')} />;
@@ -108,6 +121,12 @@ const MainContent: React.FC = () => {
         break;
       case '/forgot-password':
         content = <ForgotPassword onSwitchToLogin={() => navigate('/login')} onNavigateHome={() => navigate('/')} />;
+        break;
+      case '/update-password':
+        // A user might be unauthenticated but have a recovery token.
+        // The AuthContext will catch the PASSWORD_RECOVERY event and set the session.
+        // For a brief moment, they might be here unauthenticated.
+        content = <UpdatePassword onPasswordUpdated={() => navigate('/login')} />;
         break;
       case '/':
       default:

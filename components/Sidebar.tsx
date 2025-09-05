@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { ShieldCheckIcon } from './icons/ShieldCheckIcon';
 import { LogoutIcon } from './icons/LogoutIcon';
@@ -7,6 +8,7 @@ import { UploadIcon } from './icons/UploadIcon';
 import { SettingsIcon } from './icons/SettingsIcon';
 import { PricingIcon } from './icons/PricingIcon';
 import { ChevronLeftIcon } from './icons/ChevronLeftIcon';
+import { ProfileIcon } from './icons/ProfileIcon';
 
 interface SidebarProps {
     onOpenComingSoonModal: () => void;
@@ -15,12 +17,33 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ onOpenComingSoonModal }) => {
     const { signOut } = useAuth();
     const [isExpanded, setIsExpanded] = useState(true);
+    const [activeRoute, setActiveRoute] = useState(window.location.pathname);
+
+    useEffect(() => {
+        const handleLocationChange = () => {
+            setActiveRoute(window.location.pathname);
+        };
+        // Listen to popstate event which is triggered by browser back/forward buttons
+        // and our custom navigate function.
+        window.addEventListener('popstate', handleLocationChange);
+        return () => {
+            window.removeEventListener('popstate', handleLocationChange);
+        };
+    }, []);
+    
+    // Custom navigation function to work with the SPA router in App.tsx
+    const navigate = (path: string) => {
+        window.history.pushState({}, '', path);
+        // Dispatch a popstate event to make the App component re-render
+        window.dispatchEvent(new PopStateEvent('popstate'));
+    };
 
     const navItems = [
-        { icon: DashboardIcon, label: 'Dashboard', action: () => {}, active: true },
-        { icon: UploadIcon, label: 'Upload', action: onOpenComingSoonModal, active: false },
-        { icon: SettingsIcon, label: 'Settings', action: onOpenComingSoonModal, active: false },
-        { icon: PricingIcon, label: 'Pricing', action: onOpenComingSoonModal, active: false },
+        { icon: DashboardIcon, label: 'Dashboard', action: () => navigate('/dashboard'), path: '/dashboard' },
+        { icon: ProfileIcon, label: 'Account', action: () => navigate('/account'), path: '/account' },
+        { icon: UploadIcon, label: 'Upload', action: onOpenComingSoonModal, path: '/upload' },
+        { icon: SettingsIcon, label: 'Settings', action: onOpenComingSoonModal, path: '/settings' },
+        { icon: PricingIcon, label: 'Pricing', action: onOpenComingSoonModal, path: '/pricing' },
     ];
 
     return (
@@ -37,7 +60,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onOpenComingSoonModal }) => {
             
             <nav className="flex-1 px-2 py-4 space-y-2">
                 {navItems.map(item => (
-                    <button key={item.label} onClick={item.action} className={`flex items-center w-full p-2 rounded-lg transition-colors ${item.active ? 'bg-brand-primary text-white' : 'hover:bg-base-300/50 text-content-secondary hover:text-content-primary'}`}>
+                    <button 
+                        key={item.label} 
+                        onClick={item.action} 
+                        className={`flex items-center w-full p-2 rounded-lg transition-colors ${activeRoute === item.path ? 'bg-brand-primary text-white' : 'hover:bg-base-300/50 text-content-secondary hover:text-content-primary'}`}
+                    >
                         <item.icon className="h-6 w-6 flex-shrink-0" />
                         <span className={`ml-4 font-semibold whitespace-nowrap transition-opacity duration-200 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>{item.label}</span>
                     </button>

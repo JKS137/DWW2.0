@@ -1,4 +1,5 @@
 
+
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
 import type { AuthError, Session, User, AuthChangeEvent } from '@supabase/supabase-js';
@@ -14,6 +15,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<{ error: AuthError | null }>;
   sendPasswordResetEmail: (email: string) => Promise<{ error: AuthError | null }>;
   updateUserPassword: (password: string) => Promise<{ error: AuthError | null }>;
+  resendVerificationEmail: (email: string) => Promise<{ error: AuthError | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -115,21 +117,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const sendPasswordResetEmail = async (email: string) => {
     if (!supabase) return createConfigError();
-    // Supabase will send an email with a link that includes a recovery token.
-    // The link will redirect to the specified URL.
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/update-password`,
+      redirectTo: `${window.location.origin}`,
     });
     return { error };
   };
 
   const updateUserPassword = async (password: string) => {
       if (!supabase) return createConfigError();
-      // This function can only be called when the user is in a 'PASSWORD_RECOVERY' session state.
       const { error } = await supabase.auth.updateUser({ password });
       return { error };
   };
 
+  const resendVerificationEmail = async (email: string) => {
+    if (!supabase) return createConfigError();
+    const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+    });
+    return { error };
+  };
 
   const value = {
     user,
@@ -142,6 +149,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     signInWithGoogle,
     sendPasswordResetEmail,
     updateUserPassword,
+    resendVerificationEmail,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
