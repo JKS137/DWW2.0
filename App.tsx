@@ -109,18 +109,18 @@ const MainContent: React.FC = () => {
     const isProtectedRoute = route === '/dashboard' || route.startsWith('/account');
     if (isProtectedRoute) {
         navigate('/login');
-        return <Login onSwitchToSignup={() => navigate('/signup')} onNavigateHome={() => navigate('/')} onNavigateForgotPassword={() => navigate('/forgot-password')} onNavigateDashboard={() => navigate('/dashboard')} />;
+        return <Login onSwitchToSignup={() => navigate('/signup')} onNavigateHome={() => navigate('/')} onNavigateForgotPassword={() => navigate('/forgot-password')} />;
     }
 
     switch (route) {
       case '/login':
-        content = <Login onSwitchToSignup={() => navigate('/signup')} onNavigateHome={() => navigate('/')} onNavigateForgotPassword={() => navigate('/forgot-password')} onNavigateDashboard={() => navigate('/dashboard')} />;
+        content = <Login onSwitchToSignup={() => navigate('/signup')} onNavigateHome={() => navigate('/')} onNavigateForgotPassword={() => navigate('/forgot-password')} />;
         break;
       case '/signup':
-        content = <Signup onSwitchToLogin={() => navigate('/login')} onNavigateHome={() => navigate('/')} onNavigateDashboard={() => navigate('/dashboard')} />;
+        content = <Signup onSwitchToLogin={() => navigate('/login')} onNavigateHome={() => navigate('/')} />;
         break;
       case '/forgot-password':
-        content = <ForgotPassword onSwitchToLogin={() => navigate('/login')} onNavigateHome={() => navigate('/')} onNavigateDashboard={() => navigate('/dashboard')} />;
+        content = <ForgotPassword onSwitchToLogin={() => navigate('/login')} onNavigateHome={() => navigate('/')} />;
         break;
       case '/update-password':
         // A user might be unauthenticated but have a recovery token.

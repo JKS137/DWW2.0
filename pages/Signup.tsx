@@ -8,10 +8,9 @@ import { recordAuthAttempt, checkRateLimit } from '../services/rateLimiter';
 interface SignupProps {
   onSwitchToLogin: () => void;
   onNavigateHome: () => void;
-  onNavigateDashboard?: () => void;
 }
 
-const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome, onNavigateDashboard }) => {
+const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
   const { signUp, signInWithGoogle } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -77,30 +76,22 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome, onNavi
   return (
     <main className="flex items-center justify-center min-h-screen p-4 animate-fade-in">
       <div className="w-full max-w-md p-8 space-y-6 bg-base-200/50 backdrop-blur-lg rounded-2xl shadow-2xl border border-base-300/50">
-        <div className="text-center relative">
-          <button onClick={onNavigateHome} className="inline-block">
-              <ShieldCheckIcon className="mx-auto h-12 w-12 text-brand-primary" />
-          </button>
-          {onNavigateDashboard && (
-            <button
-              onClick={onNavigateDashboard}
-              className="absolute right-0 top-0 text-sm font-medium text-brand-primary hover:text-opacity-90"
-            >
-              Go to Dashboard
+        <div className="text-center">
+            <button onClick={onNavigateHome} className="inline-block">
+                <ShieldCheckIcon className="mx-auto h-12 w-12 text-brand-primary" />
             </button>
-          )}
-          <h2 className="mt-6 text-3xl font-extrabold text-content-primary">
-              Create your Account
-          </h2>
-          <p className="mt-2 text-sm text-content-secondary">
-              Or{' '}
-              <button
-                onClick={onSwitchToLogin}
-                className="font-medium text-brand-primary hover:text-opacity-90 focus:outline-none focus:ring-2 focus:ring-brand-primary rounded-sm"
-              >
-                sign in to your existing account
-              </button>
-          </p>
+            <h2 className="mt-6 text-3xl font-extrabold text-content-primary">
+                Create your Account
+            </h2>
+            <p className="mt-2 text-sm text-content-secondary">
+                Or{' '}
+                <button
+                  onClick={onSwitchToLogin}
+                  className="font-medium text-brand-primary hover:text-opacity-90 focus:outline-none focus:ring-2 focus:ring-brand-primary rounded-sm"
+                >
+                  sign in to your existing account
+                </button>
+            </p>
         </div>
         
         {success ? <SuccessMessage /> : (
