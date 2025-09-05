@@ -54,47 +54,49 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
 
     return (
         <>
-            <motion.nav 
-                className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-6xl mx-auto z-50 p-3 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-between shadow-lg"
-                {...motionProps}
-            >
-                {/* Left Side: Logo */}
-                <a href="#" className="flex items-center space-x-2">
-                    <ShieldCheckIcon className="h-8 w-8 text-brand-primary" />
-                    <span className="font-bold text-xl text-content-primary">Warranty Vault</span>
-                </a>
+            <div className="sticky top-0 z-50 px-2 sm:px-4 py-2">
+                <motion.nav 
+                    className="w-full max-w-6xl mx-auto p-3 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-between shadow-lg"
+                    {...motionProps}
+                >
+                    {/* Left Side: Logo */}
+                    <a href="#" className="flex items-center space-x-2">
+                        <ShieldCheckIcon className="h-8 w-8 text-brand-primary" />
+                        <span className="font-bold text-xl text-content-primary">Warranty Vault</span>
+                    </a>
 
-                {/* Center: Navigation Links (Desktop) */}
-                <div className="hidden md:flex items-center gap-6">
-                    {navLinks.map(link => (
-                        <motion.a key={link.name} href={link.href} whileHover={linkHover} className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
-                            {link.name}
-                        </motion.a>
-                    ))}
-                </div>
+                    {/* Center: Navigation Links (Desktop) */}
+                    <div className="hidden md:flex items-center gap-6">
+                        {navLinks.map(link => (
+                            <motion.a key={link.name} href={link.href} whileHover={linkHover} className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+                                {link.name}
+                            </motion.a>
+                        ))}
+                    </div>
 
-                {/* Right Side: CTAs (Desktop) */}
-                <div className="hidden md:flex items-center gap-4">
-                    <motion.button whileHover={linkHover} onClick={onNavigateLogin} className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
-                        Login
-                    </motion.button>
-                    <motion.button 
-                        onClick={onNavigateSignup} 
-                        className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full transition-all"
-                        animate={pulseAnimation}
-                        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-                    >
-                        Get Started
-                    </motion.button>
-                </div>
+                    {/* Right Side: CTAs (Desktop) */}
+                    <div className="hidden md:flex items-center gap-4">
+                        <motion.button whileHover={linkHover} onClick={onNavigateLogin} className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+                            Login
+                        </motion.button>
+                        <motion.button 
+                            onClick={onNavigateSignup} 
+                            className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full transition-all"
+                            animate={pulseAnimation}
+                            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                        >
+                            Get Started
+                        </motion.button>
+                    </div>
 
-                {/* Mobile Menu Button */}
-                <div className="md:hidden">
-                    <button onClick={() => setIsOpen(!isOpen)} className="text-gray-300 hover:text-white">
-                        {isOpen ? <XIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
-                    </button>
-                </div>
-            </motion.nav>
+                    {/* Mobile Menu Button */}
+                    <div className="md:hidden">
+                        <button onClick={() => setIsOpen(!isOpen)} className="text-gray-300 hover:text-white">
+                            {isOpen ? <XIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
+                        </button>
+                    </div>
+                </motion.nav>
+            </div>
 
             {/* Mobile Menu Overlay */}
             <AnimatePresence>
@@ -215,7 +217,7 @@ const Features: React.FC = () => {
     ];
   
     return (
-      <section id="features" className="py-20 bg-base-200/30">
+      <section id="features" className="py-20 bg-base-200/30 scroll-mt-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold">Everything you need, all in one place.</h2>
@@ -247,7 +249,7 @@ const Pricing: React.FC<LandingPageProps> = ({ onNavigateSignup }) => {
     ];
 
     return (
-        <section id="pricing" className="py-20">
+        <section id="pricing" className="py-20 scroll-mt-24">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-12">
                     <h2 className="text-3xl font-bold">Choose the plan that's right for you</h2>
