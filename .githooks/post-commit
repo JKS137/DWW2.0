@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Git post-commit hook to trigger a Vercel redeploy via the provided PowerShell script.
+# Skips when the commit message is from the redeploy script itself or explicitly opts out.
+set -euo pipefail
+
+# Last commit message
+msg="$(git log -1 --pretty=%B)"
+
+# Guard: avoid infinite loops and allow opt-out with [skip-vercel-hook]
+if echo "$msg" | grep -qiE "(Force Vercel redeploy|Revert temporary change for Vercel redeploy|\[skip-vercel-hook\])"; then
+  exit 0
+fi
+
+ROOT="$(git rev-parse --show-toplevel)"
+
+# Prefer pwsh, fallback to Windows PowerShell if available
+if command -v pwsh >/dev/null 2>&1; then
+  pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$ROOT/vercel-redeploy.ps1" >/dev/null 2>&1 || true
+elif command -v powershell >/dev/null 2>&1; then
+  powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$ROOT/vercel-redeploy.ps1" >/dev/null 2>&1 || true
+fi
+
