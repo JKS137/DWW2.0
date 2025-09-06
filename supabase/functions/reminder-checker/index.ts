@@ -17,16 +17,16 @@ interface Warranty {
 }
 
 // Function to send an email using the SendGrid API
-async function sendReminderEmail(apiKey: string, senderEmail: string, recipientEmail: string, productName: string, expiryDate: string, appUrl: string) {
+async function sendReminderEmailSendgrid(apiKey: string, senderEmail: string, recipientEmail: string, productName: string, expiryDate: string, appUrl: string) {
   const emailBody = `
-    <div style="font-family: sans-serif; line-height: 1.6;">
-      <h2>Warranty Reminder</h2>
-      <p>Hi there,</p>
-      <p>This is a friendly reminder that your warranty for <strong>${productName}</strong> is expiring soon on <strong>${new Date(expiryDate).toLocaleDateString()}</strong>.</p>
-      <p>You can view the details by visiting your dashboard:</p>
-      <p><a href="${appUrl}" style="display: inline-block; padding: 10px 15px; background-color: #007aff; color: white; text-decoration: none; border-radius: 5px;">Go to Digital Warranty Vault</a></p>
-      <p>Thanks,<br/>The Digital Warranty Vault Team</p>
-    </div>
+    <div style=\"font-family: sans-serif; line-height: 1.6;\">\r
+      <h2>Warranty Reminder</h2>\r
+      <p>Hi there,</p>\r
+      <p>This is a friendly reminder that your warranty for <strong>${productName}</strong> is expiring soon on <strong>${new Date(expiryDate).toLocaleDateString()}</strong>.</p>\r
+      <p>You can view the details by visiting your dashboard:</p>\r
+      <p><a href=\"${appUrl}\" style=\"display: inline-block; padding: 10px 15px; background-color: #007aff; color: white; text-decoration: none; border-radius: 5px;\">Go to Digital Warranty Vault</a></p>\r
+      <p>Thanks,<br/>The Digital Warranty Vault Team</p>\r
+    </div>\r
   `;
 
   const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
@@ -53,7 +53,42 @@ async function sendReminderEmail(apiKey: string, senderEmail: string, recipientE
     throw new Error(`SendGrid API error: ${response.statusText} - ${JSON.stringify(errorBody)}`);
   }
   
-  console.log(`Email sent successfully to ${recipientEmail} for product ${productName}.`);
+  console.log(`[SendGrid] Email sent successfully to ${recipientEmail} for product ${productName}.`);
+}
+
+// Function to send an email using the Resend API
+async function sendReminderEmailResend(apiKey: string, senderEmail: string, recipientEmail: string, productName: string, expiryDate: string, appUrl: string) {
+  const html = `
+    <div style=\"font-family: sans-serif; line-height: 1.6;\">\r
+      <h2>Warranty Reminder</h2>\r
+      <p>Hi there,</p>\r
+      <p>This is a friendly reminder that your warranty for <strong>${productName}</strong> is expiring soon on <strong>${new Date(expiryDate).toLocaleDateString()}</strong>.</p>\r
+      <p>You can view the details by visiting your dashboard:</p>\r
+      <p><a href=\"${appUrl}\" style=\"display: inline-block; padding: 10px 15px; background-color: #007aff; color: white; text-decoration: none; border-radius: 5px;\">Go to Digital Warranty Vault</a></p>\r
+      <p>Thanks,<br/>The Digital Warranty Vault Team</p>\r
+    </div>\r
+  `;
+
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: senderEmail,
+      to: [recipientEmail],
+      subject: `Your warranty for ${productName} is expiring soon!`,
+      html,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Resend API error: ${response.status} - ${errorBody}`);
+  }
+
+  console.log(`[Resend] Email sent successfully to ${recipientEmail} for product ${productName}.`);
 }
 
 serve(async (_req) => {
@@ -62,11 +97,15 @@ serve(async (_req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     const sendgridApiKey = Deno.env.get('SENDGRID_API_KEY');
+    const resendApiKey = Deno.env.get('RESEND_API_KEY');
     const senderEmail = Deno.env.get('SENDER_EMAIL');
     const appUrl = Deno.env.get('APP_URL') ?? 'https://yourapp.com'; // Fallback URL
 
-    if (!supabaseUrl || !serviceRoleKey || !sendgridApiKey || !senderEmail) {
-        throw new Error('Missing required environment variables (Supabase URL/Key, SendGrid Key, Sender Email).');
+    if (!supabaseUrl || !serviceRoleKey || !senderEmail) {
+        throw new Error('Missing required environment variables (Supabase URL/Key, Sender Email).');
+    }
+    if (!sendgridApiKey && !resendApiKey) {
+        throw new Error('Missing email provider credentials. Provide SENDGRID_API_KEY or RESEND_API_KEY.');
     }
 
     // 2. Create Supabase client with the service role key for elevated access
@@ -121,12 +160,21 @@ serve(async (_req) => {
         continue;
       }
 
-      emailPromises.push(
-        sendReminderEmail(
-          sendgridApiKey, senderEmail, recipientEmail,
-          warranty.product_name, warranty.expiry_date, appUrl
-        )
-      );
+      if (resendApiKey) {
+        emailPromises.push(
+          sendReminderEmailResend(
+            resendApiKey, senderEmail, recipientEmail,
+            warranty.product_name, warranty.expiry_date, appUrl
+          )
+        );
+      } else if (sendgridApiKey) {
+        emailPromises.push(
+          sendReminderEmailSendgrid(
+            sendgridApiKey, senderEmail, recipientEmail,
+            warranty.product_name, warranty.expiry_date, appUrl
+          )
+        );
+      }
 
       notificationsToLog.push({
         warranty_id: warranty.id,
