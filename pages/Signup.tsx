@@ -23,7 +23,8 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
 
   const CAPTCHA_PROVIDER = (process.env.CAPTCHA_PROVIDER as 'turnstile' | 'hcaptcha') || 'turnstile';
   const SITE_KEY = (process.env.TURNSTILE_SITE_KEY || process.env.HCAPTCHA_SITE_KEY || '') as string;
-  const captchaEnabled = Boolean(SITE_KEY);
+  // Temporarily disable CAPTCHA regardless of site key
+  const captchaEnabled = false;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
