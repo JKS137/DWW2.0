@@ -38,6 +38,14 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
         window.history.pushState({}, '', path);
         window.dispatchEvent(new PopStateEvent('popstate'));
     };
+
+    const scrollToSection = (id: string) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+        setIsOpen(false); // Close mobile menu after click
+    };
     
     return (
         <>
@@ -55,7 +63,7 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
                 {/* Center: Navigation Links (Desktop) */}
                 <div className="hidden md:flex items-center gap-6">
                     {navLinks.map(link => (
-                        <a key={link.name} href={link.href} className="text-sm font-medium text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-brand-primary/60 rounded-md px-1 py-1">
+                        <a key={link.name} href={`#${link.href}`} onClick={(e) => { e.preventDefault(); scrollToSection(link.href.substring(1)); }} className="text-sm font-medium text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-brand-primary/60 rounded-md px-1 py-1">
                             {link.name}
                         </a>
                     ))}
@@ -134,8 +142,8 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
                     {navLinks.map((link) => (
                          <a
                             key={link.name}
-                            href={link.href}
-                            onClick={() => setIsOpen(false)}
+                            href={`#${link.href}`}
+                            onClick={(e) => { e.preventDefault(); scrollToSection(link.href.substring(1)); }}
                             className="text-2xl font-semibold text-gray-200 hover:text-brand-primary"
                         >
                             {link.name}
