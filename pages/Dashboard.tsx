@@ -1,7 +1,4 @@
-
-
 import React, { useState, useMemo, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import Layout from '../components/Layout';
 import WarrantyCard from '../components/WarrantyCard';
 import WarrantyList from '../components/WarrantyList';
@@ -23,7 +20,6 @@ import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
 import { TagIcon } from '../components/icons/TagIcon';
 import { CalendarIcon } from '../components/icons/CalendarIcon';
 import { ExportIcon } from '../components/icons/ExportIcon';
-import { staggerContainerVariant, fadeUpVariant } from '../services/animations';
 
 type WarrantyStatus = 'expired' | 'expiring' | 'safe';
 type SortOrder = 'latest' | 'expiryAsc' | 'expiryDesc' | 'nameAsc' | 'nameDesc';
@@ -176,11 +172,8 @@ const Dashboard: React.FC = () => {
     }
     if (warranties.length === 0 && !isDemoMode) {
       return (
-        <motion.section 
-          className="text-center py-16 px-6 bg-base-200/50 rounded-lg"
-          variants={fadeUpVariant}
-          initial="hidden"
-          animate="visible"
+        <section 
+          className="text-center py-16 px-6 bg-base-200/50 rounded-lg animate-slide-up"
         >
           <h3 className="text-xl font-semibold text-content-primary mb-2">Your Vault is Empty</h3>
           <p className="text-content-secondary max-w-md mx-auto mb-6">
@@ -190,7 +183,7 @@ const Dashboard: React.FC = () => {
             <PlusIcon className="h-5 w-5" />
             <span>Upload Warranty</span>
           </button>
-        </motion.section>
+        </section>
       );
     }
     if (filteredWarranties.length === 0) {
@@ -199,16 +192,13 @@ const Dashboard: React.FC = () => {
 
     if (view === 'grid') {
       return (
-        <motion.div 
+        <div 
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-          variants={staggerContainerVariant}
-          initial="hidden"
-          animate="visible"
         >
           {filteredWarranties.map((warranty) => (
             <WarrantyCard key={warranty.id} warranty={warranty} onEdit={() => setEditingWarranty(warranty)} isDemo={isDemoMode} />
           ))}
-        </motion.div>
+        </div>
       );
     }
     return <WarrantyList warranties={filteredWarranties} onEdit={setEditingWarranty} onDelete={(id, url) => deleteWarranty(id, url)} isDemo={isDemoMode} />;
@@ -233,31 +223,25 @@ const Dashboard: React.FC = () => {
            )}
         </header>
 
-        <motion.section 
+        <section 
           aria-labelledby="quick-upload-heading" 
-          className="mb-8"
-          variants={fadeUpVariant}
-          initial="hidden"
-          animate="visible"
+          className="mb-8 animate-slide-up"
         >
             <h2 id="quick-upload-heading" className="sr-only">Quick Upload</h2>
             <UploadForm />
-        </motion.section>
+        </section>
 
-        <motion.section 
+        <section 
             aria-labelledby="stats-heading"
-            variants={staggerContainerVariant}
-            initial="hidden"
-            animate="visible"
         >
             <h2 id="stats-heading" className="sr-only">Statistics</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8 animate-slide-up">
                 <StatsCard title="Total Warranties" value={stats.total} Icon={ShieldCheckIcon} color="blue" />
                 <StatsCard title="Active Warranties" value={stats.active} Icon={CalendarIcon} color="teal" />
                 <StatsCard title="Expiring Soon" value={stats.expiring} Icon={TagIcon} color="pink" />
                 <StatsCard title="Expired" value={stats.expired} Icon={TagIcon} color="pink" />
             </div>
-        </motion.section>
+        </section>
         
         <section aria-labelledby="warranties-heading">
             <div className="flex flex-wrap justify-between items-center gap-4 mb-6">

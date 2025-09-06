@@ -1,7 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { XIcon } from './icons/XIcon';
-import { fadeUpVariant } from '../services/animations';
 
 interface OnboardingBannerProps {
   onDismiss: () => void;
@@ -9,12 +7,9 @@ interface OnboardingBannerProps {
 
 const OnboardingBanner: React.FC<OnboardingBannerProps> = ({ onDismiss }) => {
   return (
-    <motion.section 
+    <section 
       aria-labelledby="onboarding-heading"
-      className="bg-brand-primary/20 border border-brand-primary/50 text-content-primary rounded-lg p-6 mb-8 relative"
-      variants={fadeUpVariant}
-      initial="hidden"
-      animate="visible"
+      className="bg-brand-primary/20 border border-brand-primary/50 text-content-primary rounded-lg p-6 mb-8 relative animate-slide-up"
     >
       <button 
         onClick={onDismiss} 
@@ -39,7 +34,7 @@ const OnboardingBanner: React.FC<OnboardingBannerProps> = ({ onDismiss }) => {
           </ol>
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 };
 

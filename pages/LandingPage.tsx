@@ -1,6 +1,4 @@
-
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
 import { SecureCloudIcon } from '../components/icons/SecureCloudIcon';
 import { SmartOCRIcon } from '../components/icons/SmartOCRIcon';
@@ -10,7 +8,6 @@ import { ExportIcon } from '../components/icons/ExportIcon';
 import { CheckCircleIcon } from '../components/icons/CheckCircleIcon';
 import { UploadIcon } from '../components/icons/UploadIcon';
 import { XIcon } from '../components/icons/XIcon';
-import { staggerContainerVariant, fadeUpVariant, buttonVariants } from '../services/animations';
 
 interface LandingPageProps {
   onNavigateLogin: () => void;
@@ -32,22 +29,11 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
         { name: 'Pricing', href: '#pricing' },
     ];
     
-    const pulseAnimation = {
-        scale: [1, 1.03, 1],
-        boxShadow: [
-            '0 0 0px rgba(59, 130, 246, 0)', 
-            '0 0 20px rgba(59, 130, 246, 0.6)', 
-            '0 0 0px rgba(59, 130, 246, 0)'
-        ],
-    };
-
     return (
         <>
-            <motion.nav 
-                className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-6xl mx-auto z-50 p-3 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-between shadow-lg"
-                initial={{ y: -100, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5, ease: 'easeInOut' }}
+            <nav 
+                className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-6xl mx-auto z-50 p-3 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-between shadow-lg animate-fade-in"
+                style={{ animationDelay: '0.2s' }}
             >
                 {/* Left Side: Logo */}
                 <a href="#" className="flex items-center space-x-2">
@@ -58,31 +44,26 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
                 {/* Center: Navigation Links (Desktop) */}
                 <div className="hidden md:flex items-center gap-6">
                     {navLinks.map(link => (
-                        <motion.a key={link.name} href={link.href} whileHover={{ scale: 1.1 }} className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+                        <a key={link.name} href={link.href} className="text-sm font-medium text-gray-300 hover:text-white transition-all hover:scale-110">
                             {link.name}
-                        </motion.a>
+                        </a>
                     ))}
                 </div>
 
                 {/* Right Side: CTAs (Desktop) */}
                 <div className="hidden md:flex items-center gap-4">
-                    <motion.button 
+                    <button 
                         onClick={onNavigateLogin} 
-                        className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
-                        variants={buttonVariants}
-                        whileHover="hover"
-                        whileTap="tap"
+                        className="text-sm font-medium text-gray-300 hover:text-white transition-all hover:scale-105 active:scale-95"
                     >
                         Login
-                    </motion.button>
-                    <motion.button 
+                    </button>
+                    <button 
                         onClick={onNavigateSignup} 
-                        className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full transition-all"
-                        animate={pulseAnimation}
-                        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                        className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full transition-all animate-pulse-glow"
                     >
                         Get Started
-                    </motion.button>
+                    </button>
                 </div>
 
                 {/* Mobile Menu Button */}
@@ -91,144 +72,111 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
                         {isOpen ? <XIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
                     </button>
                 </div>
-            </motion.nav>
+            </nav>
 
             {/* Mobile Menu Overlay */}
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -50 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -50 }}
-                        className="md:hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-2xl flex flex-col items-center justify-center space-y-8"
-                    >
-                        {navLinks.map((link, i) => (
-                             <motion.a
-                                key={link.name}
-                                href={link.href}
-                                initial={{ opacity: 0, y: -20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1 * i }}
-                                onClick={() => setIsOpen(false)}
-                                className="text-2xl font-semibold text-gray-200 hover:text-brand-primary"
-                            >
-                                {link.name}
-                            </motion.a>
-                        ))}
-                        <div className="mt-8 pt-8 border-t border-white/10 w-4/5 text-center space-y-4">
-                             <motion.button
-                                initial={{ opacity: 0, y: -20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.4 }}
-                                onClick={() => { onNavigateLogin(); setIsOpen(false); }}
-                                className="w-full text-lg font-medium text-gray-200 hover:text-brand-primary"
-                                variants={buttonVariants}
-                                whileHover="hover"
-                                whileTap="tap"
-                            >
-                                Login
-                            </motion.button>
-                            <motion.button
-                                initial={{ opacity: 0, y: -20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.5 }}
-                                onClick={() => { onNavigateSignup(); setIsOpen(false); }}
-                                className="w-full px-6 py-3 text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full"
-                                variants={buttonVariants}
-                                whileHover="hover"
-                                whileTap="tap"
-                            >
-                                Get Started
-                            </motion.button>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {isOpen && (
+                <div
+                    className="md:hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-2xl flex flex-col items-center justify-center space-y-8 animate-fade-in"
+                >
+                    {navLinks.map((link) => (
+                         <a
+                            key={link.name}
+                            href={link.href}
+                            onClick={() => setIsOpen(false)}
+                            className="text-2xl font-semibold text-gray-200 hover:text-brand-primary"
+                        >
+                            {link.name}
+                        </a>
+                    ))}
+                    <div className="mt-8 pt-8 border-t border-white/10 w-4/5 text-center space-y-4">
+                         <button
+                            onClick={() => { onNavigateLogin(); setIsOpen(false); }}
+                            className="w-full text-lg font-medium text-gray-200 hover:text-brand-primary transition-transform hover:scale-105 active:scale-95"
+                        >
+                            Login
+                        </button>
+                        <button
+                            onClick={() => { onNavigateSignup(); setIsOpen(false); }}
+                            className="w-full px-6 py-3 text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full transition-transform hover:scale-105 active:scale-95"
+                        >
+                            Get Started
+                        </button>
+                    </div>
+                </div>
+            )}
         </>
     );
 };
 
 
 const Hero: React.FC<LandingPageProps> = ({ onNavigateSignup, onNavigateLogin }) => (
-    <motion.section 
+    <section 
       className="relative pt-40 pb-20 text-center"
-      initial="hidden"
-      animate="visible"
-      variants={staggerContainerVariant}
     >
         <div className="absolute inset-0 bg-gradient-radial from-blue-500/10 via-transparent to-transparent z-0"></div>
         <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.h1 variants={fadeUpVariant} className="text-4xl md:text-6xl font-extrabold text-content-primary tracking-tight leading-tight">
+            <h1 className="text-4xl md:text-6xl font-extrabold text-content-primary tracking-tight leading-tight animate-slide-up">
                 Never lose track of your warranties again.
-            </motion.h1>
-            <motion.p variants={fadeUpVariant} className="mt-6 max-w-2xl mx-auto text-lg text-content-secondary">
+            </h1>
+            <p className="mt-6 max-w-2xl mx-auto text-lg text-content-secondary animate-slide-up" style={{ animationDelay: '0.1s' }}>
                 Your digital vault for receipts, warranties, and peace of mind. Securely store, track, and get reminded before they expire.
-            </motion.p>
-            <motion.div variants={fadeUpVariant} className="mt-10 flex justify-center gap-4">
-                <motion.button 
+            </p>
+            <div className="mt-10 flex justify-center gap-4 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+                <button 
                   onClick={onNavigateSignup} 
-                  className="px-6 py-3 font-semibold bg-brand-primary text-white rounded-lg hover:bg-opacity-90 transition-all hover:shadow-glow-blue"
-                  variants={buttonVariants}
-                  whileHover="hover"
-                  whileTap="tap"
+                  className="px-6 py-3 font-semibold bg-brand-primary text-white rounded-lg hover:bg-opacity-90 transition-all hover:shadow-glow-blue hover:scale-105 active:scale-95"
                 >
                     Get Started Free
-                </motion.button>
-                 <motion.button 
+                </button>
+                 <button 
                    onClick={onNavigateLogin} 
-                   className="px-6 py-3 font-semibold bg-base-200/80 text-content-primary rounded-lg hover:bg-base-200 transition-all"
-                   variants={buttonVariants}
-                   whileHover="hover"
-                   whileTap="tap"
+                   className="px-6 py-3 font-semibold bg-base-200/80 text-content-primary rounded-lg hover:bg-base-200 transition-all hover:scale-105 active:scale-95"
                  >
                     Login
-                </motion.button>
-            </motion.div>
-             <motion.div variants={fadeUpVariant} className="mt-16 w-full max-w-4xl mx-auto">
+                </button>
+            </div>
+             <div className="mt-16 w-full max-w-4xl mx-auto animate-slide-up" style={{ animationDelay: '0.3s' }}>
                 <div className="relative rounded-xl p-1 bg-gradient-to-br from-blue-500 to-teal-400">
                     <div className="bg-base-200 rounded-lg shadow-2xl p-4">
                         <img src="https://i.imgur.com/rC4mYMS.png" alt="Dashboard Preview" className="rounded-md w-full" />
                     </div>
                 </div>
-            </motion.div>
+            </div>
         </div>
-    </motion.section>
+    </section>
 );
 
 const HowItWorks: React.FC = () => (
-    <motion.section 
+    <section 
       id="how-it-works" 
       className="py-20"
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.2 }}
-      variants={staggerContainerVariant}
     >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div variants={fadeUpVariant} className="text-center mb-12">
+            <div className="text-center mb-12 animate-slide-up">
                 <h2 className="text-3xl font-bold">How It Works</h2>
                 <p className="text-content-secondary mt-2">Get organized in three simple steps.</p>
-            </motion.div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {[
                     { title: "Upload Receipt", description: "Snap a photo or upload a file. Our AI gets to work instantly.", icon: UploadIcon },
                     { title: "Track Expiry", description: "We automatically extract details and set up expiry tracking.", icon: SmartOCRIcon },
                     { title: "Get Reminders", description: "Receive email alerts before a warranty expires so you never miss a claim.", icon: RemindersIcon }
-                ].map((step) => {
+                ].map((step, i) => {
                     const Icon = step.icon;
                     return (
-                        <motion.div key={step.title} variants={fadeUpVariant} className="text-center p-6 bg-base-200/50 backdrop-blur-md border border-base-300/50 rounded-xl">
+                        <div key={step.title} className="text-center p-6 bg-base-200/50 backdrop-blur-md border border-base-300/50 rounded-xl animate-slide-up" style={{ animationDelay: `${i * 0.1}s`}}>
                             <div className="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-base-100 border-2 border-brand-primary shadow-glow-blue mb-4">
                                <Icon className="h-8 w-8 text-brand-primary" />
                             </div>
                             <h3 className="text-xl font-semibold">{step.title}</h3>
                             <p className="text-content-secondary mt-2">{step.description}</p>
-                        </motion.div>
+                        </div>
                     );
                 })}
             </div>
         </div>
-    </motion.section>
+    </section>
 );
 
 const Features: React.FC = () => {
@@ -241,24 +189,20 @@ const Features: React.FC = () => {
     ];
   
     return (
-      <motion.section 
+      <section 
         id="features" 
         className="py-20 bg-base-200/30"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={staggerContainerVariant}
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div variants={fadeUpVariant} className="text-center mb-12">
+          <div className="text-center mb-12 animate-slide-up">
             <h2 className="text-3xl font-bold">Everything you need, all in one place.</h2>
             <p className="text-content-secondary mt-2">Powerful features to give you complete peace of mind.</p>
-          </motion.div>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {featureList.map((feature) => {
               const Icon = feature.icon;
               return (
-                <motion.div key={feature.name} variants={fadeUpVariant} className="flex items-start space-x-4 p-4">
+                <div key={feature.name} className="flex items-start space-x-4 p-4">
                    <div className="flex-shrink-0 p-2 bg-base-100 rounded-lg border border-brand-secondary/50">
                       <Icon className="h-6 w-6 text-brand-secondary" />
                    </div>
@@ -266,12 +210,12 @@ const Features: React.FC = () => {
                     <h3 className="font-semibold">{feature.name}</h3>
                     <p className="text-content-secondary text-sm mt-1">{feature.description}</p>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
         </div>
-      </motion.section>
+      </section>
     );
 };
 
@@ -283,22 +227,18 @@ const Pricing: React.FC<LandingPageProps> = ({ onNavigateSignup }) => {
     ];
 
     return (
-        <motion.section 
+        <section 
           id="pricing" 
           className="py-20"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={staggerContainerVariant}
         >
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <motion.div variants={fadeUpVariant} className="text-center mb-12">
+                <div className="text-center mb-12 animate-slide-up">
                     <h2 className="text-3xl font-bold">Choose the plan that's right for you</h2>
                     <p className="text-content-secondary mt-2">Start for free, upgrade when you're ready.</p>
-                </motion.div>
+                </div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {plans.map((plan) => (
-                        <motion.div key={plan.name} variants={fadeUpVariant} className={`relative p-8 bg-base-200/50 backdrop-blur-md border rounded-xl flex flex-col ${plan.border} transition-all hover:-translate-y-2 hover:${plan.glow}`}>
+                    {plans.map((plan, i) => (
+                        <div key={plan.name} className={`relative p-8 bg-base-200/50 backdrop-blur-md border rounded-xl flex flex-col ${plan.border} transition-all hover:-translate-y-2 hover:${plan.glow} animate-slide-up`} style={{ animationDelay: `${i * 0.1}s`}}>
                             {plan.popular && <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 px-3 py-1 text-sm font-semibold text-white bg-brand-secondary rounded-full">Most Popular</div>}
                             <h3 className="text-2xl font-semibold">{plan.name}</h3>
                             <p className="mt-4"><span className="text-4xl font-bold">{plan.price}</span><span className="text-content-secondary">/mo</span></p>
@@ -310,20 +250,17 @@ const Pricing: React.FC<LandingPageProps> = ({ onNavigateSignup }) => {
                                     </li>
                                 ))}
                             </ul>
-                            <motion.button 
+                            <button 
                               onClick={onNavigateSignup} 
-                              className={`mt-8 w-full py-3 font-semibold rounded-lg transition-colors ${plan.popular ? 'bg-brand-secondary text-white' : 'bg-base-300 text-content-primary hover:bg-opacity-80'}`}
-                              variants={buttonVariants}
-                              whileHover="hover"
-                              whileTap="tap"
+                              className={`mt-8 w-full py-3 font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 ${plan.popular ? 'bg-brand-secondary text-white' : 'bg-base-300 text-content-primary hover:bg-opacity-80'}`}
                             >
                                 Choose Plan
-                            </motion.button>
-                        </motion.div>
+                            </button>
+                        </div>
                     ))}
                 </div>
             </div>
-        </motion.section>
+        </section>
     );
 };
 

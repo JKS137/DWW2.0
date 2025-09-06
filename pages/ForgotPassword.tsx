@@ -1,10 +1,7 @@
-
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
 import { useAuth } from '../context/AuthContext';
 import { recordAuthAttempt, checkRateLimit } from '../services/rateLimiter';
-import { buttonVariants, fadeUpVariant } from '../services/animations';
 
 interface ForgotPasswordProps {
   onSwitchToLogin: () => void;
@@ -58,11 +55,8 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSwitchToLogin, onNavi
 
   return (
     <main className="flex items-center justify-center min-h-screen p-4">
-      <motion.div 
-        className="w-full max-w-md p-8 space-y-8 bg-base-200/50 backdrop-blur-lg rounded-2xl shadow-2xl border border-base-300/50"
-        variants={fadeUpVariant}
-        initial="hidden"
-        animate="visible"
+      <div 
+        className="w-full max-w-md p-8 space-y-8 bg-base-200/50 backdrop-blur-lg rounded-2xl shadow-2xl border border-base-300/50 animate-slide-up"
       >
         <div className="text-center">
           <button onClick={onNavigateHome} className="inline-block">
@@ -99,16 +93,13 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSwitchToLogin, onNavi
             {(rateLimitError || error) && <p className="text-brand-pink text-sm text-center">{rateLimitError || error}</p>}
 
             <div>
-              <motion.button
+              <button
                 type="submit"
                 disabled={loading}
-                variants={buttonVariants}
-                whileHover="hover"
-                whileTap="tap"
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base-100 focus:ring-brand-primary disabled:bg-opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-glow-blue"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base-100 focus:ring-brand-primary disabled:bg-opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-glow-blue hover:scale-105 active:scale-95"
               >
                 {loading ? 'Sending link...' : 'Send Reset Link'}
-              </motion.button>
+              </button>
             </div>
              <div className="text-center">
                 <button
@@ -121,7 +112,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSwitchToLogin, onNavi
             </div>
           </form>
         )}
-      </motion.div>
+      </div>
     </main>
   );
 };

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import type { Warranty, Category } from '../types';
 import { categories } from '../types';
 import { useWarranties } from '../context/WarrantyContext';
@@ -7,7 +6,6 @@ import { extractWarrantyInfoFromImage } from '../services/geminiService';
 import { Spinner } from './icons/Spinner';
 import { XIcon } from './icons/XIcon';
 import { SmartOCRIcon } from './icons/SmartOCRIcon';
-import { modalBackdropVariants, modalContentVariants } from '../services/animations';
 
 interface EditWarrantyModalProps {
   isOpen: boolean;
@@ -35,6 +33,7 @@ const EditWarrantyModal: React.FC<EditWarrantyModalProps> = ({ isOpen, onClose, 
       setPurchaseDate(warranty.purchase_date || '');
       setWarrantyLength(warranty.warranty_duration ?? '');
       setCategory(warranty.category || '');
+      setRescanError(null); // Reset error when modal opens with new warranty
     }
   }, [warranty]);
   
@@ -97,91 +96,91 @@ const EditWarrantyModal: React.FC<EditWarrantyModalProps> = ({ isOpen, onClose, 
     }
   };
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          className="fixed inset-0 bg-black bg-opacity-80 z-50 flex justify-center items-center p-4"
-          onClick={onClose}
-          variants={modalBackdropVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-        >
-          <motion.div
-            className="bg-base-200/50 backdrop-blur-lg border border-base-300/50 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
-            onClick={e => e.stopPropagation()}
-            variants={modalContentVariants}
-          >
-            <div className="p-6 border-b border-base-300/50 flex-shrink-0">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-content-primary">Edit Warranty</h2>
-                <button onClick={onClose} className="text-content-secondary hover:text-content-primary rounded-full p-1"><XIcon className="w-5 h-5"/></button>
+    <div
+      className="fixed inset-0 bg-black bg-opacity-80 z-50 flex justify-center items-center p-4 animate-fade-in"
+      onClick={onClose}
+    >
+      <div
+        className="bg-base-200/50 backdrop-blur-lg border border-base-300/50 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col animate-slide-up"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="p-6 border-b border-base-300/50 flex-shrink-0">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-content-primary">Edit Warranty</h2>
+            <button onClick={onClose} className="text-content-secondary hover:text-content-primary rounded-full p-1"><XIcon className="w-5 h-5"/></button>
+          </div>
+        </div>
+        
+        <div className="p-6 overflow-y-auto">
+            {rescanError && (
+              <div className="bg-red-900/40 border border-red-500/50 text-red-300 text-sm rounded-md p-3 mb-4 flex justify-between items-center">
+                <p>{rescanError}</p>
+                <button onClick={() => setRescanError(null)} className="p-1 rounded-full hover:bg-red-500/30"><XIcon className="w-4 h-4"/></button>
               </div>
-            </div>
-            
-            <div className="p-6 overflow-y-auto">
-                <div className="flex flex-col lg:flex-row gap-8">
-                    <div className="flex-shrink-0 lg:w-1/2">
-                        <h3 className="text-base font-semibold text-content-primary mb-2">Receipt Image</h3>
-                        <div className="bg-base-100/50 rounded-lg p-2 border border-base-300/50">
-                            <img src={warranty.file_url} alt={`Receipt for ${warranty.product_name}`} className="rounded-md w-full h-auto max-h-[500px] object-contain"/>
+            )}
+            <div className="flex flex-col lg:flex-row gap-8">
+                <div className="flex-shrink-0 lg:w-1/2">
+                    <h3 className="text-base font-semibold text-content-primary mb-2">Receipt Image</h3>
+                    <div className="bg-base-100/50 rounded-lg p-2 border border-base-300/50">
+                        <img src={warranty.file_url} alt={`Receipt for ${warranty.product_name}`} className="rounded-md w-full h-auto max-h-[500px] object-contain"/>
+                    </div>
+                </div>
+
+                <form onSubmit={handleSubmit} className="flex-grow space-y-4">
+                    <div className="bg-base-100/50 border border-base-300/50 rounded-lg p-4">
+                        <h3 className="text-sm font-semibold text-content-primary mb-2">Improve Details with AI</h3>
+                        <p className="text-xs text-content-secondary mb-3">If the details are incorrect, you can ask the AI to analyze the receipt again.</p>
+                        <button 
+                            type="button" 
+                            onClick={handleRescan} 
+                            disabled={isRescanning} 
+                            className="w-full flex items-center justify-center space-x-2 px-4 py-2 text-sm font-semibold bg-brand-secondary text-white rounded-lg shadow-md hover:bg-opacity-90 transition-all transform hover:scale-105 hover:shadow-glow-teal disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isRescanning ? <Spinner className="w-5 h-5" /> : <SmartOCRIcon className="w-5 h-5" />}
+                            <span>{isRescanning ? 'Analyzing...' : 'Re-scan with AI'}</span>
+                        </button>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="sm:col-span-2">
+                            <label htmlFor="editProductName" className="block text-sm font-medium text-content-secondary mb-1">Product Name</label>
+                            <input type="text" id="editProductName" value={productName} onChange={e => setProductName(e.target.value)} required className="block w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"/>
+                        </div>
+                        <div>
+                            <label htmlFor="editPurchaseDate" className="block text-sm font-medium text-content-secondary mb-1">Purchase Date</label>
+                            <input type="date" id="editPurchaseDate" value={purchaseDate} onChange={e => setPurchaseDate(e.target.value)} required className="block w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"/>
+                        </div>
+                        <div>
+                            <label htmlFor="editWarrantyLength" className="block text-sm font-medium text-content-secondary mb-1">Warranty (months)</label>
+                            <input type="number" id="editWarrantyLength" value={warrantyLength} onChange={e => setWarrantyLength(e.target.value === '' ? '' : parseInt(e.target.value, 10))} required className="block w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"/>
+                        </div>
+                        <div className="sm:col-span-2">
+                            <label htmlFor="editCategory" className="block text-sm font-medium text-content-secondary mb-1">Category</label>
+                            <select id="editCategory" value={category} onChange={e => setCategory(e.target.value as Category)} required className="block w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary">
+                                <option value="" disabled>Select a category</option>
+                                {categories.map(c => <option key={c} value={c} className="capitalize bg-base-200">{c}</option>)}
+                            </select>
                         </div>
                     </div>
+                
+                    {formError && <p className="text-brand-pink text-sm">{formError}</p>}
 
-                    <form onSubmit={handleSubmit} className="flex-grow space-y-4">
-                        <div className="bg-base-100/50 border border-base-300/50 rounded-lg p-4">
-                            <h3 className="text-sm font-semibold text-content-primary mb-2">Improve Details with AI</h3>
-                            <p className="text-xs text-content-secondary mb-3">If the details are incorrect, you can ask the AI to analyze the receipt again.</p>
-                            <button 
-                                type="button" 
-                                onClick={handleRescan} 
-                                disabled={isRescanning} 
-                                className="w-full flex items-center justify-center space-x-2 px-4 py-2 text-sm font-semibold bg-brand-secondary text-white rounded-lg shadow-md hover:bg-opacity-90 transition-all transform hover:scale-105 hover:shadow-glow-teal disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {isRescanning ? <Spinner className="w-5 h-5" /> : <SmartOCRIcon className="w-5 h-5" />}
-                                <span>{isRescanning ? 'Analyzing...' : 'Re-scan with AI'}</span>
-                            </button>
-                            {rescanError && <p className="text-brand-pink text-xs mt-2 text-center">{rescanError}</p>}
-                        </div>
-                        
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="sm:col-span-2">
-                                <label htmlFor="editProductName" className="block text-sm font-medium text-content-secondary mb-1">Product Name</label>
-                                <input type="text" id="editProductName" value={productName} onChange={e => setProductName(e.target.value)} required className="block w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"/>
-                            </div>
-                            <div>
-                                <label htmlFor="editPurchaseDate" className="block text-sm font-medium text-content-secondary mb-1">Purchase Date</label>
-                                <input type="date" id="editPurchaseDate" value={purchaseDate} onChange={e => setPurchaseDate(e.target.value)} required className="block w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"/>
-                            </div>
-                            <div>
-                                <label htmlFor="editWarrantyLength" className="block text-sm font-medium text-content-secondary mb-1">Warranty (months)</label>
-                                <input type="number" id="editWarrantyLength" value={warrantyLength} onChange={e => setWarrantyLength(e.target.value === '' ? '' : parseInt(e.target.value, 10))} required className="block w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"/>
-                            </div>
-                            <div className="sm:col-span-2">
-                                <label htmlFor="editCategory" className="block text-sm font-medium text-content-secondary mb-1">Category</label>
-                                <select id="editCategory" value={category} onChange={e => setCategory(e.target.value as Category)} required className="block w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary">
-                                    <option value="" disabled>Select a category</option>
-                                    {categories.map(c => <option key={c} value={c} className="capitalize bg-base-200">{c}</option>)}
-                                </select>
-                            </div>
-                        </div>
-                    
-                        {formError && <p className="text-brand-pink text-sm">{formError}</p>}
-
-                        <div className="pt-4 flex justify-end space-x-3">
-                        <button type="button" onClick={onClose} className="px-4 py-2 bg-base-300/50 text-content-primary rounded-md hover:bg-base-300">Cancel</button>
-                        <button type="submit" disabled={isSubmitting} className="px-4 py-2 bg-brand-primary text-white rounded-md hover:bg-opacity-90 disabled:bg-opacity-50 disabled:cursor-not-allowed flex items-center min-w-[120px] justify-center hover:shadow-glow-blue transition-shadow">
-                            {isSubmitting ? <Spinner className="w-5 h-5" /> : 'Save Changes'}
-                        </button>
-                        </div>
-                    </form>
-                </div>
+                    <div className="pt-4 flex justify-end space-x-3">
+                    <button type="button" onClick={onClose} className="px-4 py-2 bg-base-300/50 text-content-primary rounded-md hover:bg-base-300">Cancel</button>
+                    <button type="submit" disabled={isSubmitting} className="px-4 py-2 bg-brand-primary text-white rounded-md hover:bg-opacity-90 disabled:bg-opacity-50 disabled:cursor-not-allowed flex items-center min-w-[120px] justify-center hover:shadow-glow-blue transition-shadow">
+                        {isSubmitting ? <Spinner className="w-5 h-5" /> : 'Save Changes'}
+                    </button>
+                    </div>
+                </form>
             </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        </div>
+      </div>
+    </div>
   );
 };
 

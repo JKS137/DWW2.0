@@ -1,9 +1,4 @@
-
-
-
-
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import Layout from '../components/Layout';
 import { useWarranties } from '../context/WarrantyContext';
 import { Spinner } from '../components/icons/Spinner';
@@ -11,7 +6,6 @@ import type { Warranty } from '../types';
 import { CalendarIcon } from '../components/icons/CalendarIcon';
 import { TagIcon } from '../components/icons/TagIcon';
 import { ArrowLeftIcon } from '../components/icons/ArrowLeftIcon';
-import { fadeUpVariant } from '../services/animations';
 
 interface WarrantyDetailPageProps {
     warrantyId: string;
@@ -119,11 +113,8 @@ const WarrantyDetailPage: React.FC<WarrantyDetailPageProps> = ({ warrantyId }) =
 
     return (
         <Layout>
-            <motion.div 
-              className="max-w-4xl mx-auto"
-              variants={fadeUpVariant}
-              initial="hidden"
-              animate="visible"
+            <div 
+              className="max-w-4xl mx-auto animate-slide-up"
             >
                 <header className="mb-6">
                      <button 
@@ -137,7 +128,7 @@ const WarrantyDetailPage: React.FC<WarrantyDetailPageProps> = ({ warrantyId }) =
                     <h1 className="text-3xl font-bold text-content-primary">Warranty Details</h1>
                 </header>
                 {renderContent()}
-            </motion.div>
+            </div>
         </Layout>
     );
 };
