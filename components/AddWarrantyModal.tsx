@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import type { OcrData, Category } from '../types';
 import { categories } from '../types';
 import { useWarranties } from '../context/WarrantyContext';
@@ -12,7 +12,7 @@ interface AddWarrantyModalProps {
   onClose: () => void;
 }
 
-type OcrStatus = 'pending' | 'analyzing' | 'success' | 'failed' | 'manual';
+type OcrStatus = 'pending' | 'analyzing' | 'success' | 'failed';
 
 const AddWarrantyModal: React.FC<AddWarrantyModalProps> = ({ isOpen, onClose }) => {
   const { addWarranty } = useWarranties();
@@ -23,6 +23,7 @@ const AddWarrantyModal: React.FC<AddWarrantyModalProps> = ({ isOpen, onClose }) 
   const [warrantyLength, setWarrantyLength] = useState<number | ''>('');
   const [category, setCategory] = useState<Category | ''>('');
   const [receiptImage, setReceiptImage] = useState<File | null>(null);
+  const [receiptImageUrl, setReceiptImageUrl] = useState<string | null>(null);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -30,18 +31,31 @@ const AddWarrantyModal: React.FC<AddWarrantyModalProps> = ({ isOpen, onClose }) 
   const [ocrStatus, setOcrStatus] = useState<OcrStatus>('pending');
   const [step, setStep] = useState(1);
 
+  useEffect(() => {
+    // Cleanup function to revoke the object URL to prevent memory leaks
+    return () => {
+        if (receiptImageUrl) {
+            URL.revokeObjectURL(receiptImageUrl);
+        }
+    };
+  }, [receiptImageUrl]);
+
   const resetForm = useCallback(() => {
     setProductName('');
     setPurchaseDate('');
     setWarrantyLength('');
     setCategory('');
     setReceiptImage(null);
+    if (receiptImageUrl) {
+        URL.revokeObjectURL(receiptImageUrl);
+    }
+    setReceiptImageUrl(null);
     setIsSubmitting(false);
     setFormError(null);
     setOcrError(null);
     setOcrStatus('pending');
     setStep(1);
-  }, []);
+  }, [receiptImageUrl]);
 
   const handleClose = () => {
     resetForm();
@@ -69,6 +83,11 @@ const AddWarrantyModal: React.FC<AddWarrantyModalProps> = ({ isOpen, onClose }) 
     if (file) {
       setFormError(null);
       setReceiptImage(file);
+      // Create a temporary URL for the image preview
+      if (receiptImageUrl) {
+        URL.revokeObjectURL(receiptImageUrl);
+      }
+      setReceiptImageUrl(URL.createObjectURL(file));
       setStep(2);
       await performOcr(file);
     }
@@ -78,11 +97,6 @@ const AddWarrantyModal: React.FC<AddWarrantyModalProps> = ({ isOpen, onClose }) 
       if(receiptImage) {
           performOcr(receiptImage);
       }
-  };
-
-  const handleEnterManually = () => {
-    setOcrStatus('manual');
-    setOcrError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -111,19 +125,19 @@ const AddWarrantyModal: React.FC<AddWarrantyModalProps> = ({ isOpen, onClose }) 
 
   if (!isOpen) return null;
 
-  const isFormDisabled = ocrStatus === 'analyzing' || ocrStatus === 'failed';
+  const isFormDisabled = ocrStatus === 'analyzing';
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex justify-center items-center p-4 animate-fade-in" onClick={handleClose}>
-      <div className="bg-base-200/50 backdrop-blur-lg border border-base-300/50 rounded-lg shadow-xl w-full max-w-lg overflow-hidden transform transition-all" onClick={e => e.stopPropagation()}>
-        <div className="p-6">
+      <div className="bg-base-200/50 backdrop-blur-lg border border-base-300/50 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden transform transition-all flex flex-col" onClick={e => e.stopPropagation()}>
+        <div className="p-6 flex-shrink-0">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-content-primary">Add New Warranty</h2>
             <button onClick={handleClose} className="text-content-secondary hover:text-content-primary rounded-full p-1"><XIcon className="w-5 h-5" /></button>
           </div>
         </div>
         
-        <div className="p-6">
+        <div className="p-6 overflow-y-auto">
           {step === 1 && (
             <div
               className="border-2 border-dashed border-base-300 rounded-lg p-10 text-center cursor-pointer hover:border-brand-primary hover:bg-base-200/50 transition-colors"
@@ -143,24 +157,36 @@ const AddWarrantyModal: React.FC<AddWarrantyModalProps> = ({ isOpen, onClose }) 
           )}
 
           {step === 2 && (
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-4">
+            <form onSubmit={handleSubmit}>
+              <div className="flex flex-col lg:flex-row gap-8">
+                {receiptImageUrl && (
+                    <div className="flex-shrink-0 lg:w-1/2">
+                        <h3 className="text-base font-semibold text-content-primary mb-2">Receipt Preview</h3>
+                        <div className="bg-base-100/50 rounded-lg p-2 border border-base-300/50">
+                            <img src={receiptImageUrl} alt="Receipt preview" className="rounded-md w-full h-auto max-h-[500px] object-contain"/>
+                        </div>
+                    </div>
+                )}
+                <div className="flex-grow space-y-4">
                   {ocrStatus === 'analyzing' && (
                       <div className="flex flex-col items-center justify-center h-full bg-base-200/50 rounded-md p-4">
                           <Spinner />
-                          <p className="mt-2 text-sm text-content-secondary">Analyzing receipt...</p>
+                          <p className="mt-2 text-sm text-content-secondary">Analyzing receipt with AI...</p>
                       </div>
                   )}
 
                   {ocrStatus === 'failed' && (
-                    <div className="flex flex-col items-center justify-center h-full bg-red-900/50 rounded-md p-4 text-center">
-                        <p className="text-sm text-red-300 font-semibold">Analysis Failed</p>
-                        <p className="text-xs text-red-400 mt-1 mb-4">{ocrError}</p>
-                        <div className="flex space-x-2">
-                            <button type="button" onClick={handleRetryOcr} className="px-3 py-1 text-sm bg-brand-primary text-white rounded-md hover:bg-opacity-90">Retry OCR</button>
-                            <button type="button" onClick={handleEnterManually} className="px-3 py-1 text-sm bg-base-300 text-content-primary rounded-md hover:bg-opacity-80">Enter Manually</button>
-                        </div>
+                    <div className="bg-red-900/40 border border-red-500/50 text-red-300 text-sm rounded-md p-3">
+                        <p className="font-bold">AI Analysis Failed</p>
+                        <p className="text-xs mt-1">{ocrError}</p>
+                        <p className="text-xs mt-3">Please fill in the details manually below or <button type="button" onClick={handleRetryOcr} className="underline font-semibold hover:text-white">try again</button>.</p>
                     </div>
+                  )}
+                  
+                  {ocrStatus === 'success' && (
+                        <div className="bg-green-900/40 border border-green-500/50 text-green-300 text-sm rounded-md p-3">
+                            <p><strong>AI Extraction Complete!</strong> Please review the auto-filled details below and correct them if necessary before saving.</p>
+                        </div>
                   )}
 
                   <div className={isFormDisabled ? 'opacity-50 pointer-events-none' : ''}>
@@ -186,15 +212,16 @@ const AddWarrantyModal: React.FC<AddWarrantyModalProps> = ({ isOpen, onClose }) 
                         </div>
                     </div>
                   </div>
-                </div>
               
-              {formError && <p className="text-brand-pink text-sm mt-2 text-center">{formError}</p>}
+                  {formError && <p className="text-brand-pink text-sm mt-2 text-center">{formError}</p>}
 
-              <div className="pt-4 flex justify-end space-x-3">
-                <button type="button" onClick={handleClose} className="px-4 py-2 bg-base-300/50 text-content-primary rounded-md hover:bg-base-300">Cancel</button>
-                <button type="submit" disabled={isFormDisabled || isSubmitting} className="px-4 py-2 bg-brand-primary text-white rounded-md hover:bg-opacity-90 disabled:bg-opacity-50 disabled:cursor-not-allowed flex items-center min-w-[130px] justify-center hover:shadow-glow-blue transition-shadow">
-                  {isSubmitting ? <Spinner className="w-5 h-5" /> : 'Save Warranty'}
-                </button>
+                  <div className="pt-4 flex justify-end space-x-3">
+                    <button type="button" onClick={handleClose} className="px-4 py-2 bg-base-300/50 text-content-primary rounded-md hover:bg-base-300">Cancel</button>
+                    <button type="submit" disabled={isFormDisabled || isSubmitting} className="px-4 py-2 bg-brand-primary text-white rounded-md hover:bg-opacity-90 disabled:bg-opacity-50 disabled:cursor-not-allowed flex items-center min-w-[130px] justify-center hover:shadow-glow-blue transition-shadow">
+                      {isSubmitting ? <Spinner className="w-5 h-5" /> : 'Save Warranty'}
+                    </button>
+                  </div>
+                </div>
               </div>
             </form>
           )}
