@@ -5,6 +5,7 @@ import { GoogleIcon } from '../components/icons/GoogleIcon';
 import { GithubIcon } from '../components/icons/GithubIcon';
 import { recordAuthAttempt, checkRateLimit } from '../services/rateLimiter';
 import Captcha from '../components/Captcha';
+import AuthLayout from '../components/AuthLayout';
 
 interface SignupProps {
   onSwitchToLogin: () => void;
@@ -87,23 +88,16 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
   );
 
   return (
-    <main className="flex items-center justify-center min-h-screen p-4">
-      <div 
-        className="w-full max-w-md p-8 space-y-6 bg-base-200/50 backdrop-blur-lg rounded-2xl shadow-2xl border border-base-300/50 animate-slide-up"
-      >
+    <AuthLayout>
+      <div className="p-8 space-y-6 bg-base-200/50 backdrop-blur-lg rounded-2xl shadow-2xl border border-base-300/50 animate-slide-up">
         <div className="text-center">
             <button onClick={onNavigateHome} className="inline-block">
                 <ShieldCheckIcon className="mx-auto h-12 w-12 text-brand-primary" />
             </button>
-            <h2 className="mt-6 text-3xl font-extrabold text-content-primary">
-                Create your Account
-            </h2>
+            <h2 className="mt-6 text-3xl font-extrabold text-content-primary">Create your Account</h2>
             <p className="mt-2 text-sm text-content-secondary">
                 Or{' '}
-                <button
-                  onClick={onSwitchToLogin}
-                  className="font-medium text-brand-primary hover:text-opacity-90 focus:outline-none focus:ring-2 focus:ring-brand-primary rounded-sm"
-                >
+                <button onClick={onSwitchToLogin} className="font-medium text-brand-primary hover:text-opacity-90 focus:outline-none focus:ring-2 focus:ring-brand-primary rounded-sm">
                   sign in to your existing account
                 </button>
             </p>
@@ -112,17 +106,11 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
         {success ? <SuccessMessage /> : (
           <>
             <div className="grid grid-cols-1 gap-3">
-              <button
-                  onClick={handleGoogleSignIn}
-                  className="w-full flex justify-center items-center space-x-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-all hover:scale-105 active:scale-95"
-              >
+              <button onClick={handleGoogleSignIn} className="w-full flex justify-center items-center space-x-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-all hover:scale-105 active:scale-95">
                   <GoogleIcon className="h-5 w-5" />
                   <span>Sign up with Google</span>
               </button>
-              <button
-                  onClick={async () => { const { error } = await signInWithGithub(captchaToken || undefined); if (error) setError(error.message); }}
-                  className="w-full flex justify-center items-center space-x-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-all hover:scale-105 active:scale-95"
-              >
+              <button onClick={async () => { const { error } = await signInWithGithub(captchaToken || undefined); if (error) setError(error.message); }} className="w-full flex justify-center items-center space-x-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-all hover:scale-105 active:scale-95">
                   <GithubIcon className="h-5 w-5" />
                   <span>Sign up with GitHub</span>
               </button>
@@ -140,38 +128,15 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="email-address-signup" className="sr-only">Email address</label>
-                  <input
-                    id="email-address-signup"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    className="relative block w-full px-4 py-3 bg-base-100/70 border border-base-300 placeholder-content-secondary text-content-primary rounded-md focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary sm:text-sm"
-                    placeholder="Email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading}
-                  />
+                  <label htmlFor="email-address-signup" className="block text-sm font-medium text-content-secondary mb-1">Email address</label>
+                  <input id="email-address-signup" name="email" type="email" autoComplete="email" required className="relative block w-full px-4 py-3 bg-base-100/70 border border-base-300 placeholder-content-secondary text-content-primary rounded-md focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary sm:text-sm" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading} />
                 </div>
                 <div>
-                  <label htmlFor="password-signup" className="sr-only">Password</label>
-                  <input
-                    id="password-signup"
-                    name="password"
-                    type="password"
-                    autoComplete="new-password"
-                    required
-                    className="relative block w-full px-4 py-3 bg-base-100/70 border border-base-300 placeholder-content-secondary text-content-primary rounded-md focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary sm:text-sm"
-                    placeholder="Password (min. 6 characters)"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading}
-                  />
+                  <label htmlFor="password-signup" className="block text-sm font-medium text-content-secondary mb-1">Password</label>
+                  <input id="password-signup" name="password" type="password" autoComplete="new-password" required className="relative block w-full px-4 py-3 bg-base-100/70 border border-base-300 placeholder-content-secondary text-content-primary rounded-md focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary sm:text-sm" placeholder="Password (min. 6 characters)" value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} />
                 </div>
               </div>
 
-              {/* Captcha */}
               {captchaEnabled && (
                 <div className="mt-2">
                   <Captcha provider={CAPTCHA_PROVIDER as any} siteKey={SITE_KEY} onVerify={t => setCaptchaToken(t)} onExpire={() => setCaptchaToken(null)} />
@@ -181,11 +146,7 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
               {(rateLimitError || error) && <p className="text-brand-pink text-sm text-center">{rateLimitError || error}</p>}
 
               <div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base-100 focus:ring-brand-primary disabled:bg-opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-glow-blue hover:scale-105 active:scale-95"
-                >
+                <button type="submit" disabled={loading} className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base-100 focus:ring-brand-primary disabled:bg-opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-glow-blue hover:scale-105 active:scale-95">
                   {loading ? 'Creating account...' : 'Create Account'}
                 </button>
               </div>
@@ -193,7 +154,7 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
           </>
         )}
       </div>
-    </main>
+    </AuthLayout>
   );
 };
 
