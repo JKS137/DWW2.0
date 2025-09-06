@@ -1,6 +1,4 @@
 
-
-
 import React, { useState, useMemo, useEffect } from 'react';
 import Layout from '../components/Layout';
 import WarrantyCard from '../components/WarrantyCard';
@@ -53,7 +51,7 @@ const Dashboard: React.FC = () => {
   
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'expired'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'safe' | 'expiring' | 'expired'>('all');
   const [categoryFilter, setCategoryFilter] = useState<'all' | Category>('all');
   const [sortOrder, setSortOrder] = useState<SortOrder>('latest');
   
@@ -101,9 +99,7 @@ const Dashboard: React.FC = () => {
         const matchesSearch = w.product_name.toLowerCase().includes(searchTerm.toLowerCase());
         
         const currentStatus = getWarrantyStatus(w.expiry_date);
-        const matchesStatus = statusFilter === 'all' || 
-          (statusFilter === 'active' && currentStatus !== 'expired') ||
-          (statusFilter === 'expired' && currentStatus === 'expired');
+        const matchesStatus = statusFilter === 'all' || currentStatus === statusFilter;
 
         const matchesCategory = categoryFilter === 'all' || w.category === categoryFilter;
 
@@ -260,7 +256,7 @@ const Dashboard: React.FC = () => {
             {(warranties.length > 0 || isDemoMode) && (
                 <div className="bg-base-200/50 backdrop-blur-sm p-4 rounded-lg mb-6 flex flex-wrap items-center gap-4 border border-base-300/50">
                     <div className="flex-grow min-w-[200px]"><input type="text" placeholder="Search by product name..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"/></div>
-                    <div className="flex-grow sm:flex-grow-0"><select value={statusFilter} onChange={e => setStatusFilter(e.target.value as any)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"><option value="all">All Statuses</option><option value="active">Active</option><option value="expired">Expired</option></select></div>
+                    <div className="flex-grow sm:flex-grow-0"><select value={statusFilter} onChange={e => setStatusFilter(e.target.value as any)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"><option value="all">All Statuses</option><option value="safe">Active</option><option value="expiring">Expiring Soon</option><option value="expired">Expired</option></select></div>
                     <div className="flex-grow sm:flex-grow-0"><select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value as any)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"><option value="all">All Categories</option>{categories.map(c => <option key={c} value={c} className="capitalize">{c}</option>)}</select></div>
                     <div className="flex-grow sm:flex-grow-0">
                         <select value={sortOrder} onChange={e => setSortOrder(e.target.value as SortOrder)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary" aria-label="Sort warranties">

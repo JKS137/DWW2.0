@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import type { OcrData, Category } from '../types';
 import { categories } from '../types';
@@ -179,7 +180,7 @@ const AddWarrantyModal: React.FC<AddWarrantyModalProps> = ({ isOpen, onClose }) 
                     <div className="bg-red-900/40 border border-red-500/50 text-red-300 text-sm rounded-md p-3">
                         <p className="font-bold">AI Analysis Failed</p>
                         <p className="text-xs mt-1">{ocrError}</p>
-                        <p className="text-xs mt-3">Please fill in the details manually below or <button type="button" onClick={handleRetryOcr} className="underline font-semibold hover:text-white">try again</button>.</p>
+                        <p className="text-sm mt-2">Please fill in the details manually below, or you can <button type="button" onClick={handleRetryOcr} className="underline font-semibold hover:text-white">try again with a clearer image</button>.</p>
                     </div>
                   )}
                   
