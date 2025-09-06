@@ -27,48 +27,69 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [authEvent, setAuthEvent] = useState<AuthChangeEvent | null>(null);
 
   useEffect(() => {
-    if (!supabase) {
+    // Fail-safe to guarantee loading resolves even if Supabase events hang
+    let finished = false;
+    const finish = () => {
+      if (!finished) {
+        finished = true;
         setLoading(false);
+      }
+    };
+
+    try {
+      if (!supabase) {
+        finish();
         return;
-    }
+      }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setSession(session);
-      const currentUser = session?.user ?? null;
-      setUser(currentUser);
-      setAuthEvent(event);
+      // Safety timeout: resolve loading after 3s regardless of SDK behavior
+      const timeout = setTimeout(finish, 3000);
 
-      // If a user signs in, check if their profile exists. If not, create it.
-      // This handles new users signing up via OAuth.
-      if (event === 'SIGNED_IN' && currentUser) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('id', currentUser.id)
-          .single();
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        setSession(session);
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+        setAuthEvent(event);
 
-        if (!profile) {
-          const { error: profileError } = await supabase
+        // If a user signs in, ensure their profile exists (OAuth signups)
+        if (event === 'SIGNED_IN' && currentUser) {
+          const { data: profile } = await supabase
             .from('profiles')
-            .insert({ id: currentUser.id, email: currentUser.email });
-          if (profileError) {
-            console.error("Error creating profile for new OAuth user:", profileError);
+            .select('id')
+            .eq('id', currentUser.id)
+            .single();
+
+          if (!profile) {
+            const { error: profileError } = await supabase
+              .from('profiles')
+              .insert({ id: currentUser.id, email: currentUser.email });
+            if (profileError) {
+              console.error("Error creating profile for new OAuth user:", profileError);
+            }
           }
         }
-      }
-      
-      setLoading(false);
-    });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-    });
+        finish();
+      });
 
-    return () => {
-      subscription?.unsubscribe();
-    };
+      supabase.auth.getSession()
+        .then(({ data: { session } }) => {
+          setSession(session);
+          setUser(session?.user ?? null);
+        })
+        .catch((e) => {
+          console.error('getSession failed:', e);
+        })
+        .finally(() => finish());
+
+      return () => {
+        clearTimeout(timeout);
+        subscription?.unsubscribe();
+      };
+    } catch (e) {
+      console.error('Auth initialization failed:', e);
+      finish();
+    }
   }, []);
   
   const createConfigError = (): { error: AuthError } => ({
