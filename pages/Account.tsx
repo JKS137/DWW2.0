@@ -1,11 +1,14 @@
 
 
 
+
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
 import { getProfile, Profile } from '../services/profileService';
 import { Spinner } from '../components/icons/Spinner';
+import { fadeUpVariant } from '../services/animations';
 
 const Account: React.FC = () => {
     const { user, resendVerificationEmail } = useAuth();
@@ -98,13 +101,18 @@ const Account: React.FC = () => {
 
     return (
         <Layout>
-            <section className="animate-fade-in max-w-2xl mx-auto">
+            <motion.section 
+              className="max-w-2xl mx-auto"
+              variants={fadeUpVariant}
+              initial="hidden"
+              animate="visible"
+            >
                 <header className="mb-6">
                     <h1 className="text-3xl font-bold text-content-primary">Account Settings</h1>
                     <p className="text-content-secondary mt-1">Manage your account details and subscription.</p>
                 </header>
                 {renderContent()}
-            </section>
+            </motion.section>
         </Layout>
     );
 };

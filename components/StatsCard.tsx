@@ -1,4 +1,6 @@
 import React from 'react';
+import { motion } from 'framer-motion';
+import { fadeUpVariant } from '../services/animations';
 
 interface StatsCardProps {
   title: string;
@@ -32,10 +34,13 @@ const StatsCard: React.FC<StatsCardProps> = ({ title, value, Icon, color }) => {
   const styles = colorStyles[color];
 
   return (
-    <div className={`
-      relative p-5 rounded-xl border backdrop-blur-sm transition-all duration-300
-      ${styles.bg} ${styles.border} ${styles.glow}
-    `}>
+    <motion.div 
+      className={`
+        relative p-5 rounded-xl border backdrop-blur-sm transition-all duration-300
+        ${styles.bg} ${styles.border} ${styles.glow}
+      `}
+      variants={fadeUpVariant}
+    >
       <div className="flex justify-between items-start">
         <div>
           <p className="text-sm font-medium text-content-secondary">{title}</p>
@@ -45,7 +50,7 @@ const StatsCard: React.FC<StatsCardProps> = ({ title, value, Icon, color }) => {
           <Icon className={`h-6 w-6 ${styles.icon}`} />
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

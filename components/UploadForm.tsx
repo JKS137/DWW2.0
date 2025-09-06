@@ -1,5 +1,7 @@
 
+
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useWarranties } from '../context/WarrantyContext';
 import { UploadIcon } from './icons/UploadIcon';
 import { Spinner } from './icons/Spinner';
@@ -158,7 +160,13 @@ const UploadForm: React.FC = () => {
             {uploads.map(upload => {
                 const currentProgress = Math.round(progress[upload.id] || 0);
                 return (
-                    <div key={upload.id} className="bg-base-200/50 p-4 rounded-lg flex items-center justify-between gap-4 animate-fade-in transition-all">
+                    <motion.div 
+                        key={upload.id} 
+                        className="bg-base-200/50 p-4 rounded-lg flex items-center justify-between gap-4 transition-all"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        layout
+                    >
                         <div className="flex items-center gap-4 overflow-hidden flex-1">
                             <div className="flex-shrink-0">
                                 {upload.status === 'uploading' && <Spinner className="w-6 h-6"/>}
@@ -205,7 +213,7 @@ const UploadForm: React.FC = () => {
                                 <XIcon className="w-4 h-4"/>
                             </button>
                         )}
-                    </div>
+                    </motion.div>
                 );
             })}
         </div>

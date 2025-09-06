@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import type { Warranty } from '../types';
 import { useWarranties } from '../context/WarrantyContext';
 import { TrashIcon } from './icons/TrashIcon';
@@ -6,7 +7,7 @@ import { CalendarIcon } from './icons/CalendarIcon';
 import { WarningIcon } from './icons/WarningIcon';
 import { EditIcon } from './icons/EditIcon';
 import { TagIcon } from './icons/TagIcon';
-
+import { fadeUpVariant } from '../services/animations';
 
 interface WarrantyCardProps {
   warranty: Warranty;
@@ -72,7 +73,11 @@ const WarrantyCard: React.FC<WarrantyCardProps> = ({ warranty, onEdit, isDemo = 
   };
 
   return (
-    <div className={`rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-1 transition-all duration-300 ease-in-out animate-fade-in border backdrop-blur-sm ${styles.card}`}>
+    <motion.div 
+      className={`rounded-xl shadow-lg overflow-hidden transition-all duration-300 ease-in-out border backdrop-blur-sm ${styles.card}`}
+      variants={fadeUpVariant}
+      whileHover={{ y: -5, transition: { type: 'spring', stiffness: 300 } }}
+    >
       <img className="h-48 w-full object-cover" src={warranty.file_url} alt={`Receipt for ${warranty.product_name}`} />
       <div className="p-5">
         <div className="flex justify-between items-start gap-2">
@@ -127,7 +132,7 @@ const WarrantyCard: React.FC<WarrantyCardProps> = ({ warranty, onEdit, isDemo = 
           </p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

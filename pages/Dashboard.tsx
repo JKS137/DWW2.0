@@ -1,5 +1,7 @@
 
+
 import React, { useState, useMemo, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import Layout from '../components/Layout';
 import WarrantyCard from '../components/WarrantyCard';
 import WarrantyList from '../components/WarrantyList';
@@ -21,6 +23,7 @@ import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
 import { TagIcon } from '../components/icons/TagIcon';
 import { CalendarIcon } from '../components/icons/CalendarIcon';
 import { ExportIcon } from '../components/icons/ExportIcon';
+import { staggerContainerVariant, fadeUpVariant } from '../services/animations';
 
 type WarrantyStatus = 'expired' | 'expiring' | 'safe';
 type SortOrder = 'latest' | 'expiryAsc' | 'expiryDesc' | 'nameAsc' | 'nameDesc';
@@ -53,7 +56,7 @@ const Dashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'safe' | 'expiring' | 'expired'>('all');
   const [categoryFilter, setCategoryFilter] = useState<'all' | Category>('all');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('latest');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('expiryAsc');
   
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isDemoMode, setIsDemoMode] = useState(false);
@@ -173,7 +176,12 @@ const Dashboard: React.FC = () => {
     }
     if (warranties.length === 0 && !isDemoMode) {
       return (
-        <section className="text-center py-16 px-6 bg-base-200/50 rounded-lg">
+        <motion.section 
+          className="text-center py-16 px-6 bg-base-200/50 rounded-lg"
+          variants={fadeUpVariant}
+          initial="hidden"
+          animate="visible"
+        >
           <h3 className="text-xl font-semibold text-content-primary mb-2">Your Vault is Empty</h3>
           <p className="text-content-secondary max-w-md mx-auto mb-6">
             Upload your first warranty receipt to begin tracking. Never lose coverage again — we’ll remind you before warranties expire.
@@ -182,7 +190,7 @@ const Dashboard: React.FC = () => {
             <PlusIcon className="h-5 w-5" />
             <span>Upload Warranty</span>
           </button>
-        </section>
+        </motion.section>
       );
     }
     if (filteredWarranties.length === 0) {
@@ -191,11 +199,16 @@ const Dashboard: React.FC = () => {
 
     if (view === 'grid') {
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          variants={staggerContainerVariant}
+          initial="hidden"
+          animate="visible"
+        >
           {filteredWarranties.map((warranty) => (
             <WarrantyCard key={warranty.id} warranty={warranty} onEdit={() => setEditingWarranty(warranty)} isDemo={isDemoMode} />
           ))}
-        </div>
+        </motion.div>
       );
     }
     return <WarrantyList warranties={filteredWarranties} onEdit={setEditingWarranty} onDelete={(id, url) => deleteWarranty(id, url)} isDemo={isDemoMode} />;
@@ -203,7 +216,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <Layout>
-      <section className="animate-fade-in">
+      <section>
         {showOnboarding && <OnboardingBanner onDismiss={handleDismissOnboarding} />}
         
         <header className="flex flex-wrap justify-between items-center gap-4 mb-6">
@@ -220,12 +233,23 @@ const Dashboard: React.FC = () => {
            )}
         </header>
 
-        <section aria-labelledby="quick-upload-heading" className="mb-8">
+        <motion.section 
+          aria-labelledby="quick-upload-heading" 
+          className="mb-8"
+          variants={fadeUpVariant}
+          initial="hidden"
+          animate="visible"
+        >
             <h2 id="quick-upload-heading" className="sr-only">Quick Upload</h2>
             <UploadForm />
-        </section>
+        </motion.section>
 
-        <section aria-labelledby="stats-heading">
+        <motion.section 
+            aria-labelledby="stats-heading"
+            variants={staggerContainerVariant}
+            initial="hidden"
+            animate="visible"
+        >
             <h2 id="stats-heading" className="sr-only">Statistics</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
                 <StatsCard title="Total Warranties" value={stats.total} Icon={ShieldCheckIcon} color="blue" />
@@ -233,7 +257,7 @@ const Dashboard: React.FC = () => {
                 <StatsCard title="Expiring Soon" value={stats.expiring} Icon={TagIcon} color="pink" />
                 <StatsCard title="Expired" value={stats.expired} Icon={TagIcon} color="pink" />
             </div>
-        </section>
+        </motion.section>
         
         <section aria-labelledby="warranties-heading">
             <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
@@ -262,9 +286,9 @@ const Dashboard: React.FC = () => {
                     <div className="flex-grow sm:flex-grow-0"><select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value as any)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"><option value="all">All Categories</option>{categories.map(c => <option key={c} value={c} className="capitalize">{c}</option>)}</select></div>
                     <div className="flex-grow sm:flex-grow-0">
                         <select value={sortOrder} onChange={e => setSortOrder(e.target.value as SortOrder)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary" aria-label="Sort warranties">
-                            <option value="latest">Date Added (Newest First)</option>
                             <option value="expiryAsc">Expiry Date (Soonest First)</option>
                             <option value="expiryDesc">Expiry Date (Latest First)</option>
+                            <option value="latest">Date Added (Newest First)</option>
                             <option value="nameAsc">Product Name (A-Z)</option>
                             <option value="nameDesc">Product Name (Z-A)</option>
                         </select>

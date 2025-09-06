@@ -9,14 +9,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "@google/genai": "0.14.0",
     "@supabase/supabase-js": "2.45.0",
-    "@supabase/postgrest-js": "1.15.5",
     "@supabase/functions-js": "2.4.1",
+    "@supabase/node-fetch": "3.1.0",
+    "@supabase/postgrest-js": "1.15.5",
     "@supabase/realtime-js": "2.11.0",
-    "framer-motion": "11.3.19"
+    "@supabase/storage-js": "2.6.0",
+    "framer-motion": "11.3.8",
+    "@emotion/is-prop-valid": "1.2.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

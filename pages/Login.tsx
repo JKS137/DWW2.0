@@ -1,9 +1,12 @@
 
+
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
 import { useAuth } from '../context/AuthContext';
 import { GoogleIcon } from '../components/icons/GoogleIcon';
 import { recordAuthAttempt, checkRateLimit } from '../services/rateLimiter';
+import { buttonVariants, fadeUpVariant } from '../services/animations';
 
 interface LoginProps {
   onSwitchToSignup: () => void;
@@ -49,8 +52,13 @@ const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavig
   };
 
   return (
-    <main className="flex items-center justify-center min-h-screen p-4 animate-fade-in">
-      <div className="w-full max-w-md p-8 space-y-6 bg-base-200/50 backdrop-blur-lg rounded-2xl shadow-2xl border border-base-300/50">
+    <main className="flex items-center justify-center min-h-screen p-4">
+      <motion.div 
+        className="w-full max-w-md p-8 space-y-6 bg-base-200/50 backdrop-blur-lg rounded-2xl shadow-2xl border border-base-300/50"
+        variants={fadeUpVariant}
+        initial="hidden"
+        animate="visible"
+      >
         <div className="text-center">
             <button onClick={onNavigateHome} className="inline-block">
               <ShieldCheckIcon className="mx-auto h-12 w-12 text-brand-primary" />
@@ -70,13 +78,16 @@ const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavig
         </div>
         
         <div>
-            <button
+            <motion.button
                 onClick={handleGoogleSignIn}
+                variants={buttonVariants}
+                whileHover="hover"
+                whileTap="tap"
                 className="w-full flex justify-center items-center space-x-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-colors"
             >
                 <GoogleIcon className="h-5 w-5" />
                 <span>Sign in with Google</span>
-            </button>
+            </motion.button>
         </div>
 
         <div className="relative">
@@ -137,16 +148,19 @@ const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavig
           {(rateLimitError || error) && <p className="text-brand-pink text-sm text-center">{rateLimitError || error}</p>}
 
           <div>
-            <button
+            <motion.button
               type="submit"
               disabled={loading}
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base-100 focus:ring-brand-primary disabled:bg-opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-glow-blue"
             >
               {loading ? 'Signing in...' : 'Sign in'}
-            </button>
+            </motion.button>
           </div>
         </form>
-      </div>
+      </motion.div>
     </main>
   );
 };

@@ -1,7 +1,10 @@
 
+
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
 import { useAuth } from '../context/AuthContext';
+import { buttonVariants, fadeUpVariant } from '../services/animations';
 
 interface UpdatePasswordProps {
   onPasswordUpdated: () => void;
@@ -43,20 +46,30 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onPasswordUpdated }) =>
 
   if (success) {
     return (
-        <main className="flex items-center justify-center min-h-screen p-4 animate-fade-in">
-            <div className="w-full max-w-md p-8 space-y-6 bg-base-200/50 backdrop-blur-lg rounded-2xl shadow-2xl border border-base-300/50 text-center">
+        <main className="flex items-center justify-center min-h-screen p-4">
+            <motion.div 
+              className="w-full max-w-md p-8 space-y-6 bg-base-200/50 backdrop-blur-lg rounded-2xl shadow-2xl border border-base-300/50 text-center"
+              variants={fadeUpVariant}
+              initial="hidden"
+              animate="visible"
+            >
                 <ShieldCheckIcon className="mx-auto h-12 w-12 text-brand-secondary" />
                 <h2 className="text-2xl font-bold text-content-primary">Password Updated!</h2>
                 <p className="text-content-secondary">Your password has been changed successfully. Redirecting you to the dashboard...</p>
-            </div>
+            </motion.div>
         </main>
     );
   }
 
 
   return (
-    <main className="flex items-center justify-center min-h-screen p-4 animate-fade-in">
-      <div className="w-full max-w-md p-8 space-y-8 bg-base-200/50 backdrop-blur-lg rounded-2xl shadow-2xl border border-base-300/50">
+    <main className="flex items-center justify-center min-h-screen p-4">
+      <motion.div 
+        className="w-full max-w-md p-8 space-y-8 bg-base-200/50 backdrop-blur-lg rounded-2xl shadow-2xl border border-base-300/50"
+        variants={fadeUpVariant}
+        initial="hidden"
+        animate="visible"
+      >
         <div className="text-center">
           <ShieldCheckIcon className="mx-auto h-12 w-12 text-brand-primary" />
           <h2 className="mt-6 text-3xl font-extrabold text-content-primary">
@@ -104,16 +117,19 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onPasswordUpdated }) =>
           {error && <p className="text-brand-pink text-sm text-center">{error}</p>}
 
           <div>
-            <button
+            <motion.button
               type="submit"
               disabled={loading}
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base-100 focus:ring-brand-primary disabled:bg-opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-glow-blue"
             >
               {loading ? 'Saving...' : 'Save New Password'}
-            </button>
+            </motion.button>
           </div>
         </form>
-      </div>
+      </motion.div>
     </main>
   );
 };

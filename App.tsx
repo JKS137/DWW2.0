@@ -1,6 +1,8 @@
 
 
+
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -15,6 +17,7 @@ import { Spinner } from './components/icons/Spinner';
 import { supabaseConfigurationError } from './services/supabaseClient';
 import { ShieldCheckIcon } from './components/icons/ShieldCheckIcon';
 import { trackPageView } from './services/analyticsService';
+import { pageVariants } from './services/animations';
 
 const ConfigurationErrorScreen: React.FC<{ message: string }> = ({ message }) => (
     <div className="flex items-center justify-center min-h-screen bg-red-900/50 text-red-200 p-4">
@@ -139,7 +142,17 @@ const MainContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-transparent text-content-primary font-sans">
-        {content}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={route}
+          variants={pageVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+        >
+          {content}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };

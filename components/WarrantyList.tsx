@@ -1,9 +1,11 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import type { Warranty } from '../types';
 import { TrashIcon } from './icons/TrashIcon';
 import { EditIcon } from './icons/EditIcon';
 import { TagIcon } from './icons/TagIcon';
 import { WarningIcon } from './icons/WarningIcon';
+import { staggerContainerVariant, fadeUpVariant } from '../services/animations';
 
 interface WarrantyListProps {
   warranties: (Warranty & { status: 'safe' | 'expiring' | 'expired' })[];
@@ -28,10 +30,19 @@ const WarrantyList: React.FC<WarrantyListProps> = ({ warranties, onEdit, onDelet
   };
 
   return (
-    <div className="bg-base-200/40 backdrop-blur-sm border border-base-300/50 rounded-lg shadow-sm overflow-hidden animate-fade-in">
+    <motion.div 
+      className="bg-base-200/40 backdrop-blur-sm border border-base-300/50 rounded-lg shadow-sm overflow-hidden"
+      variants={staggerContainerVariant}
+      initial="hidden"
+      animate="visible"
+    >
       <div className="divide-y divide-base-300/50">
         {warranties.map((warranty) => (
-          <div key={warranty.id} className="p-4 flex flex-wrap items-center justify-between gap-4 hover:bg-base-300/50 transition-colors">
+          <motion.div
+            key={warranty.id}
+            className="p-4 flex flex-wrap items-center justify-between gap-4 hover:bg-base-300/50 transition-colors"
+            variants={fadeUpVariant}
+          >
             <div className="flex items-center gap-4 flex-1 min-w-[200px]">
               <img src={warranty.file_url} alt={warranty.product_name} className="h-12 w-12 rounded-md object-cover flex-shrink-0" />
               <div>
@@ -58,10 +69,10 @@ const WarrantyList: React.FC<WarrantyListProps> = ({ warranties, onEdit, onDelet
               <button onClick={() => onEdit(warranty)} disabled={isDemo} className="p-2 text-content-secondary hover:text-brand-primary" aria-label="Edit"><EditIcon className="h-5 w-5"/></button>
               <button onClick={() => handleDelete(warranty)} disabled={isDemo} className="p-2 text-content-secondary hover:text-red-500" aria-label="Delete"><TrashIcon className="h-5 w-5" /></button>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

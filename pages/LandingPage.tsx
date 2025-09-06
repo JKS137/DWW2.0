@@ -6,10 +6,10 @@ import { SmartOCRIcon } from '../components/icons/SmartOCRIcon';
 import { RemindersIcon } from '../components/icons/RemindersIcon';
 import { SyncIcon } from '../components/icons/SyncIcon';
 import { ExportIcon } from '../components/icons/ExportIcon';
-import { ShareIcon } from '../components/icons/ShareIcon';
 import { CheckCircleIcon } from '../components/icons/CheckCircleIcon';
 import { UploadIcon } from '../components/icons/UploadIcon';
 import { XIcon } from '../components/icons/XIcon';
+import { staggerContainerVariant, fadeUpVariant, buttonVariants } from '../services/animations';
 
 interface LandingPageProps {
   onNavigateLogin: () => void;
@@ -30,13 +30,6 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
         { name: 'Features', href: '#features' },
         { name: 'Pricing', href: '#pricing' },
     ];
-
-    // FIX: Add `as const` to the transition type to satisfy framer-motion's expected type.
-    const linkHover = {
-        scale: 1.1,
-        textShadow: '0 0 8px rgba(59, 130, 246, 0.8)',
-        transition: { type: 'spring' as const, stiffness: 300 }
-    };
     
     const pulseAnimation = {
         scale: [1, 1.03, 1],
@@ -64,7 +57,7 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
                 {/* Center: Navigation Links (Desktop) */}
                 <div className="hidden md:flex items-center gap-6">
                     {navLinks.map(link => (
-                        <motion.a key={link.name} href={link.href} whileHover={linkHover} className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+                        <motion.a key={link.name} href={link.href} whileHover={{ scale: 1.1 }} className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
                             {link.name}
                         </motion.a>
                     ))}
@@ -72,7 +65,7 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
 
                 {/* Right Side: CTAs (Desktop) */}
                 <div className="hidden md:flex items-center gap-4">
-                    <motion.button whileHover={linkHover} onClick={onNavigateLogin} className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+                    <motion.button whileHover={{ scale: 1.1 }} onClick={onNavigateLogin} className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
                         Login
                     </motion.button>
                     <motion.button 
@@ -144,61 +137,85 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
 
 
 const Hero: React.FC<LandingPageProps> = ({ onNavigateSignup, onNavigateLogin }) => (
-    <section className="relative pt-40 pb-20 text-center">
+    <motion.section 
+      className="relative pt-40 pb-20 text-center"
+      initial="hidden"
+      animate="visible"
+      variants={staggerContainerVariant}
+    >
         <div className="absolute inset-0 bg-gradient-radial from-blue-500/10 via-transparent to-transparent z-0"></div>
         <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-4xl md:text-6xl font-extrabold text-content-primary tracking-tight leading-tight animate-fade-in">
+            <motion.h1 variants={fadeUpVariant} className="text-4xl md:text-6xl font-extrabold text-content-primary tracking-tight leading-tight">
                 Never lose track of your warranties again.
-            </h1>
-            <p className="mt-6 max-w-2xl mx-auto text-lg text-content-secondary animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            </motion.h1>
+            <motion.p variants={fadeUpVariant} className="mt-6 max-w-2xl mx-auto text-lg text-content-secondary">
                 Your digital vault for receipts, warranties, and peace of mind. Securely store, track, and get reminded before they expire.
-            </p>
-            <div className="mt-10 flex justify-center gap-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                <button onClick={onNavigateSignup} className="px-6 py-3 font-semibold bg-brand-primary text-white rounded-lg hover:bg-opacity-90 transition-all transform hover:scale-105 hover:shadow-glow-blue">
+            </motion.p>
+            <motion.div variants={fadeUpVariant} className="mt-10 flex justify-center gap-4">
+                <motion.button 
+                  onClick={onNavigateSignup} 
+                  className="px-6 py-3 font-semibold bg-brand-primary text-white rounded-lg hover:bg-opacity-90 transition-all hover:shadow-glow-blue"
+                  variants={buttonVariants}
+                  whileHover="hover"
+                  whileTap="tap"
+                >
                     Get Started Free
-                </button>
-                 <button onClick={onNavigateLogin} className="px-6 py-3 font-semibold bg-base-200/80 text-content-primary rounded-lg hover:bg-base-200 transition-all transform hover:scale-105">
+                </motion.button>
+                 <motion.button 
+                   onClick={onNavigateLogin} 
+                   className="px-6 py-3 font-semibold bg-base-200/80 text-content-primary rounded-lg hover:bg-base-200 transition-all"
+                   variants={buttonVariants}
+                   whileHover="hover"
+                   whileTap="tap"
+                 >
                     Login
-                </button>
-            </div>
-             <div className="mt-16 w-full max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                </motion.button>
+            </motion.div>
+             <motion.div variants={fadeUpVariant} className="mt-16 w-full max-w-4xl mx-auto">
                 <div className="relative rounded-xl p-1 bg-gradient-to-br from-blue-500 to-teal-400">
                     <div className="bg-base-200 rounded-lg shadow-2xl p-4">
                         <img src="https://i.imgur.com/rC4mYMS.png" alt="Dashboard Preview" className="rounded-md w-full" />
                     </div>
                 </div>
-            </div>
+            </motion.div>
         </div>
-    </section>
+    </motion.section>
 );
 
 const HowItWorks: React.FC = () => (
-    <section id="how-it-works" className="py-20">
+    <motion.section 
+      id="how-it-works" 
+      className="py-20"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
+      variants={staggerContainerVariant}
+    >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
+            <motion.div variants={fadeUpVariant} className="text-center mb-12">
                 <h2 className="text-3xl font-bold">How It Works</h2>
                 <p className="text-content-secondary mt-2">Get organized in three simple steps.</p>
-            </div>
+            </motion.div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {[
                     { title: "Upload Receipt", description: "Snap a photo or upload a file. Our AI gets to work instantly.", icon: UploadIcon },
                     { title: "Track Expiry", description: "We automatically extract details and set up expiry tracking.", icon: SmartOCRIcon },
                     { title: "Get Reminders", description: "Receive email alerts before a warranty expires so you never miss a claim.", icon: RemindersIcon }
-                ].map((step, index) => {
+                ].map((step) => {
                     const Icon = step.icon;
                     return (
-                        <div key={step.title} className="text-center p-6 bg-base-200/50 backdrop-blur-md border border-base-300/50 rounded-xl animate-slide-up" style={{ animationDelay: `${index * 0.1}s`}}>
+                        <motion.div key={step.title} variants={fadeUpVariant} className="text-center p-6 bg-base-200/50 backdrop-blur-md border border-base-300/50 rounded-xl">
                             <div className="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-base-100 border-2 border-brand-primary shadow-glow-blue mb-4">
                                <Icon className="h-8 w-8 text-brand-primary" />
                             </div>
                             <h3 className="text-xl font-semibold">{step.title}</h3>
                             <p className="text-content-secondary mt-2">{step.description}</p>
-                        </div>
+                        </motion.div>
                     );
                 })}
             </div>
         </div>
-    </section>
+    </motion.section>
 );
 
 const Features: React.FC = () => {
@@ -211,17 +228,24 @@ const Features: React.FC = () => {
     ];
   
     return (
-      <section id="features" className="py-20 bg-base-200/30">
+      <motion.section 
+        id="features" 
+        className="py-20 bg-base-200/30"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={staggerContainerVariant}
+      >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <motion.div variants={fadeUpVariant} className="text-center mb-12">
             <h2 className="text-3xl font-bold">Everything you need, all in one place.</h2>
             <p className="text-content-secondary mt-2">Powerful features to give you complete peace of mind.</p>
-          </div>
+          </motion.div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featureList.map((feature, index) => {
+            {featureList.map((feature) => {
               const Icon = feature.icon;
               return (
-                <div key={feature.name} className="flex items-start space-x-4 p-4 animate-slide-up" style={{ animationDelay: `${index * 0.05}s`}}>
+                <motion.div key={feature.name} variants={fadeUpVariant} className="flex items-start space-x-4 p-4">
                    <div className="flex-shrink-0 p-2 bg-base-100 rounded-lg border border-brand-secondary/50">
                       <Icon className="h-6 w-6 text-brand-secondary" />
                    </div>
@@ -229,12 +253,12 @@ const Features: React.FC = () => {
                     <h3 className="font-semibold">{feature.name}</h3>
                     <p className="text-content-secondary text-sm mt-1">{feature.description}</p>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
         </div>
-      </section>
+      </motion.section>
     );
 };
 
@@ -246,15 +270,22 @@ const Pricing: React.FC<LandingPageProps> = ({ onNavigateSignup }) => {
     ];
 
     return (
-        <section id="pricing" className="py-20">
+        <motion.section 
+          id="pricing" 
+          className="py-20"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={staggerContainerVariant}
+        >
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-12">
+                <motion.div variants={fadeUpVariant} className="text-center mb-12">
                     <h2 className="text-3xl font-bold">Choose the plan that's right for you</h2>
                     <p className="text-content-secondary mt-2">Start for free, upgrade when you're ready.</p>
-                </div>
+                </motion.div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {plans.map((plan, index) => (
-                        <div key={plan.name} className={`relative p-8 bg-base-200/50 backdrop-blur-md border rounded-xl flex flex-col ${plan.border} transition-all hover:-translate-y-2 hover:${plan.glow} animate-slide-up`} style={{ animationDelay: `${index * 0.1}s`}}>
+                    {plans.map((plan) => (
+                        <motion.div key={plan.name} variants={fadeUpVariant} className={`relative p-8 bg-base-200/50 backdrop-blur-md border rounded-xl flex flex-col ${plan.border} transition-all hover:-translate-y-2 hover:${plan.glow}`}>
                             {plan.popular && <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 px-3 py-1 text-sm font-semibold text-white bg-brand-secondary rounded-full">Most Popular</div>}
                             <h3 className="text-2xl font-semibold">{plan.name}</h3>
                             <p className="mt-4"><span className="text-4xl font-bold">{plan.price}</span><span className="text-content-secondary">/mo</span></p>
@@ -266,14 +297,20 @@ const Pricing: React.FC<LandingPageProps> = ({ onNavigateSignup }) => {
                                     </li>
                                 ))}
                             </ul>
-                            <button onClick={onNavigateSignup} className={`mt-8 w-full py-3 font-semibold rounded-lg transition-colors ${plan.popular ? 'bg-brand-secondary text-white' : 'bg-base-300 text-content-primary hover:bg-opacity-80'}`}>
+                            <motion.button 
+                              onClick={onNavigateSignup} 
+                              className={`mt-8 w-full py-3 font-semibold rounded-lg transition-colors ${plan.popular ? 'bg-brand-secondary text-white' : 'bg-base-300 text-content-primary hover:bg-opacity-80'}`}
+                              variants={buttonVariants}
+                              whileHover="hover"
+                              whileTap="tap"
+                            >
                                 Choose Plan
-                            </button>
-                        </div>
+                            </motion.button>
+                        </motion.div>
                     ))}
                 </div>
             </div>
-        </section>
+        </motion.section>
     );
 };
 
