@@ -1,4 +1,3 @@
-
 import { supabase } from './supabaseClient';
 import type { Warranty, Category } from '../types';
 
@@ -201,4 +200,64 @@ export const getWarrantyById = async (warrantyId: string, userId: string): Promi
         throw new Error(error.message);
     }
     return data as Warranty;
+};
+
+
+/**
+ * Creates a shareable link for a warranty.
+ */
+export const createShareLink = async (warrantyId: string, userId: string): Promise<string> => {
+    if (!supabase) throw new Error("Supabase client is not initialized.");
+    
+    // Insert a new share record and get the token.
+    // RLS policy ensures user can only create links for their own warranties.
+    const { data, error } = await supabase
+        .from('shared_warranties')
+        .insert({ warranty_id: warrantyId, user_id: userId }) // user_id is implicit via auth
+        .select('share_token')
+        .single();
+    
+    if (error) {
+        // Check for a specific error related to RLS failing on the check
+        if (error.message.includes('check constraint')) {
+             throw new Error("You do not have permission to share this warranty.");
+        }
+        throw new Error(`Could not create share link: ${error.message}`);
+    }
+    
+    return data.share_token;
+};
+
+
+/**
+ * Fetches a shared warranty's public details using a share token.
+ */
+export const getSharedWarranty = async (shareToken: string): Promise<Partial<Warranty>> => {
+    if (!supabase) throw new Error("Supabase client is not initialized.");
+
+    const { data: sharedLink, error: linkError } = await supabase
+        .from('shared_warranties')
+        .select('warranties ( product_name, purchase_date, expiry_date, category, file_url )')
+        .eq('share_token', shareToken)
+        .single();
+
+    if (linkError) {
+        if (linkError.code === 'PGRST116') { // No rows found
+             throw new Error("This share link is invalid or has been revoked.");
+        }
+        throw new Error(linkError.message);
+    }
+    
+    if (!sharedLink || !Array.isArray(sharedLink.warranties) || sharedLink.warranties.length === 0) {
+        const nestedWarranties = sharedLink.warranties as unknown as Partial<Warranty> | null;
+        if (!nestedWarranties) {
+             throw new Error("Could not find the warranty associated with this link.");
+        }
+        return nestedWarranties;
+    }
+
+    // Supabase returns the nested object. Handle both object and array-of-one responses.
+    const warrantyData = Array.isArray(sharedLink.warranties) ? sharedLink.warranties[0] : sharedLink.warranties;
+
+    return warrantyData as Partial<Warranty>;
 };

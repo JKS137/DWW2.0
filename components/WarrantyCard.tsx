@@ -6,10 +6,12 @@ import { CalendarIcon } from './icons/CalendarIcon';
 import { WarningIcon } from './icons/WarningIcon';
 import { EditIcon } from './icons/EditIcon';
 import { TagIcon } from './icons/TagIcon';
+import { ShareIcon } from './icons/ShareIcon';
 
 interface WarrantyCardProps {
   warranty: Warranty;
   onEdit: () => void;
+  onShare: () => void;
   isDemo?: boolean;
 }
 
@@ -58,7 +60,7 @@ const cardStatusStyles: Record<WarrantyStatus, { card: string; text: string; ico
 };
 
 
-const WarrantyCard: React.FC<WarrantyCardProps> = ({ warranty, onEdit, isDemo = false }) => {
+const WarrantyCard: React.FC<WarrantyCardProps> = ({ warranty, onEdit, onShare, isDemo = false }) => {
   const { deleteWarranty } = useWarranties();
   const { text, status } = getWarrantyStatusInfo(warranty.expiry_date);
   const styles = cardStatusStyles[status];
@@ -88,6 +90,14 @@ const WarrantyCard: React.FC<WarrantyCardProps> = ({ warranty, onEdit, isDemo = 
                 )}
             </div>
             <div className={`flex-shrink-0 flex items-center space-x-1 -mt-1 -mr-1 ${isDemo ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                <button 
+                    onClick={onShare}
+                    disabled={isDemo}
+                    className="text-content-secondary hover:text-brand-secondary transition-colors p-1"
+                    aria-label="Share warranty"
+                >
+                    <ShareIcon className="h-5 w-5"/>
+                </button>
                 <button 
                     onClick={onEdit}
                     disabled={isDemo}

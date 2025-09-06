@@ -4,6 +4,7 @@ import WarrantyCard from '../components/WarrantyCard';
 import WarrantyList from '../components/WarrantyList';
 import AddWarrantyModal from '../components/AddWarrantyModal';
 import EditWarrantyModal from '../components/EditWarrantyModal';
+import ShareWarrantyModal from '../components/ShareWarrantyModal';
 import OnboardingBanner from '../components/OnboardingBanner';
 import StatsCard from '../components/StatsCard';
 import ToggleSwitch from '../components/ToggleSwitch';
@@ -45,6 +46,7 @@ const demoWarranties: Warranty[] = [
 const Dashboard: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingWarranty, setEditingWarranty] = useState<Warranty | null>(null);
+  const [sharingWarranty, setSharingWarranty] = useState<Warranty | null>(null);
   const { warranties, loading, error, deleteWarranty } = useWarranties();
   const { user } = useAuth();
   
@@ -196,12 +198,12 @@ const Dashboard: React.FC = () => {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
         >
           {filteredWarranties.map((warranty) => (
-            <WarrantyCard key={warranty.id} warranty={warranty} onEdit={() => setEditingWarranty(warranty)} isDemo={isDemoMode} />
+            <WarrantyCard key={warranty.id} warranty={warranty} onEdit={() => setEditingWarranty(warranty)} onShare={() => setSharingWarranty(warranty)} isDemo={isDemoMode} />
           ))}
         </div>
       );
     }
-    return <WarrantyList warranties={filteredWarranties} onEdit={setEditingWarranty} onDelete={(id, url) => deleteWarranty(id, url)} isDemo={isDemoMode} />;
+    return <WarrantyList warranties={filteredWarranties} onEdit={setEditingWarranty} onDelete={(id, url) => deleteWarranty(id, url)} onShare={setSharingWarranty} isDemo={isDemoMode} />;
   };
 
   return (
@@ -287,6 +289,7 @@ const Dashboard: React.FC = () => {
 
       <AddWarrantyModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
       {editingWarranty && <EditWarrantyModal isOpen={!!editingWarranty} onClose={() => setEditingWarranty(null)} warranty={editingWarranty} />}
+      <ShareWarrantyModal isOpen={!!sharingWarranty} onClose={() => setSharingWarranty(null)} warranty={sharingWarranty} />
     </Layout>
   );
 };

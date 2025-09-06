@@ -4,11 +4,13 @@ import { TrashIcon } from './icons/TrashIcon';
 import { EditIcon } from './icons/EditIcon';
 import { TagIcon } from './icons/TagIcon';
 import { WarningIcon } from './icons/WarningIcon';
+import { ShareIcon } from './icons/ShareIcon';
 
 interface WarrantyListProps {
   warranties: (Warranty & { status: 'safe' | 'expiring' | 'expired' })[];
   onEdit: (warranty: Warranty) => void;
   onDelete: (id: string, fileUrl: string) => void;
+  onShare: (warranty: Warranty) => void;
   isDemo?: boolean;
 }
 
@@ -18,7 +20,7 @@ const statusStyles = {
     expired: 'bg-red-500/20 text-red-300',
 };
 
-const WarrantyList: React.FC<WarrantyListProps> = ({ warranties, onEdit, onDelete, isDemo = false }) => {
+const WarrantyList: React.FC<WarrantyListProps> = ({ warranties, onEdit, onDelete, onShare, isDemo = false }) => {
 
   const handleDelete = (warranty: Warranty) => {
     if (isDemo) return;
@@ -60,6 +62,7 @@ const WarrantyList: React.FC<WarrantyListProps> = ({ warranties, onEdit, onDelet
                 </span>
             </div>
             <div className={`flex-shrink-0 flex items-center space-x-2 ${isDemo ? 'opacity-50 cursor-not-allowed' : ''}`}>
+              <button onClick={() => onShare(warranty)} disabled={isDemo} className="p-2 text-content-secondary hover:text-brand-secondary" aria-label="Share"><ShareIcon className="h-5 w-5"/></button>
               <button onClick={() => onEdit(warranty)} disabled={isDemo} className="p-2 text-content-secondary hover:text-brand-primary" aria-label="Edit"><EditIcon className="h-5 w-5"/></button>
               <button onClick={() => handleDelete(warranty)} disabled={isDemo} className="p-2 text-content-secondary hover:text-red-500" aria-label="Delete"><TrashIcon className="h-5 w-5" /></button>
             </div>

@@ -6,7 +6,8 @@ import LandingPage from './pages/LandingPage';
 import ForgotPassword from './pages/ForgotPassword';
 import UpdatePassword from './pages/UpdatePassword';
 import Account from './pages/Account';
-import WarrantyDetailPage from './pages/WarrantyDetailPage'; // New page
+import WarrantyDetailPage from './pages/WarrantyDetailPage';
+import SharePage from './pages/SharePage'; // New page
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { WarrantyProvider } from './context/WarrantyContext';
 import { Spinner } from './components/icons/Spinner';
@@ -72,7 +73,12 @@ const MainContent: React.FC = () => {
 
 
   let content;
-  if (loading) {
+  const shareMatch = route.match(/^\/share\/(.+)/);
+
+  if (shareMatch) {
+    const shareToken = shareMatch[1];
+    content = <SharePage shareToken={shareToken} />;
+  } else if (loading) {
     content = (
       <div className="flex items-center justify-center min-h-screen">
           <Spinner className="w-10 h-10" />

@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, ReactNode, useCallback, useEffect } from 'react';
 import type { Warranty, Category, OcrData } from '../types';
 import { useAuth } from './AuthContext';
@@ -9,6 +8,7 @@ import {
   createWarranty as apiCreateWarranty,
   uploadReceiptAndCreateWarranty as apiUploadAndCreate,
   getWarrantyById as apiGetWarrantyById,
+  createShareLink as apiCreateShareLink,
 } from '../services/warrantyService';
 import { fileToBase64, extractWarrantyInfoFromImage } from '../services/geminiService';
 
@@ -22,6 +22,7 @@ interface WarrantyContextType {
   deleteWarranty: (id: string, fileUrl: string) => Promise<void>;
   uploadAndProcessReceipt: (receiptFile: File) => Promise<Warranty>;
   getWarrantyById: (id: string) => Promise<Warranty>;
+  createShareLink: (warrantyId: string) => Promise<string>;
 }
 
 const WarrantyContext = createContext<WarrantyContextType | undefined>(undefined);
@@ -111,6 +112,7 @@ export const WarrantyProvider: React.FC<{ children: ReactNode }> = ({ children }
       });
 
       // After a successful OCR update, refetch the single warranty to get the complete data
+      // FIX: The call to `apiGetWarrantyById` was missing the `userId` argument.
       const finalWarranty = await apiGetWarrantyById(newWarrantyStub.id, user.id);
       return finalWarranty;
 
@@ -132,8 +134,13 @@ export const WarrantyProvider: React.FC<{ children: ReactNode }> = ({ children }
     return apiGetWarrantyById(id, user.id);
   }, [user]);
 
+  const createShareLink = useCallback(async (warrantyId: string): Promise<string> => {
+    if (!user) throw new Error("User not authenticated.");
+    return apiCreateShareLink(warrantyId, user.id);
+  }, [user]);
+
   return (
-    <WarrantyContext.Provider value={{ warranties, loading, error, addWarranty, updateWarranty, deleteWarranty, uploadAndProcessReceipt, getWarrantyById }}>
+    <WarrantyContext.Provider value={{ warranties, loading, error, addWarranty, updateWarranty, deleteWarranty, uploadAndProcessReceipt, getWarrantyById, createShareLink }}>
       {children}
     </WarrantyContext.Provider>
   );

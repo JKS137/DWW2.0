@@ -9,6 +9,7 @@ A web application to store, manage, and track your product warranties. Simply up
 - **Cloud Storage**: Receipts are securely stored in Supabase Storage.
 - **Dashboard**: View all your warranties in a clean grid or list format.
 - **Search & Filtering**: Instantly search by product name and filter by status (Active/Expired) or category.
+- **Warranty Sharing**: Generate unique, secure links to share read-only warranty details with others.
 - **Visual Alerts**: Warranties that are expiring soon or have expired are visually highlighted.
 - **Automated Email Reminders**: A daily cron job sends email reminders via SendGrid for warranties expiring in 30 or 7 days.
 - **CRUD Operations**: Full support for creating, reading, updating, and deleting warranties.
@@ -31,7 +32,44 @@ The project is designed to run in a web-based development environment that provi
 
 No local setup is required if you are running the app in its intended environment.
 
-### 2. Automated Email Reminders
+### 2. Database Setup for Sharing
+
+The warranty sharing feature requires a new table in your Supabase database.
+
+1.  Navigate to the **SQL Editor** in your Supabase project dashboard.
+2.  Click **New query** and run the following SQL to create the `shared_warranties` table and set up the required security policies.
+
+```sql
+-- Create the table to store share tokens
+CREATE TABLE public.shared_warranties (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    warranty_id uuid NOT NULL,
+    share_token uuid NOT NULL DEFAULT gen_random_uuid(),
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    CONSTRAINT shared_warranties_pkey PRIMARY KEY (id),
+    CONSTRAINT shared_warranties_share_token_key UNIQUE (share_token),
+    CONSTRAINT shared_warranties_warranty_id_fkey FOREIGN KEY (warranty_id) REFERENCES warranties(id) ON DELETE CASCADE
+);
+
+-- 1. Enable RLS
+ALTER TABLE public.shared_warranties ENABLE ROW LEVEL SECURITY;
+
+-- 2. Create policies
+-- Allow public, anonymous read access to anyone
+CREATE POLICY "Allow public read access" ON public.shared_warranties
+FOR SELECT USING (true);
+
+-- Allow authenticated users to create share links for their own warranties
+CREATE POLICY "Allow users to create share links for their warranties" ON public.shared_warranties
+FOR INSERT TO authenticated WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM warranties
+    WHERE warranties.id = shared_warranties.warranty_id AND warranties.user_id = auth.uid()
+  )
+);
+```
+
+### 3. Automated Email Reminders
 
 The application includes a Supabase Edge Function that runs daily to send email reminders for expiring warranties.
 
