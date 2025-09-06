@@ -14,6 +14,7 @@ import { Spinner } from './components/icons/Spinner';
 import { supabaseConfigurationError } from './services/supabaseClient';
 import { ShieldCheckIcon } from './components/icons/ShieldCheckIcon';
 import { trackPageView } from './services/analyticsService';
+import SpeedInsights from './components/SpeedInsights';
 
 const ConfigurationErrorScreen: React.FC<{ message: string }> = ({ message }) => (
     <div className="flex items-center justify-center min-h-screen bg-red-900/50 text-red-200 p-4">
@@ -39,6 +40,7 @@ const App: React.FC = () => {
     <AuthProvider>
       <WarrantyProvider>
         <MainContent />
+        <SpeedInsights />
       </WarrantyProvider>
     </AuthProvider>
   );
