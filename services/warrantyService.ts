@@ -1,7 +1,7 @@
 import { supabase } from './supabaseClient';
 import type { Warranty, Category } from '../types';
 
-const RECEIPTS_BUCKET = 'receipts';
+const RECEIPTS_BUCKET = (process.env.SUPABASE_BUCKET as string) || 'receipts';
 
 // Helper to calculate expiry date
 const calculateExpiryDate = (purchaseDate: string, months: number): string => {
@@ -42,7 +42,13 @@ const uploadReceipt = async (userId: string, file: File): Promise<string> => {
         .from(RECEIPTS_BUCKET)
         .upload(fileName, file);
 
-    if (uploadError) throw new Error(`Storage upload failed: ${uploadError.message}`);
+    if (uploadError) {
+        const msg = uploadError.message?.toLowerCase?.() ?? '';
+        if (msg.includes('bucket') && msg.includes('not')) {
+            throw new Error(`Storage upload failed: Bucket '${RECEIPTS_BUCKET}' not found. Create this bucket in Supabase Storage (public recommended) or set SUPABASE_BUCKET to an existing bucket name in your environment.`);
+        }
+        throw new Error(`Storage upload failed: ${uploadError.message}`);
+    }
 
     const { data } = supabase.storage
         .from(RECEIPTS_BUCKET)
