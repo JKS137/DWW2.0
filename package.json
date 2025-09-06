@@ -18,7 +18,7 @@
     "@supabase/postgrest-js": "1.15.5",
     "@supabase/realtime-js": "2.11.0",
     "@supabase/storage-js": "2.6.0",
-    "framer-motion": "^12.23.12"
+    "framer-motion": "11.3.19"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
