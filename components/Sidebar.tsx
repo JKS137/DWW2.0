@@ -68,7 +68,16 @@ const Sidebar: React.FC = () => {
 
             <div className="p-4 border-t border-base-300/50">
                  <div className="flex items-center">
-                     <button onClick={signOut} className="flex items-center w-full p-2 rounded-lg hover:bg-red-500/20 text-red-400">
+                     <button 
+                        onClick={async () => {
+                            const { error } = await signOut();
+                            if (error) {
+                                console.error('Sign out failed:', error);
+                                return;
+                            }
+                            navigate('/login');
+                        }} 
+                        className="flex items-center w-full p-2 rounded-lg hover:bg-red-500/20 text-red-400">
                         <LogoutIcon className="h-6 w-6 flex-shrink-0" />
                         <span className={`ml-4 font-semibold whitespace-nowrap transition-opacity duration-200 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>Logout</span>
                     </button>
