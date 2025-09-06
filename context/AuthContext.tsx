@@ -9,11 +9,11 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   authEvent: AuthChangeEvent | null;
-  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
-  signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+  signIn: (email: string, password: string, captchaToken?: string) => Promise<{ error: AuthError | null }>;
+  signUp: (email: string, password: string, captchaToken?: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<{ error: AuthError | null }>;
-  signInWithGoogle: () => Promise<{ error: AuthError | null }>;
-  signInWithGithub: () => Promise<{ error: AuthError | null }>;
+  signInWithGoogle: (captchaToken?: string) => Promise<{ error: AuthError | null }>;
+  signInWithGithub: (captchaToken?: string) => Promise<{ error: AuthError | null }>;
   sendPasswordResetEmail: (email: string) => Promise<{ error: AuthError | null }>;
   updateUserPassword: (password: string) => Promise<{ error: AuthError | null }>;
   resendVerificationEmail: (email: string) => Promise<{ error: AuthError | null }>;
@@ -100,33 +100,33 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } as AuthError
   });
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, captchaToken?: string) => {
     if (!supabase) return createConfigError();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({ email, password, options: { captchaToken } });
     return { error };
   };
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = async (captchaToken?: string) => {
     if (!supabase) return createConfigError();
     const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: window.location.origin }
+        options: { redirectTo: window.location.origin, captchaToken }
     });
     return { error };
   };
 
-  const signInWithGithub = async () => {
+  const signInWithGithub = async (captchaToken?: string) => {
     if (!supabase) return createConfigError();
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'github',
-      options: { redirectTo: window.location.origin }
+      options: { redirectTo: window.location.origin, captchaToken }
     });
     return { error };
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, captchaToken?: string) => {
     if (!supabase) return createConfigError();
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({ email, password, options: { captchaToken } });
     
     if (!error && data.user) {
         const { error: profileError } = await supabase

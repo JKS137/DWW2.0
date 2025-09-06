@@ -146,3 +146,51 @@ SENDGRID_API_KEY=...
 SENDER_EMAIL=...
 APP_URL=http://localhost:3000
 ```
+
+### 4. Test Email Edge Function
+
+A tiny function for sending a test email using either Resend or SendGrid.
+
+Secrets required (set them in Supabase > Project Settings > Edge Functions):
+- SENDER_EMAIL: The sender address (e.g., noreply@yourdomain.com)
+- One of: RESEND_API_KEY or SENDGRID_API_KEY
+
+Deploy the function:
+
+```bash
+supabase functions deploy test-email
+```
+
+Invoke remotely with curl (replace placeholders):
+
+```bash
+# PowerShell
+$ANON = "{{SUPABASE_ANON_KEY}}"  # set your anon key in an env var
+$URL  = "https://<YOUR_PROJECT_REF>.supabase.co/functions/v1/test-email"
+
+curl -X POST `
+  -H "Authorization: Bearer $ANON" `
+  -H "Content-Type: application/json" `
+  -d '{"to":"you@example.com"}' `
+  $URL
+```
+
+You can also pick a provider explicitly and pass a custom subject/body:
+
+```bash
+# provider: resend | sendgrid
+curl -X POST \
+  -H "Authorization: Bearer $ANON" \
+  -H "Content-Type: application/json" \
+  -d '{"to":"you@example.com","provider":"resend","subject":"Hello","text":"Plain text","html":"<b>Hi!</b>"}' \
+  $URL
+```
+
+Local test:
+
+```bash
+supabase start
+supabase functions serve test-email
+# in another shell
+curl -X POST -H "Content-Type: application/json" -d '{"to":"you@example.com"}' http://localhost:54321/functions/v1/test-email
+```

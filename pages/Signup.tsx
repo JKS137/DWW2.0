@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { GoogleIcon } from '../components/icons/GoogleIcon';
 import { GithubIcon } from '../components/icons/GithubIcon';
 import { recordAuthAttempt, checkRateLimit } from '../services/rateLimiter';
+import Captcha from '../components/Captcha';
 
 interface SignupProps {
   onSwitchToLogin: () => void;
@@ -18,6 +19,11 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [rateLimitError, setRateLimitError] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+
+  const CAPTCHA_PROVIDER = (process.env.CAPTCHA_PROVIDER as 'turnstile' | 'hcaptcha') || 'turnstile';
+  const SITE_KEY = (process.env.TURNSTILE_SITE_KEY || process.env.HCAPTCHA_SITE_KEY || '') as string;
+  const captchaEnabled = Boolean(SITE_KEY);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +44,13 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
         return;
     }
 
-    const { error } = await signUp(email, password);
+    if (captchaEnabled && !captchaToken) {
+        setError('Please complete the CAPTCHA.');
+        setLoading(false);
+        return;
+    }
+
+    const { error } = await signUp(email, password, captchaToken || undefined);
 
     if (error) {
       setError(error.message);
@@ -52,7 +64,7 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
   const handleGoogleSignIn = async () => {
     setError(null);
     setRateLimitError(null);
-    const { error } = await signInWithGoogle();
+    const { error } = await signInWithGoogle(captchaToken || undefined);
     if (error) {
         setError(error.message);
     }
@@ -107,7 +119,7 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
                   <span>Sign up with Google</span>
               </button>
               <button
-                  onClick={async () => { const { error } = await signInWithGithub(); if (error) setError(error.message); }}
+                  onClick={async () => { const { error } = await signInWithGithub(captchaToken || undefined); if (error) setError(error.message); }}
                   className="w-full flex justify-center items-center space-x-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-all hover:scale-105 active:scale-95"
               >
                   <GithubIcon className="h-5 w-5" />
@@ -157,6 +169,13 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
                   />
                 </div>
               </div>
+
+              {/* Captcha */}
+              {captchaEnabled && (
+                <div className="mt-2">
+                  <Captcha provider={CAPTCHA_PROVIDER as any} siteKey={SITE_KEY} onVerify={t => setCaptchaToken(t)} onExpire={() => setCaptchaToken(null)} />
+                </div>
+              )}
               
               {(rateLimitError || error) && <p className="text-brand-pink text-sm text-center">{rateLimitError || error}</p>}
 

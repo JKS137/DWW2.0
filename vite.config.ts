@@ -7,7 +7,10 @@ export default defineConfig(({ mode }) => {
       define: {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
         'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.SUPABASE_BUCKET': JSON.stringify(env.SUPABASE_BUCKET || env.VITE_SUPABASE_BUCKET || 'receipts')
+        'process.env.SUPABASE_BUCKET': JSON.stringify(env.SUPABASE_BUCKET || env.VITE_SUPABASE_BUCKET || 'receipts'),
+        'process.env.CAPTCHA_PROVIDER': JSON.stringify(env.CAPTCHA_PROVIDER || env.VITE_CAPTCHA_PROVIDER || 'turnstile'),
+        'process.env.TURNSTILE_SITE_KEY': JSON.stringify(env.TURNSTILE_SITE_KEY || env.VITE_TURNSTILE_SITE_KEY || ''),
+        'process.env.HCAPTCHA_SITE_KEY': JSON.stringify(env.HCAPTCHA_SITE_KEY || env.VITE_HCAPTCHA_SITE_KEY || ''),
       },
       resolve: {
         alias: {
