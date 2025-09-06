@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
@@ -65,7 +66,13 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
 
                 {/* Right Side: CTAs (Desktop) */}
                 <div className="hidden md:flex items-center gap-4">
-                    <motion.button whileHover={{ scale: 1.1 }} onClick={onNavigateLogin} className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+                    <motion.button 
+                        onClick={onNavigateLogin} 
+                        className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
+                        variants={buttonVariants}
+                        whileHover="hover"
+                        whileTap="tap"
+                    >
                         Login
                     </motion.button>
                     <motion.button 
@@ -115,6 +122,9 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
                                 transition={{ delay: 0.4 }}
                                 onClick={() => { onNavigateLogin(); setIsOpen(false); }}
                                 className="w-full text-lg font-medium text-gray-200 hover:text-brand-primary"
+                                variants={buttonVariants}
+                                whileHover="hover"
+                                whileTap="tap"
                             >
                                 Login
                             </motion.button>
@@ -124,6 +134,9 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
                                 transition={{ delay: 0.5 }}
                                 onClick={() => { onNavigateSignup(); setIsOpen(false); }}
                                 className="w-full px-6 py-3 text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full"
+                                variants={buttonVariants}
+                                whileHover="hover"
+                                whileTap="tap"
                             >
                                 Get Started
                             </motion.button>
