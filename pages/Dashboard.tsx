@@ -289,7 +289,7 @@ const Dashboard: React.FC = () => {
 
       <AddWarrantyModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
       {editingWarranty && <EditWarrantyModal isOpen={!!editingWarranty} onClose={() => setEditingWarranty(null)} warranty={editingWarranty} />}
-      <ShareWarrantyModal isOpen={!!sharingWarranty} onClose={() => setSharingWarranty(null)} warranty={sharingWarranty} />
+      {sharingWarranty && <ShareWarrantyModal isOpen={!!sharingWarranty} onClose={() => setSharingWarranty(null)} warranty={sharingWarranty} />}
     </Layout>
   );
 };

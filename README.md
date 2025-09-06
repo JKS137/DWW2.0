@@ -44,12 +44,17 @@ The warranty sharing feature requires a new table in your Supabase database.
 CREATE TABLE public.shared_warranties (
     id uuid NOT NULL DEFAULT gen_random_uuid(),
     warranty_id uuid NOT NULL,
+    user_id uuid NOT NULL,
     share_token uuid NOT NULL DEFAULT gen_random_uuid(),
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     CONSTRAINT shared_warranties_pkey PRIMARY KEY (id),
     CONSTRAINT shared_warranties_share_token_key UNIQUE (share_token),
+    CONSTRAINT shared_warranties_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE,
     CONSTRAINT shared_warranties_warranty_id_fkey FOREIGN KEY (warranty_id) REFERENCES warranties(id) ON DELETE CASCADE
 );
+
+-- Add index for faster lookups
+CREATE INDEX idx_shared_warranties_share_token ON public.shared_warranties USING btree (share_token);
 
 -- 1. Enable RLS
 ALTER TABLE public.shared_warranties ENABLE ROW LEVEL SECURITY;
@@ -61,12 +66,7 @@ FOR SELECT USING (true);
 
 -- Allow authenticated users to create share links for their own warranties
 CREATE POLICY "Allow users to create share links for their warranties" ON public.shared_warranties
-FOR INSERT TO authenticated WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM warranties
-    WHERE warranties.id = shared_warranties.warranty_id AND warranties.user_id = auth.uid()
-  )
-);
+FOR INSERT TO authenticated WITH CHECK (user_id = auth.uid());
 ```
 
 ### 3. Automated Email Reminders

@@ -20,7 +20,8 @@ const ShareWarrantyModal: React.FC<ShareWarrantyModalProps> = ({ isOpen, onClose
     const [copied, setCopied] = useState(false);
 
     useEffect(() => {
-        if (isOpen && warranty && !shareLink) {
+        if (isOpen && warranty) {
+            setShareLink(null); // Reset link when a new warranty is selected
             const generateLink = async () => {
                 setLoading(true);
                 setError(null);
@@ -36,7 +37,7 @@ const ShareWarrantyModal: React.FC<ShareWarrantyModalProps> = ({ isOpen, onClose
             };
             generateLink();
         }
-    }, [isOpen, warranty, createShareLink, shareLink]);
+    }, [isOpen, warranty, createShareLink]);
 
     const handleClose = () => {
         onClose();

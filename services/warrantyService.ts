@@ -213,14 +213,21 @@ export const createShareLink = async (warrantyId: string, userId: string): Promi
     // RLS policy ensures user can only create links for their own warranties.
     const { data, error } = await supabase
         .from('shared_warranties')
-        .insert({ warranty_id: warrantyId, user_id: userId }) // user_id is implicit via auth
+        .insert({ warranty_id: warrantyId, user_id: userId })
         .select('share_token')
         .single();
     
     if (error) {
-        // Check for a specific error related to RLS failing on the check
-        if (error.message.includes('check constraint')) {
-             throw new Error("You do not have permission to share this warranty.");
+        // Check if a share link for this warranty already exists
+        if (error.code === '23505') { // unique_violation
+             const { data: existing, error: fetchError } = await supabase
+                .from('shared_warranties')
+                .select('share_token')
+                .eq('warranty_id', warrantyId)
+                .single();
+
+            if (fetchError) throw new Error(`Could not create or retrieve share link: ${fetchError.message}`);
+            if (existing) return existing.share_token;
         }
         throw new Error(`Could not create share link: ${error.message}`);
     }
@@ -248,12 +255,8 @@ export const getSharedWarranty = async (shareToken: string): Promise<Partial<War
         throw new Error(linkError.message);
     }
     
-    if (!sharedLink || !Array.isArray(sharedLink.warranties) || sharedLink.warranties.length === 0) {
-        const nestedWarranties = sharedLink.warranties as unknown as Partial<Warranty> | null;
-        if (!nestedWarranties) {
-             throw new Error("Could not find the warranty associated with this link.");
-        }
-        return nestedWarranties;
+    if (!sharedLink || !sharedLink.warranties) {
+         throw new Error("Could not find the warranty associated with this link.");
     }
 
     // Supabase returns the nested object. Handle both object and array-of-one responses.
