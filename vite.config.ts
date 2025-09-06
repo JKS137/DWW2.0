@@ -12,18 +12,6 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
-      },
-      build: {
-        chunkSizeWarningLimit: 1200,
-        rollupOptions: {
-          output: {
-            manualChunks: {
-              react: ['react', 'react-dom'],
-              motion: ['framer-motion'],
-              supabase: ['@supabase/supabase-js'],
-            }
-          }
-        }
       }
     };
 });
