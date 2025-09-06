@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, ReactNode, useCallback, useEffect } from 'react';
 import type { Warranty, Category, OcrData } from '../types';
 import { useAuth } from './AuthContext';
@@ -7,6 +8,7 @@ import {
   updateWarranty as apiUpdateWarranty,
   createWarranty as apiCreateWarranty,
   uploadReceiptAndCreateWarranty as apiUploadAndCreate,
+  getWarrantyById as apiGetWarrantyById,
 } from '../services/warrantyService';
 import { fileToBase64, extractWarrantyInfoFromImage } from '../services/geminiService';
 
@@ -18,7 +20,8 @@ interface WarrantyContextType {
   addWarranty: (data: Omit<Warranty, 'id' | 'user_id' | 'expiry_date' | 'created_at' | 'ocr_raw' | 'file_url' | 'category'> & { category: Category | null }, receiptFile: File) => Promise<void>;
   updateWarranty: (id: string, updates: Partial<Pick<Warranty, 'product_name' | 'purchase_date' | 'warranty_duration' | 'category'>>) => Promise<void>;
   deleteWarranty: (id: string, fileUrl: string) => Promise<void>;
-  uploadAndProcessReceipt: (receiptFile: File) => Promise<void>;
+  uploadAndProcessReceipt: (receiptFile: File) => Promise<Warranty>;
+  getWarrantyById: (id: string) => Promise<Warranty>;
 }
 
 const WarrantyContext = createContext<WarrantyContextType | undefined>(undefined);
@@ -85,7 +88,7 @@ export const WarrantyProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   }, [warranties]);
   
-  const uploadAndProcessReceipt = useCallback(async (receiptFile: File) => {
+  const uploadAndProcessReceipt = useCallback(async (receiptFile: File): Promise<Warranty> => {
     if (!user) throw new Error("User not authenticated.");
 
     let newWarrantyStub: Warranty | null = null;
@@ -107,6 +110,10 @@ export const WarrantyProvider: React.FC<{ children: ReactNode }> = ({ children }
           ocr_raw: JSON.stringify(ocrData, null, 2),
       });
 
+      // After a successful OCR update, refetch the single warranty to get the complete data
+      const finalWarranty = await apiGetWarrantyById(newWarrantyStub.id, user.id);
+      return finalWarranty;
+
     } catch (error: any) {
         console.error("Failed during upload and process flow:", error);
         // If OCR or update fails, update the stub to show an error state.
@@ -120,8 +127,13 @@ export const WarrantyProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   }, [user, fetchWarranties]);
 
+  const getWarrantyById = useCallback(async (id: string): Promise<Warranty> => {
+    if (!user) throw new Error("User not authenticated.");
+    return apiGetWarrantyById(id, user.id);
+  }, [user]);
+
   return (
-    <WarrantyContext.Provider value={{ warranties, loading, error, addWarranty, updateWarranty, deleteWarranty, uploadAndProcessReceipt }}>
+    <WarrantyContext.Provider value={{ warranties, loading, error, addWarranty, updateWarranty, deleteWarranty, uploadAndProcessReceipt, getWarrantyById }}>
       {children}
     </WarrantyContext.Provider>
   );

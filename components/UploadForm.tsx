@@ -1,42 +1,98 @@
-import React, { useState, useRef, useCallback } from 'react';
+
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useWarranties } from '../context/WarrantyContext';
 import { UploadIcon } from './icons/UploadIcon';
 import { Spinner } from './icons/Spinner';
 import { CheckCircleIcon } from './icons/CheckCircleIcon';
 import { XCircleIcon } from './icons/XCircleIcon';
+import { XIcon } from './icons/XIcon';
+import type { Warranty } from '../types';
 
-type UploadStatus = 'idle' | 'uploading' | 'success' | 'error';
+interface Upload {
+    id: string;
+    file: File;
+    status: 'uploading' | 'success' | 'error';
+    error?: string;
+    warranty?: Warranty;
+}
 
 const UploadForm: React.FC = () => {
     const { uploadAndProcessReceipt } = useWarranties();
     const [isDragging, setIsDragging] = useState(false);
-    const [uploadStatus, setUploadStatus] = useState<UploadStatus>('idle');
-    const [error, setError] = useState<string | null>(null);
+    const [uploads, setUploads] = useState<Upload[]>([]);
+    const [progress, setProgress] = useState<Record<string, number>>({});
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleFile = useCallback(async (file: File) => {
-        if (!file) return;
+    const navigate = (path: string) => {
+        window.history.pushState({}, '', path);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+    };
+    
+    // Simulate upload progress
+    useEffect(() => {
+        const activeUploads = uploads.filter(u => u.status === 'uploading');
+        if (activeUploads.length === 0) return;
 
-        const acceptedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
-        if (!acceptedTypes.includes(file.type)) {
-            setError('Invalid file type. Please upload an image or PDF.');
-            setUploadStatus('error');
-            return;
-        }
+        const interval = setInterval(() => {
+            setProgress(prev => {
+                const newProgress = { ...prev };
+                activeUploads.forEach(upload => {
+                    const current = newProgress[upload.id] || 0;
+                    if (current < 95) { // Don't let it reach 100% automatically
+                        newProgress[upload.id] = current + Math.random() * 5;
+                    }
+                });
+                return newProgress;
+            });
+        }, 300);
 
-        setError(null);
-        setUploadStatus('uploading');
+        return () => clearInterval(interval);
+    }, [uploads]);
 
+    const processFile = useCallback(async (upload: Upload) => {
         try {
-            await uploadAndProcessReceipt(file);
-            setUploadStatus('success');
-            setTimeout(() => setUploadStatus('idle'), 3000); // Reset after 3 seconds
+            const newWarranty = await uploadAndProcessReceipt(upload.file);
+            setProgress(prev => ({ ...prev, [upload.id]: 100 }));
+            setUploads(prev => prev.map(u => u.id === upload.id ? { ...u, status: 'success', warranty: newWarranty } : u));
         } catch (err: any) {
-            setError(err.message || 'An unknown error occurred.');
-            setUploadStatus('error');
+            setUploads(prev => prev.map(u => u.id === upload.id ? { ...u, status: 'error', error: err.message || 'An unknown error occurred.' } : u));
         }
     }, [uploadAndProcessReceipt]);
+
+    const handleFiles = useCallback((files: FileList | null) => {
+        if (!files || files.length === 0) return;
+
+        const newUploads: Upload[] = Array.from(files).map(file => {
+            const acceptedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+            if (!acceptedTypes.includes(file.type)) {
+                return {
+                    id: `${file.name}-${Date.now()}`,
+                    file,
+                    status: 'error' as const,
+                    error: 'Invalid file type.'
+                };
+            }
+            return {
+                id: `${file.name}-${Date.now()}`,
+                file,
+                status: 'uploading' as const,
+            };
+        });
+        
+        setUploads(prev => [...newUploads, ...prev]);
+
+        newUploads.forEach(upload => {
+            if (upload.status === 'uploading') {
+                setProgress(prev => ({...prev, [upload.id]: 0}));
+                processFile(upload);
+            }
+        });
+    }, [processFile]);
     
+    const handleCancel = (id: string) => {
+        setUploads(prev => prev.filter(u => u.id !== id));
+    };
+
     const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
@@ -58,23 +114,20 @@ const UploadForm: React.FC = () => {
         e.preventDefault();
         e.stopPropagation();
         setIsDragging(false);
-        const file = e.dataTransfer.files?.[0];
-        handleFile(file);
+        handleFiles(e.dataTransfer.files);
     };
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        handleFile(file);
-        // Reset file input value to allow uploading the same file again
+        handleFiles(e.target.files);
         if (e.target) {
             e.target.value = '';
         }
     };
 
-    const baseClasses = "relative block w-full border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-300";
+    const baseClasses = "relative block w-full border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-300 cursor-pointer";
     const draggingClasses = isDragging ? "border-brand-primary bg-brand-primary/10" : "border-base-300/70 hover:border-brand-primary/70";
 
-    return (
+    const DropzoneContent = () => (
         <div 
             className={`${baseClasses} ${draggingClasses}`}
             onDragEnter={handleDragEnter}
@@ -86,47 +139,80 @@ const UploadForm: React.FC = () => {
             <input
                 ref={fileInputRef}
                 type="file"
+                multiple
                 className="hidden"
                 accept="image/jpeg,image/png,image/webp,application/pdf"
                 onChange={handleFileSelect}
             />
-            
-            {uploadStatus === 'idle' && (
-                <div className="space-y-2">
-                    <UploadIcon className="mx-auto h-10 w-10 text-content-secondary" />
-                    <p className="font-semibold text-content-primary">Quick Upload &amp; Analyze</p>
-                    <p className="text-sm text-content-secondary">Drag &amp; drop or click to upload a receipt. <br/> AI will automatically extract the details.</p>
-                </div>
-            )}
-
-            {uploadStatus === 'uploading' && (
-                <div className="flex flex-col items-center justify-center">
-                    <Spinner className="w-10 h-10" />
-                    <p className="mt-2 text-sm text-content-secondary">Uploading &amp; Analyzing...</p>
-                </div>
-            )}
-
-            {uploadStatus === 'success' && (
-                 <div className="flex flex-col items-center justify-center">
-                    <CheckCircleIcon className="w-10 h-10 text-brand-secondary" />
-                    <p className="mt-2 text-sm font-semibold text-brand-secondary">Analysis Complete!</p>
-                </div>
-            )}
-
-            {uploadStatus === 'error' && (
-                <div className="flex flex-col items-center justify-center">
-                    <XCircleIcon className="w-10 h-10 text-brand-pink" />
-                    <p className="mt-2 text-sm font-semibold text-brand-pink">Processing Failed</p>
-                    <p className="text-xs text-content-secondary mt-1">{error}</p>
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); setUploadStatus('idle'); }} 
-                        className="mt-4 px-3 py-1 text-xs bg-base-300 rounded-md hover:bg-opacity-80"
-                    >
-                        Try Again
-                    </button>
-                </div>
-            )}
+            <div className="space-y-2">
+                <UploadIcon className="mx-auto h-10 w-10 text-content-secondary" />
+                <p className="font-semibold text-content-primary">Quick Upload &amp; Analyze</p>
+                <p className="text-sm text-content-secondary">Drag &amp; drop or click to upload receipts. <br/> AI will automatically extract the details.</p>
+            </div>
         </div>
+    );
+
+    const UploadsList = () => (
+        <div className="mt-4 space-y-3">
+            {uploads.map(upload => {
+                const currentProgress = Math.round(progress[upload.id] || 0);
+                return (
+                    <div key={upload.id} className="bg-base-200/50 p-4 rounded-lg flex items-center justify-between gap-4 animate-fade-in transition-all">
+                        <div className="flex items-center gap-4 overflow-hidden flex-1">
+                            <div className="flex-shrink-0">
+                                {upload.status === 'uploading' && <Spinner className="w-6 h-6"/>}
+                                {upload.status === 'success' && <CheckCircleIcon className="w-6 h-6 text-brand-secondary"/>}
+                                {upload.status === 'error' && <XCircleIcon className="w-6 h-6 text-brand-pink"/>}
+                            </div>
+                            <div className="overflow-hidden w-full">
+                                <p className="text-sm font-medium text-content-primary truncate">{upload.file.name}</p>
+                                
+                                <div className="mt-1.5">
+                                    {upload.status === 'uploading' && (
+                                        <>
+                                            <div className="flex justify-between items-center text-xs text-content-secondary mb-1">
+                                                <span>Analyzing with AI...</span>
+                                                <span>{currentProgress}%</span>
+                                            </div>
+                                            <div className="w-full bg-base-300 rounded-full h-2">
+                                                <div 
+                                                    className="bg-brand-primary h-2 rounded-full transition-all duration-300 ease-linear" 
+                                                    style={{ width: `${currentProgress}%` }}
+                                                ></div>
+                                            </div>
+                                        </>
+                                    )}
+                                    {upload.status === 'error' && <p className="text-xs text-brand-pink">{upload.error}</p>}
+                                    {upload.status === 'success' && upload.warranty && (
+                                        <p className="text-xs text-brand-secondary">
+                                            Success! Warranty details extracted.{' '}
+                                            <button
+                                                onClick={() => navigate(`/warranty/${upload.warranty!.id}`)}
+                                                className="underline hover:text-teal-300 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-secondary rounded-sm"
+                                            >
+                                                View Details
+                                            </button>
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                        {upload.status === 'uploading' && (
+                            <button onClick={() => handleCancel(upload.id)} className="p-1.5 text-content-secondary hover:text-content-primary rounded-full hover:bg-base-300/50 flex-shrink-0" aria-label="Cancel upload">
+                                <XIcon className="w-4 h-4"/>
+                            </button>
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    );
+
+    return (
+        <>
+            <DropzoneContent />
+            {uploads.length > 0 && <UploadsList />}
+        </>
     );
 };
 

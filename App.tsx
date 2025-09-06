@@ -7,7 +7,8 @@ import Signup from './pages/Signup';
 import LandingPage from './pages/LandingPage';
 import ForgotPassword from './pages/ForgotPassword';
 import UpdatePassword from './pages/UpdatePassword';
-import Account from './pages/Account'; // New page
+import Account from './pages/Account';
+import WarrantyDetailPage from './pages/WarrantyDetailPage'; // New page
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { WarrantyProvider } from './context/WarrantyContext';
 import { Spinner } from './components/icons/Spinner';
@@ -80,33 +81,37 @@ const MainContent: React.FC = () => {
       </div>
     );
   } else if (user) {
-    // Authenticated user routing
     const isAuthPublicRoute = ['/', '/login', '/signup', '/forgot-password'].includes(route);
-
     if (isAuthPublicRoute) {
         navigate('/dashboard');
         return <div className="flex items-center justify-center min-h-screen"><Spinner className="w-10 h-10" /></div>;
     }
 
-    switch (route) {
-        case '/dashboard':
-            content = <Dashboard />;
-            break;
-        case '/account':
-            content = <Account />;
-            break;
-        case '/update-password':
-            content = <UpdatePassword onPasswordUpdated={() => navigate('/dashboard')} />;
-            break;
-        default:
-            // If route is unknown for a logged-in user, redirect to dashboard.
-            navigate('/dashboard');
-            content = <Dashboard />;
-            break;
+    const warrantyDetailMatch = route.match(/^\/warranty\/(.+)/);
+    if (warrantyDetailMatch) {
+        const warrantyId = warrantyDetailMatch[1];
+        content = <WarrantyDetailPage warrantyId={warrantyId} />;
+    } else {
+        switch (route) {
+            case '/dashboard':
+                content = <Dashboard />;
+                break;
+            case '/account':
+                content = <Account />;
+                break;
+            case '/update-password':
+                content = <UpdatePassword onPasswordUpdated={() => navigate('/dashboard')} />;
+                break;
+            default:
+                // If route is unknown for a logged-in user, redirect to dashboard.
+                navigate('/dashboard');
+                content = <Dashboard />;
+                break;
+        }
     }
   } else {
     // Unauthenticated user routing
-    const isProtectedRoute = route === '/dashboard' || route.startsWith('/account');
+    const isProtectedRoute = route === '/dashboard' || route.startsWith('/account') || route.startsWith('/warranty/');
     if (isProtectedRoute) {
         navigate('/login');
         return <Login onSwitchToSignup={() => navigate('/signup')} onNavigateHome={() => navigate('/')} onNavigateForgotPassword={() => navigate('/forgot-password')} />;
@@ -123,9 +128,6 @@ const MainContent: React.FC = () => {
         content = <ForgotPassword onSwitchToLogin={() => navigate('/login')} onNavigateHome={() => navigate('/')} />;
         break;
       case '/update-password':
-        // A user might be unauthenticated but have a recovery token.
-        // The AuthContext will catch the PASSWORD_RECOVERY event and set the session.
-        // For a brief moment, they might be here unauthenticated.
         content = <UpdatePassword onPasswordUpdated={() => navigate('/login')} />;
         break;
       case '/':

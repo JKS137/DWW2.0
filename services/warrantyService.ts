@@ -1,3 +1,4 @@
+
 import { supabase } from './supabaseClient';
 import type { Warranty, Category } from '../types';
 
@@ -179,4 +180,25 @@ export const deleteWarranty = async (warrantyId: string, fileUrl: string): Promi
     } catch (e: any) {
         console.error("Error parsing file URL for deletion:", e.message);
     }
+};
+
+/**
+ * Fetches a single warranty by its ID for a specific user.
+ */
+export const getWarrantyById = async (warrantyId: string, userId: string): Promise<Warranty> => {
+    if (!supabase) throw new Error("Supabase client is not initialized.");
+    const { data, error } = await supabase
+        .from('warranties')
+        .select('*')
+        .eq('id', warrantyId)
+        .eq('user_id', userId)
+        .single();
+
+    if (error) {
+        if (error.code === 'PGRST116') { // Code for "No rows found"
+            throw new Error("Warranty not found or you don't have permission to view it.");
+        }
+        throw new Error(error.message);
+    }
+    return data as Warranty;
 };

@@ -59,16 +59,19 @@ const Sidebar: React.FC<SidebarProps> = ({ onOpenComingSoonModal }) => {
             </div>
             
             <nav className="flex-1 px-2 py-4 space-y-2">
-                {navItems.map(item => (
-                    <button 
-                        key={item.label} 
-                        onClick={item.action} 
-                        className={`flex items-center w-full p-2 rounded-lg transition-colors ${activeRoute === item.path ? 'bg-brand-primary text-white' : 'hover:bg-base-300/50 text-content-secondary hover:text-content-primary'}`}
-                    >
-                        <item.icon className="h-6 w-6 flex-shrink-0" />
-                        <span className={`ml-4 font-semibold whitespace-nowrap transition-opacity duration-200 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>{item.label}</span>
-                    </button>
-                ))}
+                {navItems.map(item => {
+                    const Icon = item.icon;
+                    return (
+                        <button 
+                            key={item.label} 
+                            onClick={item.action} 
+                            className={`flex items-center w-full p-2 rounded-lg transition-colors ${activeRoute === item.path ? 'bg-brand-primary text-white' : 'hover:bg-base-300/50 text-content-secondary hover:text-content-primary'}`}
+                        >
+                            <Icon className="h-6 w-6 flex-shrink-0" />
+                            <span className={`ml-4 font-semibold whitespace-nowrap transition-opacity duration-200 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>{item.label}</span>
+                        </button>
+                    );
+                })}
             </nav>
 
             <div className="p-4 border-t border-base-300/50">

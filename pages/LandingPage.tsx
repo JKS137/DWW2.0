@@ -189,15 +189,18 @@ const HowItWorks: React.FC = () => (
                     { title: "Upload Receipt", description: "Snap a photo or upload a file. Our AI gets to work instantly.", icon: UploadIcon },
                     { title: "Track Expiry", description: "We automatically extract details and set up expiry tracking.", icon: SmartOCRIcon },
                     { title: "Get Reminders", description: "Receive email alerts before a warranty expires so you never miss a claim.", icon: RemindersIcon }
-                ].map((step, index) => (
-                    <div key={step.title} className="text-center p-6 bg-base-200/50 backdrop-blur-md border border-base-300/50 rounded-xl animate-slide-up" style={{ animationDelay: `${index * 0.1}s`}}>
-                        <div className="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-base-100 border-2 border-brand-primary shadow-glow-blue mb-4">
-                           <step.icon className="h-8 w-8 text-brand-primary" />
+                ].map((step, index) => {
+                    const Icon = step.icon;
+                    return (
+                        <div key={step.title} className="text-center p-6 bg-base-200/50 backdrop-blur-md border border-base-300/50 rounded-xl animate-slide-up" style={{ animationDelay: `${index * 0.1}s`}}>
+                            <div className="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-base-100 border-2 border-brand-primary shadow-glow-blue mb-4">
+                               <Icon className="h-8 w-8 text-brand-primary" />
+                            </div>
+                            <h3 className="text-xl font-semibold">{step.title}</h3>
+                            <p className="text-content-secondary mt-2">{step.description}</p>
                         </div>
-                        <h3 className="text-xl font-semibold">{step.title}</h3>
-                        <p className="text-content-secondary mt-2">{step.description}</p>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     </section>
@@ -221,17 +224,20 @@ const Features: React.FC = () => {
             <p className="text-content-secondary mt-2">Powerful features to give you complete peace of mind.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featureList.map((feature, index) => (
-              <div key={feature.name} className="flex items-start space-x-4 p-4 animate-slide-up" style={{ animationDelay: `${index * 0.05}s`}}>
-                 <div className="flex-shrink-0 p-2 bg-base-100 rounded-lg border border-brand-secondary/50">
-                    <feature.icon className="h-6 w-6 text-brand-secondary" />
-                 </div>
-                <div>
-                  <h3 className="font-semibold">{feature.name}</h3>
-                  <p className="text-content-secondary text-sm mt-1">{feature.description}</p>
+            {featureList.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <div key={feature.name} className="flex items-start space-x-4 p-4 animate-slide-up" style={{ animationDelay: `${index * 0.05}s`}}>
+                   <div className="flex-shrink-0 p-2 bg-base-100 rounded-lg border border-brand-secondary/50">
+                      <Icon className="h-6 w-6 text-brand-secondary" />
+                   </div>
+                  <div>
+                    <h3 className="font-semibold">{feature.name}</h3>
+                    <p className="text-content-secondary text-sm mt-1">{feature.description}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

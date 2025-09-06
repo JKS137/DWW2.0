@@ -1,7 +1,5 @@
-// This placeholder should be replaced by your actual Google Analytics Measurement ID.
-// In a typical build environment (like Next.js or Vite), this would be read from an environment variable
-// such as `process.env.NEXT_PUBLIC_GA_ID`. For this setup, it's read from the script in index.html.
-const GA_MEASUREMENT_ID = '%%NEXT_PUBLIC_GA_ID%%';
+// The Google Analytics Measurement ID for this application.
+const GA_MEASUREMENT_ID = 'G-EVQTZBJLWH';
 
 // Augment the global Window interface to include the `gtag` function
 declare global {
