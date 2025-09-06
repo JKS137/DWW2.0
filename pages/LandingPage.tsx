@@ -10,6 +10,8 @@ import { ExportIcon } from '../components/icons/ExportIcon';
 import { CheckCircleIcon } from '../components/icons/CheckCircleIcon';
 import { UploadIcon } from '../components/icons/UploadIcon';
 import { XIcon } from '../components/icons/XIcon';
+import { GithubIcon } from '../components/icons/GithubIcon';
+import { useAuth } from '../context/AuthContext';
 
 interface LandingPageProps {
   onNavigateLogin: () => void;
@@ -114,7 +116,9 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
 };
 
 
-const Hero: React.FC<LandingPageProps> = ({ onNavigateSignup, onNavigateLogin }) => (
+const Hero: React.FC<LandingPageProps> = ({ onNavigateSignup, onNavigateLogin }) => {
+    const { signInWithGithub } = useAuth();
+    return (
     <section 
       className="relative pt-40 pb-20 text-center"
     >
@@ -126,7 +130,7 @@ const Hero: React.FC<LandingPageProps> = ({ onNavigateSignup, onNavigateLogin })
             <p className="mt-6 max-w-2xl mx-auto text-lg text-content-secondary animate-slide-up" style={{ animationDelay: '0.1s' }}>
                 Your digital vault for receipts, warranties, and peace of mind. Securely store, track, and get reminded before they expire.
             </p>
-            <div className="mt-10 flex justify-center gap-4 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+            <div className="mt-10 flex flex-wrap justify-center gap-4 animate-slide-up" style={{ animationDelay: '0.2s' }}>
                 <button 
                   onClick={onNavigateSignup} 
                   className="px-6 py-3 font-semibold bg-brand-primary text-white rounded-lg hover:bg-opacity-90 transition-all hover:shadow-glow-blue hover:scale-105 active:scale-95"
@@ -139,6 +143,14 @@ const Hero: React.FC<LandingPageProps> = ({ onNavigateSignup, onNavigateLogin })
                  >
                     Login
                 </button>
+                <button
+                   onClick={async () => { const { error } = await signInWithGithub(); if (error) alert(error.message); }}
+                   className="px-6 py-3 font-semibold bg-base-100 text-content-primary border border-base-300 rounded-lg hover:bg-base-200 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+                   aria-label="Continue with GitHub"
+                >
+                   <GithubIcon className="h-5 w-5" />
+                   Continue with GitHub
+                </button>
             </div>
              <div className="mt-16 w-full max-w-4xl mx-auto animate-slide-up" style={{ animationDelay: '0.3s' }}>
                 <div className="relative rounded-xl p-1 bg-gradient-to-br from-blue-500 to-teal-400">
@@ -149,7 +161,8 @@ const Hero: React.FC<LandingPageProps> = ({ onNavigateSignup, onNavigateLogin })
             </div>
         </div>
     </section>
-);
+    );
+};
 
 const HowItWorks: React.FC = () => (
     <section 
