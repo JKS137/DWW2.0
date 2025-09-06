@@ -162,9 +162,6 @@ const Hero: React.FC<LandingPageProps> = ({ onNavigateSignup, onNavigateLogin })
                  <button onClick={onNavigateLogin} className="px-6 py-3 font-semibold bg-base-200/80 text-content-primary rounded-lg hover:bg-base-200 transition-all transform hover:scale-105">
                     Login
                 </button>
-                <button className="px-6 py-3 font-semibold bg-base-200/80 text-content-primary rounded-lg hover:bg-base-200 transition-all transform hover:scale-105">
-                    View Demo
-                </button>
             </div>
              <div className="mt-16 w-full max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: '0.6s' }}>
                 <div className="relative rounded-xl p-1 bg-gradient-to-br from-blue-500 to-teal-400">
@@ -212,8 +209,7 @@ const Features: React.FC = () => {
       { name: "Smart OCR Extraction", icon: SmartOCRIcon, description: "AI-powered receipt scanning saves you manual data entry." },
       { name: "Expiry Reminders", icon: RemindersIcon, description: "Automated email notifications so you're always prepared." },
       { name: "Multi-Device Sync", icon: SyncIcon, description: "Access your vault from anywhere, on any device." },
-      { name: "Export (PDF/CSV)", icon: ExportIcon, description: "Download your warranty data for personal records or insurance." },
-      { name: "Family/Team Sharing", icon: ShareIcon, description: "Share access to warranties with family members or colleagues." },
+      { name: "Export to CSV", icon: ExportIcon, description: "Download your warranty data for personal records or insurance." },
     ];
   
     return (
@@ -248,7 +244,7 @@ const Pricing: React.FC<LandingPageProps> = ({ onNavigateSignup }) => {
     const plans = [
         { name: "Free", price: "$0", features: ["5 Warranties", "Basic OCR", "Email Reminders"], glow: 'shadow-glow-blue', border: 'border-blue-500' },
         { name: "Starter", price: "$5", features: ["50 Warranties", "Advanced OCR", "Priority Support", "Export to CSV"], glow: 'shadow-glow-teal', border: 'border-teal-500', popular: true },
-        { name: "Pro", price: "$10", features: ["Unlimited Warranties", "All Starter Features", "Family Sharing", "API Access"], glow: 'shadow-glow-purple', border: 'border-purple-500' }
+        { name: "Pro", price: "$10", features: ["Unlimited Warranties", "All Starter Features", "API Access"], glow: 'shadow-glow-purple', border: 'border-purple-500' }
     ];
 
     return (

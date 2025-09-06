@@ -1,4 +1,6 @@
 
+
+
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { useWarranties } from '../context/WarrantyContext';
@@ -7,7 +9,6 @@ import type { Warranty } from '../types';
 import { CalendarIcon } from '../components/icons/CalendarIcon';
 import { TagIcon } from '../components/icons/TagIcon';
 import { ArrowLeftIcon } from '../components/icons/ArrowLeftIcon';
-import ComingSoonModal from '../components/ComingSoonModal';
 
 interface WarrantyDetailPageProps {
     warrantyId: string;
@@ -18,7 +19,6 @@ const WarrantyDetailPage: React.FC<WarrantyDetailPageProps> = ({ warrantyId }) =
     const [warranty, setWarranty] = useState<Warranty | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [isComingSoonModalOpen, setIsComingSoonModalOpen] = useState(false);
 
     const navigate = (path: string) => {
         window.history.pushState({}, '', path);
@@ -115,7 +115,7 @@ const WarrantyDetailPage: React.FC<WarrantyDetailPageProps> = ({ warrantyId }) =
     };
 
     return (
-        <Layout onOpenComingSoonModal={() => setIsComingSoonModalOpen(true)}>
+        <Layout>
             <div className="animate-fade-in max-w-4xl mx-auto">
                 <header className="mb-6">
                      <button 
@@ -130,7 +130,6 @@ const WarrantyDetailPage: React.FC<WarrantyDetailPageProps> = ({ warrantyId }) =
                 </header>
                 {renderContent()}
             </div>
-            <ComingSoonModal isOpen={isComingSoonModalOpen} onClose={() => setIsComingSoonModalOpen(false)} featureName="This feature" />
         </Layout>
     );
 };

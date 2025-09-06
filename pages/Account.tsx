@@ -1,17 +1,17 @@
 
+
+
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
 import { getProfile, Profile } from '../services/profileService';
 import { Spinner } from '../components/icons/Spinner';
-import ComingSoonModal from '../components/ComingSoonModal';
 
 const Account: React.FC = () => {
     const { user, resendVerificationEmail } = useAuth();
     const [profile, setProfile] = useState<Profile | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [isComingSoonModalOpen, setIsComingSoonModalOpen] = useState(false);
     const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
     useEffect(() => {
@@ -97,7 +97,7 @@ const Account: React.FC = () => {
     };
 
     return (
-        <Layout onOpenComingSoonModal={() => setIsComingSoonModalOpen(true)}>
+        <Layout>
             <section className="animate-fade-in max-w-2xl mx-auto">
                 <header className="mb-6">
                     <h1 className="text-3xl font-bold text-content-primary">Account Settings</h1>
@@ -105,7 +105,6 @@ const Account: React.FC = () => {
                 </header>
                 {renderContent()}
             </section>
-            <ComingSoonModal isOpen={isComingSoonModalOpen} onClose={() => setIsComingSoonModalOpen(false)} featureName="This feature" />
         </Layout>
     );
 };

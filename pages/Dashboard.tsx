@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useMemo, useEffect } from 'react';
 import Layout from '../components/Layout';
 import WarrantyCard from '../components/WarrantyCard';
@@ -9,7 +10,6 @@ import EditWarrantyModal from '../components/EditWarrantyModal';
 import OnboardingBanner from '../components/OnboardingBanner';
 import StatsCard from '../components/StatsCard';
 import ToggleSwitch from '../components/ToggleSwitch';
-import ComingSoonModal from '../components/ComingSoonModal';
 import UploadForm from '../components/UploadForm';
 import { PlusIcon } from '../components/icons/PlusIcon';
 import { ViewGridIcon } from '../components/icons/ViewGridIcon';
@@ -25,7 +25,7 @@ import { CalendarIcon } from '../components/icons/CalendarIcon';
 import { ExportIcon } from '../components/icons/ExportIcon';
 
 type WarrantyStatus = 'expired' | 'expiring' | 'safe';
-type SortOrder = 'latest' | 'expiryAsc' | 'expiryDesc';
+type SortOrder = 'latest' | 'expiryAsc' | 'expiryDesc' | 'nameAsc' | 'nameDesc';
 
 const getWarrantyStatus = (expiryDate: string): WarrantyStatus => {
     const today = new Date();
@@ -47,7 +47,6 @@ const demoWarranties: Warranty[] = [
 
 const Dashboard: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isComingSoonModalOpen, setIsComingSoonModalOpen] = useState(false);
   const [editingWarranty, setEditingWarranty] = useState<Warranty | null>(null);
   const { warranties, loading, error, deleteWarranty } = useWarranties();
   const { user } = useAuth();
@@ -88,6 +87,10 @@ const Dashboard: React.FC = () => {
                   return new Date(a.expiry_date).getTime() - new Date(b.expiry_date).getTime();
               case 'expiryDesc':
                   return new Date(b.expiry_date).getTime() - new Date(a.expiry_date).getTime();
+              case 'nameAsc':
+                  return a.product_name.localeCompare(b.product_name);
+              case 'nameDesc':
+                  return b.product_name.localeCompare(a.product_name);
               case 'latest':
               default:
                   return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
@@ -201,7 +204,7 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <Layout onOpenComingSoonModal={() => setIsComingSoonModalOpen(true)}>
+    <Layout>
       <section className="animate-fade-in">
         {showOnboarding && <OnboardingBanner onDismiss={handleDismissOnboarding} />}
         
@@ -260,10 +263,12 @@ const Dashboard: React.FC = () => {
                     <div className="flex-grow sm:flex-grow-0"><select value={statusFilter} onChange={e => setStatusFilter(e.target.value as any)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"><option value="all">All Statuses</option><option value="active">Active</option><option value="expired">Expired</option></select></div>
                     <div className="flex-grow sm:flex-grow-0"><select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value as any)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"><option value="all">All Categories</option>{categories.map(c => <option key={c} value={c} className="capitalize">{c}</option>)}</select></div>
                     <div className="flex-grow sm:flex-grow-0">
-                        <select value={sortOrder} onChange={e => setSortOrder(e.target.value as SortOrder)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary">
-                            <option value="latest">Sort by: Latest</option>
-                            <option value="expiryAsc">Sort by: Expiry Date (Asc)</option>
-                            <option value="expiryDesc">Sort by: Expiry Date (Desc)</option>
+                        <select value={sortOrder} onChange={e => setSortOrder(e.target.value as SortOrder)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary" aria-label="Sort warranties">
+                            <option value="latest">Date Added (Newest First)</option>
+                            <option value="expiryAsc">Expiry Date (Soonest First)</option>
+                            <option value="expiryDesc">Expiry Date (Latest First)</option>
+                            <option value="nameAsc">Product Name (A-Z)</option>
+                            <option value="nameDesc">Product Name (Z-A)</option>
                         </select>
                     </div>
                     <div className="flex items-center bg-base-200 rounded-md p-1"><button onClick={() => setView('grid')} className={`p-1.5 rounded ${view === 'grid' ? 'bg-brand-primary text-white' : 'text-content-secondary'}`} aria-label="Grid View"><ViewGridIcon className="h-5 w-5"/></button><button onClick={() => setView('list')} className={`p-1.5 rounded ${view === 'list' ? 'bg-brand-primary text-white' : 'text-content-secondary'}`} aria-label="List View"><ViewListIcon className="h-5 w-5" /></button></div>
@@ -276,7 +281,6 @@ const Dashboard: React.FC = () => {
 
       <AddWarrantyModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
       {editingWarranty && <EditWarrantyModal isOpen={!!editingWarranty} onClose={() => setEditingWarranty(null)} warranty={editingWarranty} />}
-      <ComingSoonModal isOpen={isComingSoonModalOpen} onClose={() => setIsComingSoonModalOpen(false)} featureName="This feature" />
     </Layout>
   );
 };

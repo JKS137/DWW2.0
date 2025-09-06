@@ -153,7 +153,8 @@ const UploadForm: React.FC = () => {
     );
 
     const UploadsList = () => (
-        <div className="mt-4 space-y-3">
+        <div className="mt-6 space-y-3">
+            <h3 className="text-lg font-semibold text-content-primary">Upload Progress</h3>
             {uploads.map(upload => {
                 const currentProgress = Math.round(progress[upload.id] || 0);
                 return (
@@ -184,15 +185,17 @@ const UploadForm: React.FC = () => {
                                     )}
                                     {upload.status === 'error' && <p className="text-xs text-brand-pink">{upload.error}</p>}
                                     {upload.status === 'success' && upload.warranty && (
-                                        <p className="text-xs text-brand-secondary">
-                                            Success! Warranty details extracted.{' '}
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs text-brand-secondary">
+                                                Success! Details extracted.
+                                            </span>
                                             <button
                                                 onClick={() => navigate(`/warranty/${upload.warranty!.id}`)}
-                                                className="underline hover:text-teal-300 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-secondary rounded-sm"
+                                                className="ml-4 flex-shrink-0 px-3 py-1 text-xs font-semibold bg-brand-secondary text-white rounded-md hover:bg-opacity-90 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base-200 focus:ring-brand-secondary"
                                             >
                                                 View Details
                                             </button>
-                                        </p>
+                                        </div>
                                     )}
                                 </div>
                             </div>

@@ -1,20 +1,15 @@
 
+
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { ShieldCheckIcon } from './icons/ShieldCheckIcon';
 import { LogoutIcon } from './icons/LogoutIcon';
 import { DashboardIcon } from './icons/DashboardIcon';
-import { UploadIcon } from './icons/UploadIcon';
-import { SettingsIcon } from './icons/SettingsIcon';
-import { PricingIcon } from './icons/PricingIcon';
-import { ChevronLeftIcon } from './icons/ChevronLeftIcon';
 import { ProfileIcon } from './icons/ProfileIcon';
+import { ChevronLeftIcon } from './icons/ChevronLeftIcon';
 
-interface SidebarProps {
-    onOpenComingSoonModal: () => void;
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ onOpenComingSoonModal }) => {
+const Sidebar: React.FC = () => {
     const { signOut } = useAuth();
     const [isExpanded, setIsExpanded] = useState(true);
     const [activeRoute, setActiveRoute] = useState(window.location.pathname);
@@ -41,9 +36,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onOpenComingSoonModal }) => {
     const navItems = [
         { icon: DashboardIcon, label: 'Dashboard', action: () => navigate('/dashboard'), path: '/dashboard' },
         { icon: ProfileIcon, label: 'Account', action: () => navigate('/account'), path: '/account' },
-        { icon: UploadIcon, label: 'Upload', action: onOpenComingSoonModal, path: '/upload' },
-        { icon: SettingsIcon, label: 'Settings', action: onOpenComingSoonModal, path: '/settings' },
-        { icon: PricingIcon, label: 'Pricing', action: onOpenComingSoonModal, path: '/pricing' },
     ];
 
     return (
