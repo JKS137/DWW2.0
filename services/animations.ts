@@ -64,3 +64,17 @@ export const modalContentVariants: Variants = {
         transition: { duration: 0.2 }
     }
 };
+
+export const pulseGlow: Variants = {
+  animate: {
+    scale: 1.03,
+    boxShadow: "0 0 20px rgba(59, 130, 246, 0.6)",
+    transition: {
+      type: "spring",
+      stiffness: 200,
+      damping: 15,
+      repeat: Infinity,
+      repeatType: "reverse",
+    },
+  },
+};

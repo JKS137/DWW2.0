@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { pulseGlow } from '../services/animations';
 import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
 import { SecureCloudIcon } from '../components/icons/SecureCloudIcon';
 import { SmartOCRIcon } from '../components/icons/SmartOCRIcon';
@@ -58,12 +60,14 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
                     >
                         Login
                     </button>
-                    <button 
+                    <motion.button 
                         onClick={onNavigateSignup} 
-                        className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full transition-all animate-pulse-glow"
+                        className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full transition-all"
+                        variants={pulseGlow}
+                        animate="animate"
                     >
                         Get Started
-                    </button>
+                    </motion.button>
                 </div>
 
                 {/* Mobile Menu Button */}
