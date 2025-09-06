@@ -27,59 +27,96 @@ const MenuIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 
 const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigateSignup }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const { signInWithGithub } = useAuth();
+    const { user, signOut } = useAuth();
 
     const navLinks = [
-        { name: 'Home', href: '#' },
         { name: 'Features', href: '#features' },
+        { name: 'How it works', href: '#how-it-works' },
         { name: 'Pricing', href: '#pricing' },
     ];
+
+    const navigate = (path: string) => {
+        window.history.pushState({}, '', path);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+    };
     
     return (
         <>
             <nav 
-                className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-6xl mx-auto z-50 p-3 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-between shadow-lg animate-fade-in"
+                className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-6xl mx-auto z-50 px-3 py-2 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-between shadow-lg animate-fade-in"
                 style={{ animationDelay: '0.2s' }}
+                aria-label="Main"
             >
                 {/* Left Side: Logo */}
                 <a href="#" className="flex items-center space-x-2">
-                    <ShieldCheckIcon className="h-8 w-8 text-brand-primary" />
-                    <span className="font-bold text-xl text-content-primary">DigitalWarrantyVault</span>
+                    <ShieldCheckIcon className="h-6 w-6 text-brand-primary" />
+                    <span className="font-semibold text-lg text-content-primary">DigitalWarrantyVault</span>
                 </a>
 
                 {/* Center: Navigation Links (Desktop) */}
                 <div className="hidden md:flex items-center gap-6">
                     {navLinks.map(link => (
-                        <a key={link.name} href={link.href} className="text-sm font-medium text-gray-300 hover:text-white transition-all hover:scale-110">
+                        <a key={link.name} href={link.href} className="text-sm font-medium text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-brand-primary/60 rounded-md px-1 py-1">
                             {link.name}
                         </a>
                     ))}
                 </div>
 
-                {/* Right Side: CTAs (Desktop) */}
-                <div className="hidden md:flex items-center gap-3">
-                    <button 
-                        onClick={async () => { const { error } = await signInWithGithub(); if (error) console.error(error.message); }}
-                        className="flex items-center gap-2 px-3 py-2 text-sm font-medium bg-base-100 text-content-primary border border-base-300 rounded-lg hover:bg-base-200 transition-all"
-                        aria-label="Continue with GitHub"
+                {/* Right Side: Actions (Desktop) */}
+                <div className="hidden md:flex items-center gap-2">
+                    {/* GitHub icon link */}
+                    <a 
+                        href="https://github.com/JKS137/DWW2.0" 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        aria-label="GitHub"
+                        className="h-9 w-9 grid place-items-center rounded-lg text-gray-300 hover:text-white hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-brand-primary/70"
                     >
                         <GithubIcon className="h-4 w-4" />
-                        Continue with GitHub
-                    </button>
-                    <button 
-                        onClick={onNavigateLogin} 
-                        className="text-sm font-medium text-gray-300 hover:text-white transition-all hover:scale-105 active:scale-95"
-                    >
-                        Login
-                    </button>
-                    <motion.button 
-                        onClick={onNavigateSignup} 
-                        className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full transition-all"
-                        variants={pulseGlow}
-                        animate="animate"
-                    >
-                        Get Started
-                    </motion.button>
+                    </a>
+
+                    {/* Auth-aware CTAs */}
+                    {!user ? (
+                        <>
+                            <button 
+                                onClick={onNavigateLogin} 
+                                className="px-3 py-2 text-sm font-medium text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-brand-primary/60 rounded-lg"
+                            >
+                                Login
+                            </button>
+                            <motion.button 
+                                onClick={onNavigateSignup} 
+                                className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary/60"
+                                variants={pulseGlow}
+                                animate="animate"
+                            >
+                                Get Started
+                            </motion.button>
+                        </>
+                    ) : (
+                        <>
+                            <button 
+                                onClick={() => navigate('/account')} 
+                                className="px-3 py-2 text-sm font-medium text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-brand-primary/60 rounded-lg"
+                            >
+                                Account
+                            </button>
+                            <motion.button 
+                                onClick={() => navigate('/dashboard')} 
+                                className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary/60"
+                                variants={pulseGlow}
+                                animate="animate"
+                            >
+                                Open App
+                            </motion.button>
+                            <button 
+                                onClick={async () => { await signOut(); }} 
+                                className="ml-1 px-3 py-2 text-sm font-medium text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-brand-primary/60 rounded-lg"
+                            >
+                                Sign out
+                            </button>
+                        </>
+                    )}
                 </div>
 
                 {/* Mobile Menu Button */}
@@ -106,25 +143,54 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
                         </a>
                     ))}
                     <div className="mt-8 pt-8 border-t border-white/10 w-4/5 text-center space-y-4">
-                         <button
-                            onClick={() => { onNavigateLogin(); setIsOpen(false); }}
-                            className="w-full text-lg font-medium text-gray-200 hover:text-brand-primary transition-transform hover:scale-105 active:scale-95"
-                        >
-                            Login
-                        </button>
-                        <button
-                            onClick={() => { onNavigateSignup(); setIsOpen(false); }}
-                            className="w-full px-6 py-3 text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full transition-transform hover:scale-105 active:scale-95"
-                        >
-                            Get Started
-                        </button>
-                        <button
-                            onClick={async () => { const { error } = await signInWithGithub(); if (error) console.error(error.message); setIsOpen(false); }}
-                            className="w-full flex justify-center items-center space-x-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-all"
+                        {!user ? (
+                            <>
+                                <button
+                                    onClick={() => { onNavigateLogin(); setIsOpen(false); }}
+                                    className="w-full text-lg font-medium text-gray-200 hover:text-brand-primary transition-transform hover:scale-105 active:scale-95"
+                                >
+                                    Login
+                                </button>
+                                <button
+                                    onClick={() => { onNavigateSignup(); setIsOpen(false); }}
+                                    className="w-full px-6 py-3 text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full transition-transform hover:scale-105 active:scale-95"
+                                >
+                                    Get Started
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button
+                                    onClick={() => { navigate('/dashboard'); setIsOpen(false); }}
+                                    className="w-full px-6 py-3 text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full transition-transform hover:scale-105 active:scale-95"
+                                >
+                                    Open App
+                                </button>
+                                <button
+                                    onClick={() => { navigate('/account'); setIsOpen(false); }}
+                                    className="w-full text-lg font-medium text-gray-200 hover:text-brand-primary transition-transform hover:scale-105 active:scale-95"
+                                >
+                                    Account
+                                </button>
+                                <button
+                                    onClick={async () => { await signOut(); setIsOpen(false); }}
+                                    className="w-full text-lg font-medium text-gray-300 hover:text-white transition-transform"
+                                >
+                                    Sign out
+                                </button>
+                            </>
+                        )}
+                        <a 
+                            href="https://github.com/JKS137/DWW2.0" 
+                            target="_blank" 
+                            rel="noreferrer"
+                            className="mx-auto inline-flex items-center justify-center gap-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-all"
+                            onClick={() => setIsOpen(false)}
+                            aria-label="GitHub"
                         >
                             <GithubIcon className="h-5 w-5" />
-                            <span>Continue with GitHub</span>
-                        </button>
+                            <span>GitHub</span>
+                        </a>
                     </div>
                 </div>
             )}
