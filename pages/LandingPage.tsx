@@ -12,7 +12,6 @@ import { UploadIcon } from '../components/icons/UploadIcon';
 import { XIcon } from '../components/icons/XIcon';
 import { GithubIcon } from '../components/icons/GithubIcon';
 import { useAuth } from '../context/AuthContext';
-import SafeImage from '../components/SafeImage';
 
 interface LandingPageProps {
   onNavigateLogin: () => void;
@@ -199,29 +198,72 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
 };
 
 
-const Hero: React.FC<LandingPageProps> = ({ onNavigateSignup, onNavigateLogin }) => (
-    <section 
-      className="relative pt-40 pb-20 text-center"
-    >
-        <div className="absolute inset-0 bg-gradient-radial from-blue-500/10 via-transparent to-transparent z-0"></div>
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-4xl md:text-6xl font-extrabold text-content-primary tracking-tight leading-tight animate-slide-up">
-                Never lose track of your warranties again.
-            </h1>
-            <p className="mt-6 max-w-2xl mx-auto text-lg text-content-secondary animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                Your digital vault for receipts, warranties, and peace of mind. Securely store, track, and get reminded before they expire.
-            </p>
-            {/* Primary CTAs moved to navbar for better visibility */}
-             <div className="mt-16 w-full max-w-4xl mx-auto animate-slide-up" style={{ animationDelay: '0.3s' }}>
-                <div className="relative rounded-xl p-1 bg-gradient-to-br from-blue-500 to-teal-400">
-                    <div className="bg-base-200 rounded-lg shadow-2xl p-4">
-                        <SafeImage src="/hero-preview.png" fallbackSrc={["/hero-preview.svg", "/image-fallback.svg"]} alt="Dashboard preview" className="rounded-md w-full aspect-video object-cover" loading="lazy" />
+const Hero: React.FC<LandingPageProps> = ({ onNavigateSignup, onNavigateLogin }) => {
+    const brands = [
+        'Acme',
+        'Globex',
+        'Initech',
+        'Umbrella',
+        'Hooli',
+        'Stark Industries',
+        'Wayne Enterprises',
+        'Wonka',
+        'Soylent',
+        'Cyberdyne',
+        'Pied Piper',
+        'Vandelay'
+    ];
+
+    return (
+        <section 
+          className="relative pt-40 pb-20 text-center"
+        >
+            <div className="absolute inset-0 bg-gradient-radial from-blue-500/10 via-transparent to-transparent z-0"></div>
+            <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
+                <h1 className="text-4xl md:text-6xl font-extrabold text-content-primary tracking-tight leading-tight animate-slide-up">
+                    Never lose track of your warranties again.
+                </h1>
+                <p className="mt-6 max-w-2xl mx-auto text-lg text-content-secondary animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                    Your digital vault for receipts, warranties, and peace of mind. Securely store, track, and get reminded before they expire.
+                </p>
+                {/* Trusted by marquee */}
+                <div className="mt-16 w-full max-w-6xl mx-auto animate-slide-up" style={{ animationDelay: '0.3s' }}>
+                    <div className="text-center mb-4">
+                        <p className="text-sm font-semibold uppercase tracking-wider text-content-secondary">Trusted by</p>
+                    </div>
+                    <div className="trusted-by-wrapper relative overflow-hidden">
+                        <div aria-hidden="true" className="pointer-events-none absolute left-0 top-0 h-full w-16 bg-gradient-to-r from-base-100 to-transparent"></div>
+                        <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-base-100 to-transparent"></div>
+                        <div className="trusted-by-track flex items-center gap-8 py-4 whitespace-nowrap">
+                            {brands.concat(brands).map((name, idx) => (
+                                <div key={`${name}-${idx}`} className="h-12 px-5 inline-flex items-center gap-3 rounded-xl bg-base-200/60 border border-white/10 text-content-primary">
+                                    <div className="h-8 w-8 rounded-md bg-white/10 grid place-items-center text-sm font-semibold">{name[0]}</div>
+                                    <span className="text-sm md:text-base font-medium">{name}</span>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-);
+            <style>{`
+                @keyframes trusted-marquee {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); }
+                }
+                .trusted-by-track {
+                    will-change: transform;
+                    animation: trusted-marquee 35s linear infinite;
+                }
+                .trusted-by-wrapper:hover .trusted-by-track {
+                    animation-play-state: paused;
+                }
+                @media (prefers-reduced-motion: reduce) {
+                    .trusted-by-track { animation: none; }
+                }
+            `}</style>
+        </section>
+    );
+};
 
 const HowItWorks: React.FC = () => (
     <section 
