@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-// FIX: Add TargetAndTransition to fix type inference issues with framer-motion props.
-import { motion, AnimatePresence, TargetAndTransition } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
 import { SecureCloudIcon } from '../components/icons/SecureCloudIcon';
 import { SmartOCRIcon } from '../components/icons/SmartOCRIcon';
@@ -32,14 +31,14 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
         { name: 'Pricing', href: '#pricing' },
     ];
 
-    // FIX: Explicitly type motion objects to prevent type widening by TypeScript.
-    const linkHover: TargetAndTransition = {
+    // FIX: Add `as const` to the transition type to satisfy framer-motion's expected type.
+    const linkHover = {
         scale: 1.1,
         textShadow: '0 0 8px rgba(59, 130, 246, 0.8)',
-        transition: { type: 'spring', stiffness: 300 }
+        transition: { type: 'spring' as const, stiffness: 300 }
     };
     
-    const pulseAnimation: TargetAndTransition = {
+    const pulseAnimation = {
         scale: [1, 1.03, 1],
         boxShadow: [
             '0 0 0px rgba(59, 130, 246, 0)', 
@@ -50,7 +49,6 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
 
     return (
         <>
-            {/* FIX: Inlined motion props to fix TypeScript type inference issues. */}
             <motion.nav 
                 className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-6xl mx-auto z-50 p-3 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-between shadow-lg"
                 initial={{ y: -100, opacity: 0 }}

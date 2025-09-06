@@ -98,8 +98,8 @@ const Dashboard: React.FC = () => {
       .filter(w => {
         const matchesSearch = w.product_name.toLowerCase().includes(searchTerm.toLowerCase());
         
-        const currentStatus = getWarrantyStatus(w.expiry_date);
-        const matchesStatus = statusFilter === 'all' || currentStatus === statusFilter;
+        const status = getWarrantyStatus(w.expiry_date);
+        const matchesStatus = statusFilter === 'all' || (statusFilter === 'safe' ? status === 'safe' : status === statusFilter);
 
         const matchesCategory = categoryFilter === 'all' || w.category === categoryFilter;
 
@@ -111,11 +111,13 @@ const Dashboard: React.FC = () => {
       const source = warranties; // Always calculate real stats
       const statuses = source.map(w => getWarrantyStatus(w.expiry_date));
       const expiredCount = statuses.filter(s => s === 'expired').length;
+      const expiringCount = statuses.filter(s => s === 'expiring').length;
+      const activeCount = source.length - expiredCount - expiringCount;
       return {
           total: source.length,
-          expiring: statuses.filter(s => s === 'expiring').length,
+          active: activeCount,
+          expiring: expiringCount,
           expired: expiredCount,
-          active: source.length - expiredCount,
       };
   }, [warranties]);
   
