@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
-import { SecureCloudIcon } from '../components/icons/SecureCloudIcon';
-import { SmartOCRIcon } from '../components/icons/SmartOCRIcon';
-import { RemindersIcon } from '../components/icons/RemindersIcon';
-import { SyncIcon } from '../components/icons/SyncIcon';
-import { ExportIcon } from '../components/icons/ExportIcon';
-import { ShareIcon } from '../components/icons/ShareIcon';
-import { CheckCircleIcon } from '../components/icons/CheckCircleIcon';
-import { UploadIcon } from '../components/icons/UploadIcon';
 import { XIcon } from '../components/icons/XIcon';
+
+const HowItWorks = React.lazy(() => import('../components/landing/HowItWorks'));
+const Features = React.lazy(() => import('../components/landing/Features'));
+const Pricing = React.lazy(() => import('../components/landing/Pricing'));
+const LandingFooter = React.lazy(() => import('../components/landing/LandingFooter'));
 
 interface LandingPageProps {
   onNavigateLogin: () => void;
@@ -180,120 +177,7 @@ const Hero: React.FC<LandingPageProps> = ({ onNavigateSignup, onNavigateLogin })
     </section>
 );
 
-const HowItWorks: React.FC = () => (
-    <section id="how-it-works" className="py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold">How It Works</h2>
-                <p className="text-content-secondary mt-2">Get organized in three simple steps.</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {[
-                    { title: "Upload Receipt", description: "Snap a photo or upload a file. Our AI gets to work instantly.", icon: UploadIcon },
-                    { title: "Track Expiry", description: "We automatically extract details and set up expiry tracking.", icon: SmartOCRIcon },
-                    { title: "Get Reminders", description: "Receive email alerts before a warranty expires so you never miss a claim.", icon: RemindersIcon }
-                ].map((step, index) => (
-                    <div key={step.title} className="text-center p-6 bg-base-200/50 backdrop-blur-md border border-base-300/50 rounded-xl animate-slide-up" style={{ animationDelay: `${index * 0.1}s`}}>
-                        <div className="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-base-100 border-2 border-brand-primary shadow-glow-blue mb-4">
-                           <step.icon className="h-8 w-8 text-brand-primary" />
-                        </div>
-                        <h3 className="text-xl font-semibold">{step.title}</h3>
-                        <p className="text-content-secondary mt-2">{step.description}</p>
-                    </div>
-                ))}
-            </div>
-        </div>
-    </section>
-);
-
-const Features: React.FC = () => {
-    const featureList = [
-      { name: "Secure Cloud Vault", icon: SecureCloudIcon, description: "Your data is encrypted and stored securely in the cloud." },
-      { name: "Smart OCR Extraction", icon: SmartOCRIcon, description: "AI-powered receipt scanning saves you manual data entry." },
-      { name: "Expiry Reminders", icon: RemindersIcon, description: "Automated email notifications so you're always prepared." },
-      { name: "Multi-Device Sync", icon: SyncIcon, description: "Access your vault from anywhere, on any device." },
-      { name: "Export (PDF/CSV)", icon: ExportIcon, description: "Download your warranty data for personal records or insurance." },
-      { name: "Family/Team Sharing", icon: ShareIcon, description: "Share access to warranties with family members or colleagues." },
-    ];
-  
-    return (
-      <section id="features" className="py-20 bg-base-200/30 scroll-mt-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold">Everything you need, all in one place.</h2>
-            <p className="text-content-secondary mt-2">Powerful features to give you complete peace of mind.</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featureList.map((feature, index) => (
-              <div key={feature.name} className="flex items-start space-x-4 p-4 animate-slide-up" style={{ animationDelay: `${index * 0.05}s`}}>
-                 <div className="flex-shrink-0 p-2 bg-base-100 rounded-lg border border-brand-secondary/50">
-                    <feature.icon className="h-6 w-6 text-brand-secondary" />
-                 </div>
-                <div>
-                  <h3 className="font-semibold">{feature.name}</h3>
-                  <p className="text-content-secondary text-sm mt-1">{feature.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-};
-
-const Pricing: React.FC<LandingPageProps> = ({ onNavigateSignup }) => {
-    const plans = [
-        { name: "Free", price: "$0", features: ["5 Warranties", "Basic OCR", "Email Reminders"], glow: 'shadow-glow-blue', border: 'border-blue-500' },
-        { name: "Starter", price: "$5", features: ["50 Warranties", "Advanced OCR", "Priority Support", "Export to CSV"], glow: 'shadow-glow-teal', border: 'border-teal-500', popular: true },
-        { name: "Pro", price: "$10", features: ["Unlimited Warranties", "All Starter Features", "Family Sharing", "API Access"], glow: 'shadow-glow-purple', border: 'border-purple-500' }
-    ];
-
-    return (
-        <section id="pricing" className="py-20 scroll-mt-24">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-12">
-                    <h2 className="text-3xl font-bold">Choose the plan that's right for you</h2>
-                    <p className="text-content-secondary mt-2">Start for free, upgrade when you're ready.</p>
-                </div>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {plans.map((plan, index) => (
-                        <div key={plan.name} className={`relative p-8 bg-base-200/50 backdrop-blur-md border rounded-xl flex flex-col ${plan.border} transition-all hover:-translate-y-2 hover:${plan.glow} animate-slide-up`} style={{ animationDelay: `${index * 0.1}s`}}>
-                            {plan.popular && <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 px-3 py-1 text-sm font-semibold text-white bg-brand-secondary rounded-full">Most Popular</div>}
-                            <h3 className="text-2xl font-semibold">{plan.name}</h3>
-                            <p className="mt-4"><span className="text-4xl font-bold">{plan.price}</span><span className="text-content-secondary">/mo</span></p>
-                            <ul className="mt-6 space-y-4 text-content-secondary flex-grow">
-                                {plan.features.map(feature => (
-                                    <li key={feature} className="flex items-center space-x-2">
-                                        <CheckCircleIcon className="h-5 w-5 text-brand-secondary" />
-                                        <span>{feature}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                            <button onClick={onNavigateSignup} className={`mt-8 w-full py-3 font-semibold rounded-lg transition-colors ${plan.popular ? 'bg-brand-secondary text-white' : 'bg-base-300 text-content-primary hover:bg-opacity-80'}`}>
-                                Choose Plan
-                            </button>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </section>
-    );
-};
-
-const LandingFooter: React.FC = () => (
-    <footer className="border-t border-base-300/50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex flex-col sm:flex-row justify-between items-center">
-                <p className="text-sm text-content-secondary">&copy; {new Date().getFullYear()} Digital Warranty Vault. All rights reserved.</p>
-                <div className="flex space-x-4 mt-4 sm:mt-0">
-                    <a href="#" className="text-content-secondary hover:text-content-primary">Terms</a>
-                    <a href="#" className="text-content-secondary hover:text-content-primary">Privacy</a>
-                    <a href="#" className="text-content-secondary hover:text-content-primary">Support</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-);
+// Sections moved to components/landing and lazy-loaded
 
 
 const LandingPage: React.FC<LandingPageProps> = (props) => {
@@ -301,10 +185,18 @@ const LandingPage: React.FC<LandingPageProps> = (props) => {
     <main>
       <LandingNavbar {...props} />
       <Hero {...props} />
-      <HowItWorks />
-      <Features />
-      <Pricing {...props} />
-      <LandingFooter />
+      <Suspense fallback={<div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 text-content-secondary">Loading…</div>}>
+        <HowItWorks />
+      </Suspense>
+      <Suspense fallback={<div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 text-content-secondary">Loading features…</div>}>
+        <Features />
+      </Suspense>
+      <Suspense fallback={<div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 text-content-secondary">Loading pricing…</div>}>
+        <Pricing onNavigateSignup={props.onNavigateSignup} />
+      </Suspense>
+      <Suspense fallback={<div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 text-content-secondary">Loading footer…</div>}>
+        <LandingFooter />
+      </Suspense>
     </main>
   );
 };
