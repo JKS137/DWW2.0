@@ -3,6 +3,7 @@ import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
 import { useAuth } from '../context/AuthContext';
 import { GoogleIcon } from '../components/icons/GoogleIcon';
 import { recordAuthAttempt, checkRateLimit } from '../services/rateLimiter';
+import { GithubIcon } from '../components/icons/GithubIcon';
 
 interface LoginProps {
   onSwitchToSignup: () => void;
@@ -11,7 +12,7 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavigateForgotPassword }) => {
-  const { signIn, signInWithGoogle } = useAuth();
+  const { signIn, signInWithGoogle, signInWithGithub } = useAuth();
   const [email, setEmail] = useState('demo@example.com');
   const [password, setPassword] = useState('password');
   const [error, setError] = useState<string | null>(null);
@@ -70,13 +71,20 @@ const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavig
             </p>
         </div>
         
-        <div>
+        <div className="grid grid-cols-1 gap-3">
             <button
                 onClick={handleGoogleSignIn}
                 className="w-full flex justify-center items-center space-x-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-all hover:scale-105 active:scale-95"
             >
                 <GoogleIcon className="h-5 w-5" />
                 <span>Sign in with Google</span>
+            </button>
+            <button
+                onClick={async () => { const { error } = await signInWithGithub(); if (error) setError(error.message); }}
+                className="w-full flex justify-center items-center space-x-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-all hover:scale-105 active:scale-95"
+            >
+                <GithubIcon className="h-5 w-5" />
+                <span>Sign in with GitHub</span>
             </button>
         </div>
 
