@@ -7,7 +7,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import UpdatePassword from './pages/UpdatePassword';
 import Account from './pages/Account';
 import WarrantyDetailPage from './pages/WarrantyDetailPage';
-import SharePage from './pages/SharePage'; // New page
+import SharePage from './pages/SharePage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { WarrantyProvider } from './context/WarrantyContext';
 import { Spinner } from './components/icons/Spinner';
@@ -109,15 +109,13 @@ const MainContent: React.FC = () => {
                 content = <UpdatePassword onPasswordUpdated={() => navigate('/dashboard')} />;
                 break;
             default:
-                // If route is unknown for a logged-in user, redirect to dashboard.
-                navigate('/dashboard');
+                                navigate('/dashboard');
                 content = <Dashboard />;
                 break;
         }
     }
   } else {
-    // Unauthenticated user routing
-    const isProtectedRoute = route === '/dashboard' || route.startsWith('/account') || route.startsWith('/warranty/');
+        const isProtectedRoute = route === '/dashboard' || route.startsWith('/account') || route.startsWith('/warranty/');
     if (isProtectedRoute) {
         navigate('/login');
         return <Login onSwitchToSignup={() => navigate('/signup')} onNavigateHome={() => navigate('/')} onNavigateForgotPassword={() => navigate('/forgot-password')} />;

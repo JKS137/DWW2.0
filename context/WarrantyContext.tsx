@@ -117,8 +117,7 @@ export const WarrantyProvider: React.FC<{ children: ReactNode }> = ({ children }
       return finalWarranty;
 
     } catch (error: any) {
-        console.error("Failed during upload and process flow:", error);
-        // If OCR or update fails, update the stub to show an error state.
+                // If OCR or update fails, update the stub to show an error state.
         if (newWarrantyStub) {
             await apiUpdateWarranty(newWarrantyStub.id, { product_name: 'Analysis Failed - Please Edit' });
         }

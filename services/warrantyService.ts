@@ -179,12 +179,9 @@ export const deleteWarranty = async (warrantyId: string, fileUrl: string): Promi
             .remove([fileName]);
 
         if (storageError) {
-             // Log the error but don't throw, as the DB record is already gone.
-            console.error("Failed to delete file from storage:", storageError.message);
-        }
+                     }
     } catch (e: any) {
-        console.error("Error parsing file URL for deletion:", e.message);
-    }
+            }
 };
 
 /**

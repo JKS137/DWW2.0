@@ -72,8 +72,7 @@ const Sidebar: React.FC = () => {
                         onClick={async () => {
                             const { error } = await signOut();
                             if (error) {
-                                console.error('Sign out failed:', error);
-                                return;
+                                                                return;
                             }
                             navigate('/login');
                         }} 

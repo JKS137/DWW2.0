@@ -7,6 +7,7 @@ import { WarningIcon } from './icons/WarningIcon';
 import { EditIcon } from './icons/EditIcon';
 import { TagIcon } from './icons/TagIcon';
 import { ShareIcon } from './icons/ShareIcon';
+import { formatDate } from '../utils/dateUtils';
 
 interface WarrantyCardProps {
   warranty: Warranty;
@@ -125,11 +126,11 @@ const WarrantyCard: React.FC<WarrantyCardProps> = ({ warranty, onEdit, onShare, 
         <div className="space-y-3 text-sm mt-3">
             <div className="flex items-center text-content-secondary space-x-2">
                 <CalendarIcon className="h-4 w-4" />
-                <span>Purchased: {new Date(warranty.purchase_date).toLocaleDateString()}</span>
+                <span>Purchased: {formatDate(warranty.purchase_date)}</span>
             </div>
             <div className="flex items-center text-content-secondary space-x-2">
                 <CalendarIcon className="h-4 w-4 text-brand-secondary" />
-                <span>Expires: {new Date(warranty.expiry_date).toLocaleDateString()}</span>
+                <span>Expires: {formatDate(warranty.expiry_date)}</span>
             </div>
         </div>
         <div className="mt-4 pt-4 border-t border-base-300/50">

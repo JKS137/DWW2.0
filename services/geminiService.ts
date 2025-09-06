@@ -22,8 +22,7 @@ const getAiClient = (): GoogleGenAI => {
         return ai;
     } catch (e: any) {
         initError = `Failed to initialize Gemini AI Client: ${e.message}`;
-        console.error(initError);
-        throw new Error(initError);
+                throw new Error(initError);
     }
 };
 
@@ -105,9 +104,7 @@ Return ONLY a single, valid JSON object matching the specified schema. Do not in
         return parsedData;
 
     } catch (error: any) {
-        console.error("Error extracting warranty info:", error.message);
-        // Provide a more user-friendly message
-        const errorMessage = error.message.includes("API_KEY") 
+                const errorMessage = error.message.includes("API_KEY") 
             ? "Gemini API Key is not configured. OCR functionality is disabled."
             : "Failed to analyze receipt. Please try a clearer image or enter details manually.";
         throw new Error(errorMessage);

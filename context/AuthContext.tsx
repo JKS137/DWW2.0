@@ -65,8 +65,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               .from('profiles')
               .insert({ id: currentUser.id, email: currentUser.email });
             if (profileError) {
-              console.error("Error creating profile for new OAuth user:", profileError);
-            }
+                          }
           }
         }
 
@@ -78,9 +77,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setSession(session);
           setUser(session?.user ?? null);
         })
-        .catch((e) => {
-          console.error('getSession failed:', e);
-        })
+        .catch(() => {})
         .finally(() => finish());
 
       return () => {
@@ -88,8 +85,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         subscription?.unsubscribe();
       };
     } catch (e) {
-      console.error('Auth initialization failed:', e);
-      finish();
+            finish();
     }
   }, []);
   
@@ -133,8 +129,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             .from('profiles')
             .insert({ id: data.user.id, email: data.user.email });
         if (profileError) {
-            console.error("Error creating profile:", profileError);
-        }
+                    }
     }
     
     return { error };

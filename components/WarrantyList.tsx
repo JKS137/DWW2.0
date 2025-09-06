@@ -5,6 +5,7 @@ import { EditIcon } from './icons/EditIcon';
 import { TagIcon } from './icons/TagIcon';
 import { WarningIcon } from './icons/WarningIcon';
 import { ShareIcon } from './icons/ShareIcon';
+import { formatDate } from '../utils/dateUtils';
 
 interface WarrantyListProps {
   warranties: (Warranty & { status: 'safe' | 'expiring' | 'expired' })[];
@@ -52,8 +53,8 @@ const WarrantyList: React.FC<WarrantyListProps> = ({ warranties, onEdit, onDelet
               </div>
             </div>
             <div className="flex-shrink-0 text-sm text-content-secondary text-left sm:text-right w-full sm:w-auto">
-              <p>Expires: {new Date(warranty.expiry_date).toLocaleDateString()}</p>
-              <p>Purchased: {new Date(warranty.purchase_date).toLocaleDateString()}</p>
+              <p>Expires: {formatDate(warranty.expiry_date)}</p>
+              <p>Purchased: {formatDate(warranty.purchase_date)}</p>
             </div>
             <div className="flex-shrink-0">
                 <span className={`px-2 py-1 text-xs font-semibold rounded-full inline-flex items-center gap-1 ${statusStyles[warranty.status]}`}>
