@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+// FIX: Add TargetAndTransition to fix type inference issues with framer-motion props.
+import { motion, AnimatePresence, TargetAndTransition } from 'framer-motion';
 import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
 import { SecureCloudIcon } from '../components/icons/SecureCloudIcon';
 import { SmartOCRIcon } from '../components/icons/SmartOCRIcon';
@@ -31,19 +32,14 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
         { name: 'Pricing', href: '#pricing' },
     ];
 
-    const motionProps = {
-        initial: { y: -100, opacity: 0 },
-        animate: { y: 0, opacity: 1 },
-        transition: { duration: 0.5, ease: 'easeInOut' }
-    };
-
-    const linkHover = {
+    // FIX: Explicitly type motion objects to prevent type widening by TypeScript.
+    const linkHover: TargetAndTransition = {
         scale: 1.1,
         textShadow: '0 0 8px rgba(59, 130, 246, 0.8)',
         transition: { type: 'spring', stiffness: 300 }
     };
     
-    const pulseAnimation = {
+    const pulseAnimation: TargetAndTransition = {
         scale: [1, 1.03, 1],
         boxShadow: [
             '0 0 0px rgba(59, 130, 246, 0)', 
@@ -54,9 +50,12 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
 
     return (
         <>
+            {/* FIX: Inlined motion props to fix TypeScript type inference issues. */}
             <motion.nav 
                 className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-6xl mx-auto z-50 p-3 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-between shadow-lg"
-                {...motionProps}
+                initial={{ y: -100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5, ease: 'easeInOut' }}
             >
                 {/* Left Side: Logo */}
                 <a href="#" className="flex items-center space-x-2">
