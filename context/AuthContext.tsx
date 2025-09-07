@@ -1,10 +1,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '../utils/supabaseClient';
-import { Session } from '@supabase/supabase-js';
-import { AuthChangeEvent } from '@supabase/gotrue-js';
 
 // Add at the top of context/AuthContext.tsx
-import { Session, User } from '@supabase/supabase-js';
+import { Session, User, AuthChangeEvent } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: any | null;
