@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../utils/supabaseClient'; // example if supabaseClient is in utils
 import { Session } from '@supabase/supabase-js';
 import { AuthChangeEvent } from '@supabase/gotrue-js';
 
