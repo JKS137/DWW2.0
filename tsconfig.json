@@ -1,14 +1,15 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "es2016",
+    "module": "commonjs",
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
-    "module": "ESNext",
     "lib": [
       "ES2022",
       "DOM",
       "DOM.Iterable"
     ],
+    "esModuleInterop": true,
     "skipLibCheck": true,
     "types": [
       "node"
@@ -27,6 +28,8 @@
     "noEmit": true,
     "typeRoots": [
       "node_modules/@types"
-    ]
+    ],
+    "forceConsistentCasingInFileNames": true,
+    "strict": true
   }
 }

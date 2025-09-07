@@ -6,6 +6,7 @@ import { GithubIcon } from '../components/icons/GithubIcon';
 import { recordAuthAttempt, checkRateLimit } from '../services/rateLimiter';
 import Captcha from '../components/Captcha';
 import AuthLayout from '../components/AuthLayout';
+import { useRouter } from 'next/router';
 
 interface SignupProps {
   onSwitchToLogin: () => void;
@@ -13,14 +14,14 @@ interface SignupProps {
 }
 
 const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
-  const { signUp, signInWithGoogle, signInWithGithub } = useAuth();
+  const { signUp, signInWithGoogle, signInWithGithub, loading } = useAuth();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [rateLimitError, setRateLimitError] = useState<string | null>(null);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const CAPTCHA_PROVIDER = (process.env.CAPTCHA_PROVIDER as 'turnstile' | 'hcaptcha') || 'turnstile';
   const SITE_KEY = (process.env.TURNSTILE_SITE_KEY || process.env.HCAPTCHA_SITE_KEY || '') as string;
@@ -31,36 +32,32 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
     e.preventDefault();
     setError(null);
     setRateLimitError(null);
-    setLoading(true);
 
     const { isLimited, timeLeft } = checkRateLimit('signup');
     if (isLimited) {
         setRateLimitError(`Too many attempts. Please try again in ${timeLeft} seconds.`);
-        setLoading(false);
         return;
     }
 
     if (password.length < 6) {
         setError("Password must be at least 6 characters long.");
-        setLoading(false);
         return;
     }
 
     if (captchaEnabled && !captchaToken) {
         setError('Please complete the CAPTCHA.');
-        setLoading(false);
         return;
     }
 
-    const { error } = await signUp(email, password, captchaToken || undefined);
-
-    if (error) {
-      setError(error.message);
-      recordAuthAttempt('signup');
-    } else {
+    try {
+      await signUp(email, password);
       setSuccess(true);
+      // Redirect handled by AuthContext
+    } catch (error: any) {
+      console.error("Signup error:", error.message);
+      setError(error.message); // User-friendly error
+      recordAuthAttempt('signup');
     }
-    setLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
@@ -103,7 +100,11 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
             </p>
         </div>
         
-        {success ? <SuccessMessage /> : (
+        {loading ? (
+          <div className="text-center py-4">
+            <span className="loader"></span>
+          </div>
+        ) : success ? <SuccessMessage /> : (
           <>
             <div className="grid grid-cols-1 gap-3">
               <button onClick={handleGoogleSignIn} className="w-full flex justify-center items-center space-x-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-all hover:scale-105 active:scale-95">

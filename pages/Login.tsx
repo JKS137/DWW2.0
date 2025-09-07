@@ -6,6 +6,7 @@ import { recordAuthAttempt, checkRateLimit } from '../services/rateLimiter';
 import { GithubIcon } from '../components/icons/GithubIcon';
 import Captcha from '../components/Captcha';
 import AuthLayout from '../components/AuthLayout';
+import { useRouter } from 'next/router';
 
 interface LoginProps {
   onSwitchToSignup: () => void;
@@ -14,11 +15,11 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavigateForgotPassword }) => {
-  const { signIn, signInWithGoogle, signInWithGithub } = useAuth();
+  const { signIn, signInWithGoogle, signInWithGithub, loading } = useAuth();
+  const router = useRouter();
   const [email, setEmail] = useState('demo@example.com');
   const [password, setPassword] = useState('password');
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [rateLimitError, setRateLimitError] = useState<string | null>(null);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
@@ -43,23 +44,30 @@ const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavig
       return;
     }
 
-    setLoading(true);
-    const { error } = await signIn(email, password, captchaToken || undefined);
-    if (error) {
+    try {
+      await signIn(email, password);
+      // Redirect handled by AuthContext
+    } catch (error: any) {
+      console.error("Login error:", error.message);
       setError(error.message);
       recordAuthAttempt('login');
     }
-    setLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
     setError(null);
     setRateLimitError(null);
-    const { error } = await signInWithGoogle(captchaToken || undefined);
-    if (error) {
-        setError(error.message);
+    try {
+      await signInWithGoogle();
+    } catch (error: any) {
+      setError(error.message);
+      recordAuthAttempt('login');
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <AuthLayout>
@@ -82,9 +90,21 @@ const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavig
               <GoogleIcon className="h-5 w-5" />
               <span>Sign in with Google</span>
           </button>
-          <button onClick={async () => { const { error } = await signInWithGithub(captchaToken || undefined); if (error) setError(error.message); }} className="w-full flex justify-center items-center space-x-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-all hover:scale-105 active:scale-95">
-              <GithubIcon className="h-5 w-5" />
-              <span>Sign in with GitHub</span>
+          <button
+            onClick={async () => {
+              setError(null);
+              setRateLimitError(null);
+              try {
+                await signInWithGithub();
+              } catch (error: any) {
+                setError(error.message);
+                recordAuthAttempt('login');
+              }
+            }}
+            className="w-full flex justify-center items-center space-x-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-all hover:scale-105 active:scale-95"
+          >
+            <GithubIcon className="h-5 w-5" />
+            <span>Sign in with GitHub</span>
           </button>
         </div>
 
