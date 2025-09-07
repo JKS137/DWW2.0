@@ -1,3 +1,4 @@
+// Cache-busting comment
 import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 
