@@ -1,5 +1,5 @@
 
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../utils/supabaseClient';
 import type { User } from '@supabase/supabase-js';
 
 export interface Profile {

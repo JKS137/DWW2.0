@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../utils/supabaseClient';
 import type { Warranty, Category } from '../types';
 
 const RECEIPTS_BUCKET = (process.env.SUPABASE_BUCKET as string) || 'receipts';

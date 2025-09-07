@@ -11,7 +11,7 @@ import SharePage from './pages/SharePage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { WarrantyProvider } from './context/WarrantyContext';
 import { Spinner } from './components/icons/Spinner';
-import { supabaseConfigurationError } from './lib/supabaseClient';
+import { supabaseConfigurationError } from './utils/supabaseClient';
 import { ShieldCheckIcon } from './components/icons/ShieldCheckIcon';
 import { trackPageView } from './services/analyticsService';
 import SpeedInsights from './components/SpeedInsights';
