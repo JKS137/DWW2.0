@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '../utils/supabaseClient'; // example if supabaseClient is in utils
+import { supabase } from '../services/supabaseClient';
 import { Session } from '@supabase/supabase-js';
 import { AuthChangeEvent } from '@supabase/gotrue-js';
 
@@ -37,8 +37,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setLoading(true);
       const { data, error } = await supabase!.auth.signInWithOAuth({ provider: 'google' });
       if (error) throw error;
-      setUser(data.user ?? null);
-      setSession(data.session ?? null);
+      // For OAuth, redirect to the provider's URL
+      if (data?.url) {
+        window.location.href = data.url;
+      }
     } catch (error: any) {
       console.error('Error signing in with Google:', error.message);
       throw error;
@@ -52,8 +54,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setLoading(true);
       const { data, error } = await supabase!.auth.signInWithOAuth({ provider: 'github' });
       if (error) throw error;
-      setUser(data.user ?? null);
-      setSession(data.session ?? null);
+      if (data?.url) {
+        window.location.href = data.url;
+      }
     } catch (error: any) {
       console.error('Error signing in with Github:', error.message);
       throw error;
