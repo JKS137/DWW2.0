@@ -1,21 +1,19 @@
 import React, { useEffect } from 'react';
-import { useRouter } from 'next/router';
 import { useAuth } from '../../context/AuthContext';
 
 const AuthCallback: React.FC = () => {
-  const router = useRouter();
   const { loading, error } = useAuth();
 
   useEffect(() => {
     // onAuthStateChange in AuthContext will handle the user session
     // Redirect to the dashboard after a short delay
     const timer = setTimeout(() => {
-      router.replace('/Dashboard');
+      window.location.href = '/dashboard';
     }, 1000);
 
     return () => clearTimeout(timer);
     // eslint-disable-next-line
-  }, [router]);
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-base-200">

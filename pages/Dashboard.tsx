@@ -14,7 +14,6 @@ import { ViewGridIcon } from '../components/icons/ViewGridIcon';
 import { ViewListIcon } from '../components/icons/ViewListIcon';
 import { useWarranties } from '../context/WarrantyContext';
 import { useAuth } from '../context/AuthContext';
-import { useRouter } from 'next/router';
 import { Spinner } from '../components/icons/Spinner';
 import type { Warranty, Category } from '../types';
 import { categories } from '../types';
@@ -50,7 +49,6 @@ const Dashboard: React.FC = () => {
   const [sharingWarranty, setSharingWarranty] = useState<Warranty | null>(null);
   const { warranties, loading, error, deleteWarranty } = useWarranties();
   const { user, session, loading: authLoading } = useAuth();
-  const router = useRouter();
   
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
@@ -63,9 +61,9 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
       if (!authLoading && !user) {
-        router.push('/login');
+        window.location.href = '/login';
       }
-  }, [user, authLoading, router]);
+  }, [user, authLoading]);
 
   useEffect(() => {
       if (!loading) {
