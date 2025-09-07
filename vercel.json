@@ -1,6 +1,8 @@
 {
-  "env": {
-    "SUPABASE_BUCKET": "receipts"
-  }
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ]
 }
-

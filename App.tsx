@@ -8,6 +8,7 @@ import UpdatePassword from './pages/UpdatePassword';
 import Account from './pages/Account';
 import WarrantyDetailPage from './pages/WarrantyDetailPage';
 import SharePage from './pages/SharePage';
+import NotFoundPage from './components/NotFoundPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { WarrantyProvider } from './context/WarrantyContext';
 import { Spinner } from './components/icons/Spinner';
@@ -15,6 +16,7 @@ import { supabaseConfigurationError } from './utils/supabaseClient';
 import { ShieldCheckIcon } from './components/icons/ShieldCheckIcon';
 import { trackPageView } from './services/analyticsService';
 import SpeedInsights from './components/SpeedInsights';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const ConfigurationErrorScreen: React.FC<{ message: string }> = ({ message }) => (
     <div className="flex items-center justify-center min-h-screen bg-red-900/50 text-red-200 p-4">
@@ -37,12 +39,14 @@ const App: React.FC = () => {
   }
 
   return (
-    <AuthProvider>
-      <WarrantyProvider>
-        <MainContent />
-        <SpeedInsights />
-      </WarrantyProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <WarrantyProvider>
+          <MainContent />
+          <SpeedInsights />
+        </WarrantyProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 };
 
@@ -109,8 +113,7 @@ const MainContent: React.FC = () => {
                 content = <UpdatePassword onPasswordUpdated={() => navigate('/dashboard')} />;
                 break;
             default:
-                                navigate('/dashboard');
-                content = <Dashboard />;
+                content = <NotFoundPage />;
                 break;
         }
     }
@@ -136,7 +139,7 @@ const MainContent: React.FC = () => {
         break;
       case '/':
       default:
-        content = <LandingPage onNavigateLogin={() => navigate('/login')} onNavigateSignup={() => navigate('/signup')} />;
+        content = <NotFoundPage />;
         break;
     }
   }
