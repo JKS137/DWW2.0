@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '../utils/supabaseClient';
+import { supabase } from '@/utils/supabaseClient';
 
 // Add at the top of context/AuthContext.tsx
 import { Session, User, AuthChangeEvent } from '@supabase/supabase-js';
@@ -9,11 +9,13 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   authEvent: AuthChangeEvent | null;
+  error: string | null;
+  handleAuthCallback: () => Promise<boolean>;
   signUp: (email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
-  signInWithGithub: () => Promise<void>;
+  signInWithGoogle: (captchaToken?: string) => Promise<{ error: any }>;
+  signInWithGithub: (captchaToken?: string) => Promise<{ error: any }>;
   sendPasswordResetEmail: (email: string) => Promise<{ error: any }>;
   updateUserPassword: (password: string) => Promise<{ error: any }>;
   resendVerificationEmail: (email: string) => Promise<{ error: any }>;
@@ -31,42 +33,52 @@ const createConfigError = () => {
 };
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = async (captchaToken?: string) => {
     try {
       setLoading(true);
       const { data, error } = await supabase!.auth.signInWithOAuth({ provider: 'google' });
-      if (error) throw error;
+      if (error) return { error };
       // For OAuth, redirect to the provider's URL
       if (data?.url) {
         window.location.href = data.url;
       }
     } catch (error: any) {
       console.error('Error signing in with Google:', error.message);
-      throw error;
+      return { error };
     } finally {
       setLoading(false);
     }
+    return { error: null };
   };
 
-  const signInWithGithub = async () => {
+  const signInWithGithub = async (captchaToken?: string) => {
     try {
       setLoading(true);
       const { data, error } = await supabase!.auth.signInWithOAuth({ provider: 'github' });
-      if (error) throw error;
+      if (error) return { error };
       if (data?.url) {
         window.location.href = data.url;
       }
     } catch (error: any) {
       console.error('Error signing in with Github:', error.message);
-      throw error;
+      return { error };
     } finally {
       setLoading(false);
     }
+    return { error: null };
   };
   const [user, setUser] = useState<any | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [authEvent, setAuthEvent] = useState<AuthChangeEvent | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleAuthCallback = async () => {
+    // This is a placeholder. In a real scenario, you would handle the auth callback here.
+    // For example, exchanging a code for a session.
+    console.log("Handling auth callback...");
+    return true; // Assume success for now
+  };
 
   useEffect(() => {
     const getSession = async () => {
@@ -175,6 +187,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   session,
   loading,
   authEvent,
+  error,
+  handleAuthCallback,
   signUp,
   signIn,
   signOut,

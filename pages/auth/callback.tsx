@@ -4,19 +4,18 @@ import { useAuth } from '../../context/AuthContext';
 
 const AuthCallback: React.FC = () => {
   const router = useRouter();
-  const { handleAuthCallback, loading, error } = useAuth();
+  const { loading, error } = useAuth();
 
   useEffect(() => {
-    // This function should handle the callback logic (e.g., exchanging code for token)
-    handleAuthCallback().then((success: boolean) => {
-      if (success) {
-        router.replace('/');
-      } else {
-        router.replace('/login?error=auth_failed');
-      }
-    });
+    // onAuthStateChange in AuthContext will handle the user session
+    // Redirect to the dashboard after a short delay
+    const timer = setTimeout(() => {
+      router.replace('/Dashboard');
+    }, 1000);
+
+    return () => clearTimeout(timer);
     // eslint-disable-next-line
-  }, []);
+  }, [router]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-base-200">
