@@ -9,7 +9,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
   return (
     <main className="min-h-screen grid grid-cols-1 md:grid-cols-2">
       {/* Branding (Left) */}
-      <aside className="order-2 md:order-1 relative">
+      <aside className="order-1 md:order-1 relative">
         {/* Background styling */}
         <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/20 via-brand-secondary/10 to-transparent" aria-hidden="true"></div>
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-30" aria-hidden="true"></div>
@@ -43,7 +43,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
       </aside>
 
       {/* Form (Right) */}
-      <section className="order-1 md:order-2 flex items-center justify-center px-4 py-10">
+      <section className="order-2 md:order-2 flex items-center justify-center px-4 py-10">
         <div className="w-full max-w-md">
           {children}
         </div>

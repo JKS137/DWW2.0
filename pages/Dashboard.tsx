@@ -25,10 +25,16 @@ import { ExportIcon } from '../components/icons/ExportIcon';
 type WarrantyStatus = 'expired' | 'expiring' | 'safe';
 type SortOrder = 'latest' | 'expiryAsc' | 'expiryDesc' | 'nameAsc' | 'nameDesc';
 
-const getWarrantyStatus = (expiryDate: string): WarrantyStatus => {
+const getWarrantyStatus = (expiryDate: string | null): WarrantyStatus => {
+    if (!expiryDate) return 'safe'; // Treat null or undefined expiry as "safe"
+
     const today = new Date();
-    today.setHours(0, 0, 0, 0); 
+    today.setHours(0, 0, 0, 0);
     const expiry = new Date(expiryDate);
+
+    // Handle invalid date string gracefully
+    if (isNaN(expiry.getTime())) return 'safe'; // Treat invalid date as "safe"
+
     const diffTime = expiry.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
@@ -38,9 +44,9 @@ const getWarrantyStatus = (expiryDate: string): WarrantyStatus => {
 };
 
 const demoWarranties: Warranty[] = [
-    { id: 'demo-1', user_id: 'demo', product_name: 'SuperPixel Smartphone', purchase_date: '2023-10-15', warranty_duration: 12, expiry_date: '2024-10-14', file_url: `https://picsum.photos/seed/tech/400/200`, ocr_raw: null, created_at: new Date().toISOString(), category: 'phone' },
-    { id: 'demo-2', user_id: 'demo', product_name: 'InstaFreeze Refrigerator', purchase_date: '2023-01-20', warranty_duration: 24, expiry_date: new Date(new Date().setDate(new Date().getDate() + 25)).toISOString(), file_url: `https://picsum.photos/seed/kitchen/400/200`, ocr_raw: null, created_at: new Date().toISOString(), category: 'appliance' },
-    { id: 'demo-3', user_id: 'demo', product_name: 'Roadster EV Sedan', purchase_date: '2022-08-01', warranty_duration: 18, expiry_date: '2024-02-01', file_url: `https://picsum.photos/seed/car/400/200`, ocr_raw: null, created_at: new Date().toISOString(), category: 'car' },
+    { id: 'demo-1', user_id: 'demo', product_name: 'SuperPixel Smartphone', purchase_date: '2023-10-15', warranty_duration: 12, expiry_date: '2024-10-14', receipt_url: `https://picsum.photos/seed/tech/400/200`, created_at: new Date().toISOString(), category: 'phone', device_id: null, store_name: 'TechMart', notes: 'Demo warranty for testing', tags: ['electronics'] },
+    { id: 'demo-2', user_id: 'demo', product_name: 'InstaFreeze Refrigerator', purchase_date: '2023-01-20', warranty_duration: 24, expiry_date: new Date(new Date().setDate(new Date().getDate() + 25)).toISOString(), receipt_url: `https://picsum.photos/seed/kitchen/400/200`, created_at: new Date().toISOString(), category: 'appliance', device_id: null, store_name: 'ApplianceCo', notes: 'Demo warranty for testing', tags: ['home'] },
+    { id: 'demo-3', user_id: 'demo', product_name: 'Roadster EV Sedan', purchase_date: '2022-08-01', warranty_duration: 18, expiry_date: '2024-02-01', receipt_url: `https://picsum.photos/seed/car/400/200`, created_at: new Date().toISOString(), category: 'car', device_id: null, store_name: 'AutoDealer', notes: 'Demo warranty for testing', tags: ['automotive'] },
 ];
 
 const Dashboard: React.FC = () => {
@@ -89,9 +95,9 @@ const Dashboard: React.FC = () => {
       .sort((a, b) => {
           switch (sortOrder) {
               case 'expiryAsc':
-                  return new Date(a.expiry_date).getTime() - new Date(b.expiry_date).getTime();
+                  return (a.expiry_date ? new Date(a.expiry_date).getTime() : Infinity) - (b.expiry_date ? new Date(b.expiry_date).getTime() : Infinity);
               case 'expiryDesc':
-                  return new Date(b.expiry_date).getTime() - new Date(a.expiry_date).getTime();
+                  return (b.expiry_date ? new Date(b.expiry_date).getTime() : -Infinity) - (a.expiry_date ? new Date(a.expiry_date).getTime() : -Infinity);
               case 'nameAsc':
                   return a.product_name.localeCompare(b.product_name);
               case 'nameDesc':
@@ -101,11 +107,11 @@ const Dashboard: React.FC = () => {
                   return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
           }
       })
-      .map(w => ({ ...w, status: getWarrantyStatus(w.expiry_date) }))
+      .map(w => ({ ...w, status: getWarrantyStatus(w.expiry_date) })) // Pass nullable expiry_date
       .filter(w => {
         const matchesSearch = w.product_name.toLowerCase().includes(searchTerm.toLowerCase());
         
-        const status = getWarrantyStatus(w.expiry_date);
+        const status = getWarrantyStatus(w.expiry_date); // Pass nullable expiry_date
         const matchesStatus = statusFilter === 'all' || (statusFilter === 'safe' ? status === 'safe' : status === statusFilter);
 
         const matchesCategory = categoryFilter === 'all' || w.category === categoryFilter;
@@ -146,9 +152,9 @@ const Dashboard: React.FC = () => {
     const rows = filteredWarranties.map(w => [
         `"${w.product_name.replace(/"/g, '""')}"`,
         w.category || 'N/A',
-        w.purchase_date,
-        w.warranty_duration,
-        w.expiry_date,
+        w.purchase_date || '', // Handle null
+        w.warranty_duration !== null && w.warranty_duration !== undefined ? w.warranty_duration : '', // Handle null/undefined
+        w.expiry_date || '', // Handle null
         w.status,
     ].join(','));
 
