@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '../services/supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 import { Session } from '@supabase/supabase-js';
 import { AuthChangeEvent } from '@supabase/gotrue-js';
 
@@ -10,6 +10,7 @@ interface AuthContextType {
   user: any | null;
   session: Session | null;
   loading: boolean;
+  authEvent: AuthChangeEvent | null;
   signUp: (email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -67,6 +68,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<any | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authEvent, setAuthEvent] = useState<AuthChangeEvent | null>(null);
 
   useEffect(() => {
     const getSession = async () => {
@@ -86,6 +88,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     getSession();
 
     const { data: { subscription } } = supabase!.auth.onAuthStateChange(async (_event: AuthChangeEvent, session: Session | null) => {
+      setAuthEvent(_event);
       setSession(session);
       setUser(session?.user || null);
     });
@@ -173,6 +176,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   user,
   session,
   loading,
+  authEvent,
   signUp,
   signIn,
   signOut,
@@ -181,7 +185,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   sendPasswordResetEmail,
   updateUserPassword,
   resendVerificationEmail,
- };
+  };
 
   return (
     <AuthContext.Provider value={value}>
