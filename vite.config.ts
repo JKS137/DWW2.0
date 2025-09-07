@@ -20,13 +20,5 @@ export default defineConfig(({ mode }) => {
           '@': path.resolve(__dirname, '.'),
         }
       },
-      css: {
-        postcss: {
-          plugins: [
-            require('tailwindcss'),
-            require('autoprefixer'),
-          ],
-        },
-      },
     };
 });
