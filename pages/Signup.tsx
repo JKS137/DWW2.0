@@ -6,7 +6,6 @@ import { GithubIcon } from '../components/icons/GithubIcon';
 import { recordAuthAttempt, checkRateLimit } from '../services/rateLimiter';
 import Captcha from '../components/Captcha';
 import AuthLayout from '../components/AuthLayout';
-import { useRouter } from 'next/router';
 
 interface SignupProps {
   onSwitchToLogin: () => void;
@@ -15,7 +14,6 @@ interface SignupProps {
 
 const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
   const { signUp, signInWithGoogle, signInWithGithub, loading } = useAuth();
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);

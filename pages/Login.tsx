@@ -6,7 +6,6 @@ import { recordAuthAttempt, checkRateLimit } from '../services/rateLimiter';
 import { GithubIcon } from '../components/icons/GithubIcon';
 import Captcha from '../components/Captcha';
 import AuthLayout from '../components/AuthLayout';
-import { useRouter } from 'next/router';
 
 interface LoginProps {
   onSwitchToSignup: () => void;
@@ -16,7 +15,6 @@ interface LoginProps {
 
 const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavigateForgotPassword }) => {
   const { signIn, signInWithGoogle, signInWithGithub, loading } = useAuth();
-  const router = useRouter();
   const [email, setEmail] = useState('demo@example.com');
   const [password, setPassword] = useState('password');
   const [error, setError] = useState<string | null>(null);
