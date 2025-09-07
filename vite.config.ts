@@ -21,6 +21,9 @@ export default defineConfig(({ mode }) => {
           'next/router': path.resolve(__dirname, 'mocks/next/router.ts'),
         }
       },
+      css: {
+        postcss: './postcss.config.js',
+      },
       build: {
         chunkSizeWarningLimit: 1000, // Increase limit to 1000 KB
       },
