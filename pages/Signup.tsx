@@ -63,10 +63,11 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
   const handleGoogleSignIn = async () => {
     setError(null);
     setRateLimitError(null);
-    const { error } = await signInWithGoogle(captchaToken || undefined);
-    if (error) {
-        setError(error.message);
-    }
+    signInWithGoogle(captchaToken || undefined).then(({ error }) => {
+      if (error) {
+          setError(error.message);
+      }
+    });
   };
   
   const SuccessMessage = () => (
@@ -111,7 +112,7 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
                   <GoogleIcon className="h-5 w-5" />
                   <span>Sign up with Google</span>
               </button>
-              <button onClick={async () => { const { error } = await signInWithGithub(captchaToken || undefined); if (error) setError(error.message); }} className="w-full flex justify-center items-center space-x-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-all hover:scale-105 active:scale-95">
+              <button onClick={() => { signInWithGithub(captchaToken || undefined).then(({error}) => { if (error) setError(error.message); }); }} className="w-full flex justify-center items-center space-x-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-all hover:scale-105 active:scale-95">
                   <GithubIcon className="h-5 w-5" />
                   <span>Sign up with GitHub</span>
               </button>
