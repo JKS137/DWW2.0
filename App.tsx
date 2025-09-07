@@ -147,7 +147,7 @@ const MainContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-transparent text-content-primary font-sans">
+    <div className="min-h-screen text-content-primary font-sans">
       <div key={route} className="animate-fade-in">
         {content}
       </div>
