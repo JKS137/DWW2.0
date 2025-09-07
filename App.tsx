@@ -138,6 +138,8 @@ const MainContent: React.FC = () => {
         content = <UpdatePassword onPasswordUpdated={() => navigate('/login')} />;
         break;
       case '/':
+        content = <LandingPage onNavigateLogin={() => navigate('/login')} onNavigateSignup={() => navigate('/signup')} />;
+        break;
       default:
         content = <NotFoundPage />;
         break;
