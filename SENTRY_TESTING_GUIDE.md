@@ -20,8 +20,12 @@ VITE_SENTRY_DSN=https://your-dsn-here@xxx.ingest.us.sentry.io/xxx
 
 ### 3. Install Dependencies
 ```bash
-npm install @sentry/react @sentry/tracing
+npm install @sentry/react
 ```
+
+Dependencies automatically handled:
+- `@sentry/react`: Error tracking + integrations
+- Tracing: Built-in to @sentry/react
 
 ### 4. Verify Setup
 - Check `index.tsx` for Sentry initialization

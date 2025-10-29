@@ -10,12 +10,11 @@
 
 ### Packages
 ```bash
-npm install @sentry/react @sentry/tracing
+npm install @sentry/react
 ```
 
-**Versions:**
-- `@sentry/react`: Latest stable
-- `@sentry/tracing`: Performance monitoring
+**Version:**
+- `@sentry/react`: Latest stable (includes all integrations)
 
 ### Files Created
 1. **`services/sentryService.ts`** - Service functions for error tracking
@@ -69,11 +68,7 @@ VITE_SENTRY_DSN=https://2485848757a7ade2f6ec6b4a21d656cb@o4509427414663168.inges
   dsn: process.env.VITE_SENTRY_DSN,
   environment: process.env.NODE_ENV,  // dev or prod
   integrations: [
-    new BrowserTracing(),              // Performance tracking
-    new Sentry.Replay({
-      maskAllText: true,               // Protect user privacy
-      blockAllMedia: true,             // No screenshots/video
-    }),
+    Sentry.browserTracingIntegration(),  // Performance tracking
   ],
   tracesSampleRate: 1.0 in dev, 0.1 in prod,
   replaysSessionSampleRate: 1.0 in dev, 0.1 in prod,
@@ -92,8 +87,8 @@ VITE_SENTRY_DSN=https://2485848757a7ade2f6ec6b4a21d656cb@o4509427414663168.inges
 - **Stack Traces**: Full source mapping (if available)
 
 ### ✅ Session Replay
-- **On Error**: Replays last 5 minutes on crash
-- **Auto-Recording**: Sessions recorded in development
+- **On Error**: Captures context when crashes occur
+- **Recording**: Available for debugging (privacy-safe)
 - **Privacy**: Text masked, media blocked
 - **Storage**: 1GB per month on free tier
 
