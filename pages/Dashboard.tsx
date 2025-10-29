@@ -229,13 +229,20 @@ const Dashboard: React.FC = () => {
             <h1 className="text-3xl font-bold text-content-primary">Dashboard</h1>
             {user && <p className="text-content-secondary mt-1">Hello, {user.email}</p>}
           </div>
-           {warranties.length === 0 && !loading && (
-             <ToggleSwitch
-                label="Demo Mode"
-                enabled={isDemoMode}
-                onChange={setIsDemoMode}
-             />
-           )}
+           <div className="flex gap-4 items-center">
+             {warranties.length === 0 && !loading && (
+               <ToggleSwitch
+                  label="Demo Mode"
+                  enabled={isDemoMode}
+                  onChange={setIsDemoMode}
+               />
+             )}
+             {typeof process !== 'undefined' && process.env.NODE_ENV === 'development' && (
+               <div className="p-3 bg-blue-900/30 rounded-lg border border-blue-500/30">
+                 <SentryTestButton />
+               </div>
+             )}
+           </div>
         </header>
 
         <section 
