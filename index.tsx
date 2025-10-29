@@ -15,6 +15,9 @@ Sentry.init({
   integrations: [
     Sentry.browserTracingIntegration(),
   ],
+  // send default PII (IP addresses etc.) to Sentry. Set to true only when you
+  // explicitly want to include PII. This was requested for testing purposes.
+  sendDefaultPii: true,
   tracesSampleRate: isDev ? 1.0 : 0.1,
   replaysSessionSampleRate: isDev ? 1.0 : 0.1,
   replaysOnErrorSampleRate: 1.0,
