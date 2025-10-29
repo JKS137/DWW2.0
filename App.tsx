@@ -147,8 +147,9 @@ const MainContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen text-content-primary font-sans">
-      <div key={route} className="animate-fade-in">
+    <div className="min-h-screen text-content-primary font-sans bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 relative">
+      <div className="fixed inset-0 bg-gradient-to-br from-purple-900/10 via-blue-900/10 to-teal-900/10 pointer-events-none z-0"></div>
+      <div key={route} className="animate-fade-in relative z-10">
         {content}
       </div>
     </div>

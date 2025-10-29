@@ -44,17 +44,17 @@ const getWarrantyStatusInfo = (expiryDate: string): DaysRemainingInfo => {
 // Style mapping for different warranty statuses
 const cardStatusStyles: Record<WarrantyStatus, { card: string; text: string; icon: string }> = {
   safe: {
-    card: 'bg-base-200/40 border-base-300/50',
+    card: 'bg-gradient-to-br from-base-200/50 to-base-200/30 border-base-300/50 hover:border-base-300',
     text: 'text-green-400',
     icon: '',
   },
   expiring: {
-    card: 'bg-orange-900/40 border-orange-500/80',
+    card: 'bg-gradient-to-br from-orange-900/50 to-orange-900/30 border-orange-500/50 hover:border-orange-500',
     text: 'text-orange-400 font-bold',
     icon: 'text-orange-400',
   },
   expired: {
-    card: 'bg-red-900/40 border-red-500/80 opacity-80',
+    card: 'bg-gradient-to-br from-red-900/50 to-red-900/30 border-red-500/50 hover:border-red-500 opacity-90',
     text: 'text-red-400 font-bold',
     icon: 'text-red-400',
   },
@@ -75,26 +75,32 @@ const WarrantyCard: React.FC<WarrantyCardProps> = ({ warranty, onEdit, onShare, 
 
   return (
     <div 
-      className={`rounded-xl shadow-lg overflow-hidden transition-all duration-300 ease-in-out border backdrop-blur-sm ${styles.card} animate-slide-up hover:-translate-y-1`}
+      className={`rounded-xl overflow-hidden transition-all duration-300 ease-in-out border backdrop-blur-sm group ${styles.card} animate-slide-up hover:-translate-y-2 hover:shadow-xl`}
     >
-      <img className="h-48 w-full object-cover" src={warranty.file_url} alt={`Receipt for ${warranty.product_name}`} />
+      <div className="relative overflow-hidden h-48 bg-gradient-to-br from-base-300/30 to-base-300/10">
+        <img 
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110" 
+          src={warranty.file_url} 
+          alt={`Receipt for ${warranty.product_name}`} 
+        />
+      </div>
       <div className="p-5">
         <div className="flex justify-between items-start gap-2">
             <div className="flex items-center space-x-2 mr-2">
                 <h3 className="text-lg font-bold text-content-primary">{warranty.product_name}</h3>
                 {status !== 'safe' && (
                     <WarningIcon 
-                        className={`h-6 w-6 ${styles.icon} flex-shrink-0`}
+                        className={`h-6 w-6 ${styles.icon} flex-shrink-0 animate-pulse`}
                     >
                         <title>{status === 'expiring' ? 'Warranty expiring soon' : 'Warranty expired'}</title>
                     </WarningIcon>
                 )}
             </div>
-            <div className={`flex-shrink-0 flex items-center space-x-1 -mt-1 -mr-1 ${isDemo ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            <div className={`flex-shrink-0 flex items-center space-x-1 -mt-1 -mr-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${isDemo ? 'opacity-50 cursor-not-allowed' : ''}`}>
                 <button 
                     onClick={onShare}
                     disabled={isDemo}
-                    className="text-content-secondary hover:text-brand-secondary transition-colors p-1"
+                    className="text-content-secondary hover:text-brand-secondary transition-all p-1.5 hover:bg-base-300/50 rounded-lg"
                     aria-label="Share warranty"
                 >
                     <ShareIcon className="h-5 w-5"/>
@@ -102,7 +108,7 @@ const WarrantyCard: React.FC<WarrantyCardProps> = ({ warranty, onEdit, onShare, 
                 <button 
                     onClick={onEdit}
                     disabled={isDemo}
-                    className="text-content-secondary hover:text-brand-primary transition-colors p-1"
+                    className="text-content-secondary hover:text-brand-primary transition-all p-1.5 hover:bg-base-300/50 rounded-lg"
                     aria-label="Edit warranty"
                 >
                     <EditIcon className="h-5 w-5"/>
@@ -110,7 +116,7 @@ const WarrantyCard: React.FC<WarrantyCardProps> = ({ warranty, onEdit, onShare, 
                 <button 
                     onClick={handleDelete} 
                     disabled={isDemo}
-                    className="text-content-secondary hover:text-red-500 transition-colors p-1"
+                    className="text-content-secondary hover:text-red-500 transition-all p-1.5 hover:bg-red-900/30 rounded-lg"
                     aria-label="Delete warranty"
                 >
                     <TrashIcon className="h-5 w-5"/>
