@@ -230,16 +230,16 @@ const Hero: React.FC<LandingPageProps> = ({ onNavigateSignup, onNavigateLogin })
         >
             <div className="absolute inset-0 bg-gradient-radial from-blue-500/10 via-transparent to-transparent z-0"></div>
             <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
-                <h1 className="text-4xl md:text-6xl font-extrabold text-content-primary tracking-tight leading-tight animate-slide-up">
+                <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-tight animate-slide-up">
                     Never lose track of your warranties again.
                 </h1>
-                <p className="mt-6 max-w-2xl mx-auto text-lg text-content-secondary animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                <p className="mt-6 max-w-2xl mx-auto text-lg text-gray-200 animate-slide-up" style={{ animationDelay: '0.1s' }}>
                     Your digital vault for receipts, warranties, and peace of mind. Securely store, track, and get reminded before they expire.
                 </p>
                 {/* Trusted by marquee */}
                 <div className="mt-16 w-full max-w-6xl mx-auto animate-slide-up" style={{ animationDelay: '0.3s' }}>
                     <div className="text-center mb-4">
-                        <p className="text-sm font-semibold uppercase tracking-wider text-content-secondary">Trusted by</p>
+                        <p className="text-sm font-semibold uppercase tracking-wider text-gray-300">Trusted by</p>
                     </div>
                     <div className="trusted-by-wrapper relative overflow-hidden">
                         <div aria-hidden="true" className="pointer-events-none absolute left-0 top-0 h-full w-16 bg-gradient-to-r from-base-100 to-transparent"></div>
@@ -282,8 +282,8 @@ const HowItWorks: React.FC = () => (
     >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12 animate-slide-up">
-                <h2 className="text-3xl font-bold">How It Works</h2>
-                <p className="text-content-secondary mt-2">Get organized in three simple steps.</p>
+                <h2 className="text-3xl font-bold text-white">How It Works</h2>
+                <p className="text-gray-300 mt-2">Get organized in three simple steps.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {[
@@ -297,8 +297,8 @@ const HowItWorks: React.FC = () => (
                             <div className="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-base-100 border-2 border-brand-primary shadow-glow-blue mb-4">
                                <Icon className="h-8 w-8 text-brand-primary" />
                             </div>
-                            <h3 className="text-xl font-semibold">{step.title}</h3>
-                            <p className="text-content-secondary mt-2">{step.description}</p>
+                            <h3 className="text-xl font-semibold text-white">{step.title}</h3>
+                            <p className="text-gray-300 mt-2">{step.description}</p>
                         </div>
                     );
                 })}
@@ -323,8 +323,8 @@ const Features: React.FC = () => {
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 animate-slide-up">
-            <h2 className="text-3xl font-bold">Everything you need, all in one place.</h2>
-            <p className="text-content-secondary mt-2">Powerful features to give you complete peace of mind.</p>
+            <h2 className="text-3xl font-bold text-white">Everything you need, all in one place.</h2>
+            <p className="text-gray-300 mt-2">Powerful features to give you complete peace of mind.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {featureList.map((feature) => {
@@ -335,8 +335,8 @@ const Features: React.FC = () => {
                       <Icon className="h-6 w-6 text-brand-secondary" />
                    </div>
                   <div>
-                    <h3 className="font-semibold">{feature.name}</h3>
-                    <p className="text-content-secondary text-sm mt-1">{feature.description}</p>
+                    <h3 className="font-semibold text-white">{feature.name}</h3>
+                    <p className="text-gray-300 text-sm mt-1">{feature.description}</p>
                   </div>
                 </div>
               );
@@ -385,25 +385,25 @@ const Pricing: React.FC<LandingPageProps> = ({ onNavigateSignup }) => {
         >
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-12 animate-slide-up">
-                    <h2 className="text-3xl font-bold">Choose the plan that's right for you</h2>
-                    <p className="text-content-secondary mt-2">Start for free, upgrade when you're ready.</p>
+                    <h2 className="text-3xl font-bold text-white">Choose the plan that's right for you</h2>
+                    <p className="text-gray-300 mt-2">Start for free, upgrade when you're ready.</p>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {plans.map((plan, i) => (
                         <div key={plan.name} className={`relative p-8 bg-base-200/50 backdrop-blur-md border rounded-xl flex flex-col ${plan.border} transition-all hover:-translate-y-2 hover:${plan.glow} animate-slide-up`} style={{ animationDelay: `${i * 0.1}s`}}>
                             {plan.popular && <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 px-3 py-1 text-sm font-semibold text-white bg-brand-secondary rounded-full">Most Popular</div>}
-                            <h3 className="text-2xl font-semibold">{plan.name}</h3>
+                            <h3 className="text-2xl font-semibold text-white">{plan.name}</h3>
                             <p className="mt-4">
-                                <span className="text-4xl font-bold">{plan.price}</span>
-                                <span className="text-content-secondary">/mo</span>
+                                <span className="text-4xl font-bold text-white">{plan.price}</span>
+                                <span className="text-gray-300">/mo</span>
                                 {plan.yearlyPrice && (
-                                    <span className="block text-sm">
+                                    <span className="block text-sm text-gray-300">
                                         or <span className="font-semibold">{plan.yearlyPrice}</span>/year
                                     </span>
                                 )}
                             </p>
-                            <p className="text-content-secondary mt-2">{plan.description}</p>
-                            <ul className="mt-6 space-y-4 text-content-secondary flex-grow">
+                            <p className="text-gray-300 mt-2">{plan.description}</p>
+                            <ul className="mt-6 space-y-4 text-gray-300 flex-grow">
                                 {plan.features.map(feature => (
                                     <li key={feature} className="flex items-center space-x-2">
                                         <CheckCircleIcon className="h-5 w-5 text-brand-secondary" />
@@ -413,12 +413,12 @@ const Pricing: React.FC<LandingPageProps> = ({ onNavigateSignup }) => {
                             </ul>
                             <button 
                               onClick={onNavigateSignup} 
-                              className={`mt-8 w-full py-3 font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 ${plan.popular ? 'bg-brand-secondary text-white' : 'bg-base-300 text-content-primary hover:bg-opacity-80'}`}
+                              className={`mt-8 w-full py-3 font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 ${plan.popular ? 'bg-brand-secondary text-white' : 'bg-base-300 text-white hover:bg-opacity-80'}`}
                             >
                                 Choose Plan
                             </button>
                             {plan.yearlyPrice && (
-                                <p className="mt-2 text-center text-sm text-content-secondary">Save up to 15% with yearly billing!</p>
+                                <p className="mt-2 text-center text-sm text-gray-300">Save up to 15% with yearly billing!</p>
                             )}
                         </div>
                     ))}
@@ -432,11 +432,11 @@ const LandingFooter: React.FC = () => (
     <footer className="border-t border-base-300/50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex flex-col sm:flex-row justify-between items-center">
-                <p className="text-sm text-content-secondary text-center sm:text-left">&copy; {new Date().getFullYear()} DigitalWarrantyVault. All rights reserved.</p>
+                <p className="text-sm text-gray-300 text-center sm:text-left">&copy; {new Date().getFullYear()} DigitalWarrantyVault. All rights reserved.</p>
                 <div className="flex space-x-4 mt-4 sm:mt-0">
-                    <a href="#" className="text-content-secondary hover:text-content-primary">Terms</a>
-                    <a href="#" className="text-content-secondary hover:text-content-primary">Privacy</a>
-                    <a href="#" className="text-content-secondary hover:text-content-primary">Support</a>
+                    <a href="#" className="text-gray-300 hover:text-white">Terms</a>
+                    <a href="#" className="text-gray-300 hover:text-white">Privacy</a>
+                    <a href="#" className="text-gray-300 hover:text-white">Support</a>
                 </div>
             </div>
         </div>
