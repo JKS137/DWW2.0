@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import * as Sentry from '@sentry/react';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -42,8 +43,26 @@ const App: React.FC = () => {
     <ErrorBoundary>
       <AuthProvider>
         <WarrantyProvider>
-          <MainContent />
-          <SpeedInsights />
+          <Sentry.ErrorBoundary
+            fallback={({ error, resetError }) => (
+              <div className="flex items-center justify-center min-h-screen bg-red-900/50 text-red-200 p-4">
+                <div className="w-full max-w-2xl p-8 space-y-4 bg-base-200 rounded-xl shadow-lg border border-red-500/50">
+                  <h2 className="text-2xl font-bold">Application Error</h2>
+                  <p className="text-base">Something went wrong. Error has been reported to our team.</p>
+                  <button
+                    onClick={resetError}
+                    className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              </div>
+            )}
+            showDialog
+          >
+            <MainContent />
+            <SpeedInsights />
+          </Sentry.ErrorBoundary>
         </WarrantyProvider>
       </AuthProvider>
     </ErrorBoundary>

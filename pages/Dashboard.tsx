@@ -9,6 +9,7 @@ import OnboardingBanner from '../components/OnboardingBanner';
 import StatsCard from '../components/StatsCard';
 import ToggleSwitch from '../components/ToggleSwitch';
 import UploadForm from '../components/UploadForm';
+import SentryTestButton from '../components/SentryTestButton';
 import { PlusIcon } from '../components/icons/PlusIcon';
 import { ViewGridIcon } from '../components/icons/ViewGridIcon';
 import { ViewListIcon } from '../components/icons/ViewListIcon';

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/utils/supabaseClient';
+import { setUserContext, clearUserContext, captureAuthError } from '@/services/sentryService';
 
 // Add at the top of context/AuthContext.tsx
 import { Session, User, AuthChangeEvent } from '@supabase/supabase-js';
@@ -101,6 +102,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setAuthEvent(_event);
       setSession(session);
       setUser(session?.user || null);
+      
+      // Update Sentry user context
+      if (session?.user) {
+        setUserContext(session.user.id, session.user.email, session.user.user_metadata?.name);
+      } else {
+        clearUserContext();
+      }
     });
 
     return () => {
@@ -118,8 +126,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (error) throw error;
       setUser(data.user);
       setSession(data.session);
+      if (data.user) {
+        setUserContext(data.user.id, data.user.email);
+      }
     } catch (error: any) {
-      console.error("Error signing up:", error.message);
+      captureAuthError(error, 'signUp');
       throw error;
     } finally {
       setLoading(false);
@@ -136,8 +147,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (error) throw error;
       setUser(data.user);
       setSession(data.session);
+      if (data.user) {
+        setUserContext(data.user.id, data.user.email);
+      }
     } catch (error: any) {
-      console.error("Error signing in:", error.message);
+      captureAuthError(error, 'signIn');
       throw error;
     } finally {
       setLoading(false);
@@ -151,8 +165,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (error) throw error;
       setUser(null);
       setSession(null);
+      clearUserContext();
     } catch (error: any) {
-      console.error("Error signing out:", error.message);
+      captureAuthError(error, 'signOut');
       throw error;
     } finally {
       setLoading(false);

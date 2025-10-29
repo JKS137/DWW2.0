@@ -1,6 +1,7 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 import type { OcrData } from '../types';
+import { captureOCRError, addBreadcrumb } from './sentryService';
 
 // Lazily initialize the AI client to prevent app crash on load if API key is missing.
 let ai: GoogleGenAI | null = null;
@@ -40,15 +41,10 @@ export const fileToBase64 = (file: File): Promise<string> => {
     });
 };
 
-/**
- * Extracts warranty information from an image using Gemini API.
- * @param base64Image The base64 encoded image string.
- * @param mimeType The MIME type of the image.
- * @returns A promise that resolves with the extracted OCR data.
- */
 export const extractWarrantyInfoFromImage = async (base64Image: string, mimeType: string): Promise<OcrData> => {
     try {
-        const aiClient = getAiClient(); // This will throw if initialization fails
+        const aiClient = getAiClient();
+        addBreadcrumb(`Processing receipt image for OCR`, 'ocr');
 
         const imagePart = {
             inlineData: {
@@ -93,20 +89,26 @@ Return ONLY a single, valid JSON object matching the specified schema. Do not in
             }
         });
         
+        if (!response.text) {
+            throw new Error("Empty response from Gemini API");
+        }
+
         const jsonText = response.text.trim();
         const parsedData = JSON.parse(jsonText) as OcrData;
 
-        // Basic validation
         if (!parsedData.productName || !parsedData.purchaseDate) {
             throw new Error("Parsed data is missing required fields.");
         }
 
+        addBreadcrumb(`OCR extraction successful`, 'ocr');
         return parsedData;
 
     } catch (error: any) {
-                const errorMessage = error.message.includes("API_KEY") 
+        const errorMessage = error.message.includes("API_KEY") 
             ? "Gemini API Key is not configured. OCR functionality is disabled."
             : "Failed to analyze receipt. Please try a clearer image or enter details manually.";
+        
+        captureOCRError(error, 'receipt-image');
         throw new Error(errorMessage);
     }
 };

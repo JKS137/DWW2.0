@@ -1,5 +1,6 @@
 import { supabase } from '../utils/supabaseClient';
 import type { Warranty, Category } from '../types';
+import { captureApiError, addBreadcrumb } from './sentryService';
 
 const RECEIPTS_BUCKET = (process.env.SUPABASE_BUCKET as string) || 'receipts';
 
@@ -14,19 +15,22 @@ const calculateExpiryDate = (purchaseDate: string | null, months: number | null)
     return date.toISOString().split('T')[0];
 };
 
-/**
- * Fetches all warranties for a given user.
- */
 export const fetchWarranties = async (userId: string): Promise<Warranty[]> => {
     if (!supabase) throw new Error("Supabase client is not initialized.");
-    const { data, error } = await supabase
-        .from('warranties')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
+    try {
+        addBreadcrumb(`Fetching warranties for user ${userId}`, 'warranty');
+        const { data, error } = await supabase
+            .from('warranties')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false });
 
-    if (error) throw new Error(error.message);
-    return data as Warranty[];
+        if (error) throw error;
+        return data as Warranty[];
+    } catch (error) {
+        captureApiError(error, '/warranties', 'GET');
+        throw error;
+    }
 };
 
 /**
