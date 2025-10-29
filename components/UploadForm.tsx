@@ -144,7 +144,7 @@ const UploadForm: React.FC = () => {
                 onChange={handleFileSelect}
             />
             <div className="space-y-2">
-                <UploadIcon className="mx-auto h-10 w-10 text-content-secondary" />
+                <UploadIcon className="mx-auto h-10 w-10 text-gray-200" />
                 <p className="font-semibold text-content-primary">Quick Upload &amp; Analyze</p>
                 <p className="text-sm text-content-secondary">Drag &amp; drop or click to upload receipts. <br/> AI will automatically extract the details.</p>
             </div>

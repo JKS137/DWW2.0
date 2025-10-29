@@ -151,7 +151,7 @@ const AddWarrantyModal: React.FC<AddWarrantyModalProps> = ({ isOpen, onClose }) 
               className="border-2 border-dashed border-base-300 rounded-lg p-10 text-center cursor-pointer hover:border-brand-primary hover:bg-base-200/50 transition-colors"
               onClick={() => fileInputRef.current?.click()}
             >
-              <CameraIcon className="mx-auto h-12 w-12 text-content-secondary" />
+              <CameraIcon className="mx-auto h-12 w-12 text-gray-200" />
               <p className="mt-2 text-content-primary font-semibold">Click to upload receipt</p>
               <p className="text-xs text-content-secondary">PNG, JPG, WEBP</p>
               <input
