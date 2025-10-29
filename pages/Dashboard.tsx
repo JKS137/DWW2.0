@@ -10,6 +10,7 @@ import StatsCard from '../components/StatsCard';
 import ToggleSwitch from '../components/ToggleSwitch';
 import UploadForm from '../components/UploadForm';
 import SentryTestButton from '../components/SentryTestButton';
+import ErrorButton from '../components/ErrorButton';
 import { PlusIcon } from '../components/icons/PlusIcon';
 import { ViewGridIcon } from '../components/icons/ViewGridIcon';
 import { ViewListIcon } from '../components/icons/ViewListIcon';
@@ -238,8 +239,9 @@ const Dashboard: React.FC = () => {
                />
              )}
              {typeof process !== 'undefined' && process.env.NODE_ENV === 'development' && (
-               <div className="p-3 bg-blue-900/30 rounded-lg border border-blue-500/30">
-                 <SentryTestButton />
+               <div className="p-3 bg-blue-900/30 rounded-lg border border-blue-500/30 flex gap-3 items-center">
+                <SentryTestButton />
+                <ErrorButton />
                </div>
              )}
            </div>
