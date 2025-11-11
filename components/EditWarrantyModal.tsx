@@ -149,21 +149,21 @@ const EditWarrantyModal: React.FC<EditWarrantyModalProps> = ({ isOpen, onClose, 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="sm:col-span-2">
                             <label htmlFor="editProductName" className="block text-sm font-medium text-content-secondary mb-1">Product Name</label>
-                            <input type="text" id="editProductName" value={productName} onChange={e => setProductName(e.target.value)} required className="block w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"/>
+                            <input type="text" id="editProductName" value={productName} onChange={e => setProductName(e.target.value)} required className="block w-full px-3 py-2 bg-base-100/70 border border-base-300 text-content-primary rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"/>
                         </div>
                         <div>
                             <label htmlFor="editPurchaseDate" className="block text-sm font-medium text-content-secondary mb-1">Purchase Date</label>
-                            <input type="date" id="editPurchaseDate" value={purchaseDate} onChange={e => setPurchaseDate(e.target.value)} required className="block w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"/>
+                            <input type="date" id="editPurchaseDate" value={purchaseDate} onChange={e => setPurchaseDate(e.target.value)} required className="block w-full px-3 py-2 bg-base-100/70 border border-base-300 text-content-primary rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"/>
                         </div>
                         <div>
                             <label htmlFor="editWarrantyLength" className="block text-sm font-medium text-content-secondary mb-1">Warranty (months)</label>
-                            <input type="number" id="editWarrantyLength" value={warrantyLength} onChange={e => setWarrantyLength(e.target.value === '' ? '' : parseInt(e.target.value, 10))} required className="block w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"/>
+                            <input type="number" id="editWarrantyLength" value={warrantyLength} onChange={e => setWarrantyLength(e.target.value === '' ? '' : parseInt(e.target.value, 10))} required className="block w-full px-3 py-2 bg-base-100/70 border border-base-300 text-content-primary rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"/>
                         </div>
                         <div className="sm:col-span-2">
                             <label htmlFor="editCategory" className="block text-sm font-medium text-content-secondary mb-1">Category</label>
-                            <select id="editCategory" value={category} onChange={e => setCategory(e.target.value as Category)} required className="block w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary">
-                                <option value="" disabled>Select a category</option>
-                                {categories.map(c => <option key={c} value={c} className="capitalize bg-base-200">{c}</option>)}
+                            <select id="editCategory" value={category} onChange={e => setCategory(e.target.value as Category)} required className="block w-full px-3 py-2 bg-base-100/70 border border-base-300 text-content-primary rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary">
+                                <option value="" disabled className="bg-base-200 text-content-secondary">Select a category</option>
+                                {categories.map(c => <option key={c} value={c} className="capitalize bg-base-200 text-content-primary">{c}</option>)}
                             </select>
                         </div>
                     </div>

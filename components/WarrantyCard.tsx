@@ -7,64 +7,51 @@ import { WarningIcon } from './icons/WarningIcon';
 import { EditIcon } from './icons/EditIcon';
 import { TagIcon } from './icons/TagIcon';
 import { ShareIcon } from './icons/ShareIcon';
-import { formatDate } from '../utils/dateUtils';
+
+type WarrantyStatus = 'expired' | 'expiring' | 'safe';
 
 interface WarrantyCardProps {
-  warranty: Warranty;
+  warranty: Warranty & {
+    status: WarrantyStatus;
+    progress: number;
+    statusText: string;
+  };
   onEdit: () => void;
   onShare: () => void;
   isDemo?: boolean;
 }
 
-type WarrantyStatus = 'expired' | 'expiring' | 'safe';
-
-interface DaysRemainingInfo {
-    text: string;
-    status: WarrantyStatus;
-}
-
-// Determines the warranty status and text based on the expiry date.
-const getWarrantyStatusInfo = (expiryDate: string): DaysRemainingInfo => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Compare dates only, ignoring time
-    const expiry = new Date(expiryDate);
-    
-    const diffTime = expiry.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 0) {
-        return { text: 'Expired', status: 'expired' };
-    }
-    if (diffDays <= 30) {
-        return { text: `${diffDays} days left`, status: 'expiring' };
-    }
-    return { text: `${diffDays} days left`, status: 'safe' };
-};
-
 // Style mapping for different warranty statuses
 const cardStatusStyles: Record<WarrantyStatus, { card: string; text: string; icon: string }> = {
   safe: {
-    card: 'bg-gradient-to-br from-base-200/50 to-base-200/30 border-base-300/50 hover:border-base-300',
+    card: 'bg-base-200/40 border-base-300/50',
     text: 'text-green-400',
     icon: '',
   },
   expiring: {
-    card: 'bg-gradient-to-br from-orange-900/50 to-orange-900/30 border-orange-500/50 hover:border-orange-500',
+    card: 'bg-orange-900/40 border-orange-500/80',
     text: 'text-orange-400 font-bold',
     icon: 'text-orange-400',
   },
   expired: {
-    card: 'bg-gradient-to-br from-red-900/50 to-red-900/30 border-red-500/50 hover:border-red-500 opacity-90',
+    card: 'bg-red-900/40 border-red-500/80 opacity-80',
     text: 'text-red-400 font-bold',
     icon: 'text-red-400',
   },
 };
 
+const progressBarStatusStyles: Record<WarrantyStatus, { bar: string }> = {
+  safe: { bar: 'bg-teal-500' },
+  expiring: { bar: 'bg-orange-500' },
+  expired: { bar: 'bg-red-500' },
+};
+
 
 const WarrantyCard: React.FC<WarrantyCardProps> = ({ warranty, onEdit, onShare, isDemo = false }) => {
   const { deleteWarranty } = useWarranties();
-  const { text, status } = getWarrantyStatusInfo(warranty.expiry_date);
+  const { status, progress, statusText } = warranty;
   const styles = cardStatusStyles[status];
+  const progressStyles = progressBarStatusStyles[status];
 
   const handleDelete = () => {
     if (isDemo) return;
@@ -75,32 +62,26 @@ const WarrantyCard: React.FC<WarrantyCardProps> = ({ warranty, onEdit, onShare, 
 
   return (
     <div 
-      className={`rounded-xl overflow-hidden transition-all duration-300 ease-in-out border backdrop-blur-sm group ${styles.card} animate-slide-up hover:-translate-y-2 hover:shadow-xl`}
+      className={`rounded-xl shadow-lg overflow-hidden transition-all duration-300 ease-in-out border backdrop-blur-sm ${styles.card} animate-slide-up hover:-translate-y-1`}
     >
-      <div className="relative overflow-hidden h-48 bg-gradient-to-br from-base-300/30 to-base-300/10">
-        <img 
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110" 
-          src={warranty.file_url} 
-          alt={`Receipt for ${warranty.product_name}`} 
-        />
-      </div>
+      <img className="h-48 w-full object-cover" src={warranty.file_url} alt={`Receipt for ${warranty.product_name}`} />
       <div className="p-5">
         <div className="flex justify-between items-start gap-2">
             <div className="flex items-center space-x-2 mr-2">
                 <h3 className="text-lg font-bold text-content-primary">{warranty.product_name}</h3>
                 {status !== 'safe' && (
                     <WarningIcon 
-                        className={`h-6 w-6 ${styles.icon} flex-shrink-0 animate-pulse`}
+                        className={`h-6 w-6 ${styles.icon} flex-shrink-0`}
                     >
                         <title>{status === 'expiring' ? 'Warranty expiring soon' : 'Warranty expired'}</title>
                     </WarningIcon>
                 )}
             </div>
-            <div className={`flex-shrink-0 flex items-center space-x-1 -mt-1 -mr-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${isDemo ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            <div className={`flex-shrink-0 flex items-center space-x-1 -mt-1 -mr-1 ${isDemo ? 'opacity-50 cursor-not-allowed' : ''}`}>
                 <button 
                     onClick={onShare}
                     disabled={isDemo}
-                    className="text-content-secondary hover:text-brand-secondary transition-all p-1.5 hover:bg-base-300/50 rounded-lg"
+                    className="text-content-secondary hover:text-brand-secondary transition-colors p-1"
                     aria-label="Share warranty"
                 >
                     <ShareIcon className="h-5 w-5"/>
@@ -108,7 +89,7 @@ const WarrantyCard: React.FC<WarrantyCardProps> = ({ warranty, onEdit, onShare, 
                 <button 
                     onClick={onEdit}
                     disabled={isDemo}
-                    className="text-content-secondary hover:text-brand-primary transition-all p-1.5 hover:bg-base-300/50 rounded-lg"
+                    className="text-content-secondary hover:text-brand-primary transition-colors p-1"
                     aria-label="Edit warranty"
                 >
                     <EditIcon className="h-5 w-5"/>
@@ -116,7 +97,7 @@ const WarrantyCard: React.FC<WarrantyCardProps> = ({ warranty, onEdit, onShare, 
                 <button 
                     onClick={handleDelete} 
                     disabled={isDemo}
-                    className="text-content-secondary hover:text-red-500 transition-all p-1.5 hover:bg-red-900/30 rounded-lg"
+                    className="text-content-secondary hover:text-red-500 transition-colors p-1"
                     aria-label="Delete warranty"
                 >
                     <TrashIcon className="h-5 w-5"/>
@@ -132,17 +113,28 @@ const WarrantyCard: React.FC<WarrantyCardProps> = ({ warranty, onEdit, onShare, 
         <div className="space-y-3 text-sm mt-3">
             <div className="flex items-center text-content-secondary space-x-2">
                 <CalendarIcon className="h-4 w-4" />
-                <span>Purchased: {formatDate(warranty.purchase_date)}</span>
+                <span>Purchased: {new Date(warranty.purchase_date).toLocaleDateString()}</span>
             </div>
             <div className="flex items-center text-content-secondary space-x-2">
                 <CalendarIcon className="h-4 w-4 text-brand-secondary" />
-                <span>Expires: {formatDate(warranty.expiry_date)}</span>
+                <span>Expires: {new Date(warranty.expiry_date).toLocaleDateString()}</span>
             </div>
         </div>
-        <div className="mt-4 pt-4 border-t border-base-300/50">
-          <p className={`text-sm font-semibold ${styles.text}`}>
-            {text}
-          </p>
+        <div className="mt-4 pt-4 border-t border-base-300/50 space-y-2">
+            <div className="w-full bg-base-300/50 rounded-full h-2">
+                <div
+                    className={`h-2 rounded-full transition-all duration-500 ${progressStyles.bar}`}
+                    style={{ width: `${progress}%` }}
+                    role="progressbar"
+                    aria-valuenow={progress}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`Warranty progress ${Math.round(progress)}%`}
+                ></div>
+            </div>
+            <p className={`text-sm font-semibold ${styles.text}`}>
+                {statusText}
+            </p>
         </div>
       </div>
     </div>

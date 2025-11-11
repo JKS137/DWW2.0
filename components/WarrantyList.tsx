@@ -5,21 +5,33 @@ import { EditIcon } from './icons/EditIcon';
 import { TagIcon } from './icons/TagIcon';
 import { WarningIcon } from './icons/WarningIcon';
 import { ShareIcon } from './icons/ShareIcon';
-import { formatDate } from '../utils/dateUtils';
+
+type WarrantyStatus = 'safe' | 'expiring' | 'expired';
 
 interface WarrantyListProps {
-  warranties: (Warranty & { status: 'safe' | 'expiring' | 'expired' })[];
+  warranties: (Warranty & { 
+    status: WarrantyStatus;
+    progress: number;
+    statusText: string;
+  })[];
   onEdit: (warranty: Warranty) => void;
   onDelete: (id: string, fileUrl: string) => void;
   onShare: (warranty: Warranty) => void;
   isDemo?: boolean;
 }
 
-const statusStyles = {
+const statusStyles: Record<WarrantyStatus, string> = {
     safe: 'bg-green-500/20 text-green-300',
     expiring: 'bg-orange-500/20 text-orange-300',
     expired: 'bg-red-500/20 text-red-300',
 };
+
+const progressBarStatusStyles: Record<WarrantyStatus, { bar: string }> = {
+  safe: { bar: 'bg-teal-500' },
+  expiring: { bar: 'bg-orange-500' },
+  expired: { bar: 'bg-red-500' },
+};
+
 
 const WarrantyList: React.FC<WarrantyListProps> = ({ warranties, onEdit, onDelete, onShare, isDemo = false }) => {
 
@@ -40,7 +52,7 @@ const WarrantyList: React.FC<WarrantyListProps> = ({ warranties, onEdit, onDelet
             key={warranty.id}
             className="p-4 flex flex-wrap items-center justify-between gap-4 hover:bg-base-300/50 transition-colors"
           >
-            <div className="flex items-center gap-4 flex-1 min-w-[200px]">
+            <div className="flex items-center gap-4 flex-1 min-w-[250px]">
               <img src={warranty.file_url} alt={warranty.product_name} className="h-12 w-12 rounded-md object-cover flex-shrink-0" />
               <div>
                 <p className="font-bold text-content-primary">{warranty.product_name}</p>
@@ -52,11 +64,24 @@ const WarrantyList: React.FC<WarrantyListProps> = ({ warranties, onEdit, onDelet
                 )}
               </div>
             </div>
-            <div className="flex-shrink-0 text-sm text-content-secondary text-left sm:text-right w-full sm:w-auto">
-              <p>Expires: {formatDate(warranty.expiry_date)}</p>
-              <p>Purchased: {formatDate(warranty.purchase_date)}</p>
+            <div className="flex-grow text-sm text-content-secondary text-left sm:text-right w-full sm:w-auto min-w-[220px]">
+              <div className="w-full bg-base-300/50 rounded-full h-1.5 mb-1.5">
+                <div
+                    className={`h-1.5 rounded-full ${progressBarStatusStyles[warranty.status].bar}`}
+                    style={{ width: `${warranty.progress}%` }}
+                    role="progressbar"
+                    aria-valuenow={warranty.progress}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`Warranty progress ${Math.round(warranty.progress)}%`}
+                ></div>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span>Purchased: {new Date(warranty.purchase_date).toLocaleDateString()}</span>
+                <span>Expires: {new Date(warranty.expiry_date).toLocaleDateString()}</span>
+              </div>
             </div>
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 w-28 text-center">
                 <span className={`px-2 py-1 text-xs font-semibold rounded-full inline-flex items-center gap-1 ${statusStyles[warranty.status]}`}>
                     {warranty.status !== 'safe' && <WarningIcon className="h-3.5 w-3.5" />}
                     {warranty.status.charAt(0).toUpperCase() + warranty.status.slice(1)}

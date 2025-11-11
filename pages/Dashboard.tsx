@@ -9,12 +9,10 @@ import OnboardingBanner from '../components/OnboardingBanner';
 import StatsCard from '../components/StatsCard';
 import ToggleSwitch from '../components/ToggleSwitch';
 import UploadForm from '../components/UploadForm';
-import SentryTestButton from '../components/SentryTestButton';
-import ErrorButton from '../components/ErrorButton';
 import { PlusIcon } from '../components/icons/PlusIcon';
 import { ViewGridIcon } from '../components/icons/ViewGridIcon';
 import { ViewListIcon } from '../components/icons/ViewListIcon';
-import { useWarranties } from '../context/WarrantyContext';
+import { useWarranties } from '../context/WarrantiesContext';
 import { useAuth } from '../context/AuthContext';
 import { Spinner } from '../components/icons/Spinner';
 import type { Warranty, Category } from '../types';
@@ -27,28 +25,58 @@ import { ExportIcon } from '../components/icons/ExportIcon';
 type WarrantyStatus = 'expired' | 'expiring' | 'safe';
 type SortOrder = 'latest' | 'expiryAsc' | 'expiryDesc' | 'nameAsc' | 'nameDesc';
 
-const getWarrantyStatus = (expiryDate: string | null): WarrantyStatus => {
-    if (!expiryDate) return 'safe'; // Treat null or undefined expiry as "safe"
+type WarrantyStatusInfo = {
+    status: WarrantyStatus;
+    daysLeft: number;
+    progress: number;
+    statusText: string;
+}
 
+const getWarrantyStatusInfo = (purchaseDateStr: string, expiryDateStr: string): WarrantyStatusInfo => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const expiry = new Date(expiryDate);
 
-    // Handle invalid date string gracefully
-    if (isNaN(expiry.getTime())) return 'safe'; // Treat invalid date as "safe"
+    const purchaseDate = new Date(purchaseDateStr);
+    const expiryDate = new Date(expiryDateStr);
 
-    const diffTime = expiry.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (isNaN(purchaseDate.getTime()) || isNaN(expiryDate.getTime())) {
+        return { status: 'safe', daysLeft: 0, progress: 0, statusText: 'Invalid date' };
+    }
 
-    if (diffDays < 0) return 'expired';
-    if (diffDays <= 30) return 'expiring';
-    return 'safe';
+    const diffTime = expiryDate.getTime() - today.getTime();
+    const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    let status: WarrantyStatus = 'safe';
+    if (daysLeft < 0) {
+        status = 'expired';
+    } else if (daysLeft <= 30) {
+        status = 'expiring';
+    }
+
+    const totalDuration = expiryDate.getTime() - purchaseDate.getTime();
+    const elapsedDuration = today.getTime() - purchaseDate.getTime();
+    
+    let progress = 0;
+    if (totalDuration > 0) {
+        progress = Math.max(0, Math.min(100, (elapsedDuration / totalDuration) * 100));
+    } else if (today.getTime() >= purchaseDate.getTime()) {
+        progress = 100;
+    }
+    
+    if (status === 'expired') {
+        progress = 100;
+    }
+
+    const statusText = status === 'expired' ? 'Expired' : `${Math.max(0, daysLeft)} days left`;
+
+    return { status, daysLeft: Math.max(0, daysLeft), progress, statusText };
 };
 
+
 const demoWarranties: Warranty[] = [
-    { id: 'demo-1', user_id: 'demo', product_name: 'SuperPixel Smartphone', purchase_date: '2023-10-15', warranty_duration: 12, expiry_date: '2024-10-14', receipt_url: `https://picsum.photos/seed/tech/400/200`, created_at: new Date().toISOString(), category: 'phone', device_id: null, store_name: 'TechMart', notes: 'Demo warranty for testing', tags: ['electronics'] },
-    { id: 'demo-2', user_id: 'demo', product_name: 'InstaFreeze Refrigerator', purchase_date: '2023-01-20', warranty_duration: 24, expiry_date: new Date(new Date().setDate(new Date().getDate() + 25)).toISOString(), receipt_url: `https://picsum.photos/seed/kitchen/400/200`, created_at: new Date().toISOString(), category: 'appliance', device_id: null, store_name: 'ApplianceCo', notes: 'Demo warranty for testing', tags: ['home'] },
-    { id: 'demo-3', user_id: 'demo', product_name: 'Roadster EV Sedan', purchase_date: '2022-08-01', warranty_duration: 18, expiry_date: '2024-02-01', receipt_url: `https://picsum.photos/seed/car/400/200`, created_at: new Date().toISOString(), category: 'car', device_id: null, store_name: 'AutoDealer', notes: 'Demo warranty for testing', tags: ['automotive'] },
+    { id: 'demo-1', user_id: 'demo', product_name: 'SuperPixel Smartphone', purchase_date: '2023-10-15', warranty_duration: 12, expiry_date: '2024-10-14', file_url: `https://picsum.photos/seed/tech/400/200`, ocr_raw: null, created_at: new Date().toISOString(), category: 'phone' },
+    { id: 'demo-2', user_id: 'demo', product_name: 'InstaFreeze Refrigerator', purchase_date: '2023-01-20', warranty_duration: 24, expiry_date: new Date(new Date().setDate(new Date().getDate() + 25)).toISOString(), file_url: `https://picsum.photos/seed/kitchen/400/200`, ocr_raw: null, created_at: new Date().toISOString(), category: 'appliance' },
+    { id: 'demo-3', user_id: 'demo', product_name: 'Roadster EV Sedan', purchase_date: '2022-08-01', warranty_duration: 18, expiry_date: '2024-02-01', file_url: `https://picsum.photos/seed/car/400/200`, ocr_raw: null, created_at: new Date().toISOString(), category: 'car' },
 ];
 
 const Dashboard: React.FC = () => {
@@ -56,7 +84,7 @@ const Dashboard: React.FC = () => {
   const [editingWarranty, setEditingWarranty] = useState<Warranty | null>(null);
   const [sharingWarranty, setSharingWarranty] = useState<Warranty | null>(null);
   const { warranties, loading, error, deleteWarranty } = useWarranties();
-  const { user, session, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
@@ -66,12 +94,6 @@ const Dashboard: React.FC = () => {
   
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isDemoMode, setIsDemoMode] = useState(false);
-
-  useEffect(() => {
-      if (!authLoading && !user) {
-        window.location.href = '/login';
-      }
-  }, [user, authLoading]);
 
   useEffect(() => {
       if (!loading) {
@@ -94,12 +116,13 @@ const Dashboard: React.FC = () => {
 
   const filteredWarranties = useMemo(() => {
     return [...dataToDisplay] // Create a shallow copy to avoid mutating the original array
+      .map(w => ({ ...w, ...getWarrantyStatusInfo(w.purchase_date, w.expiry_date) }))
       .sort((a, b) => {
           switch (sortOrder) {
               case 'expiryAsc':
-                  return (a.expiry_date ? new Date(a.expiry_date).getTime() : Infinity) - (b.expiry_date ? new Date(b.expiry_date).getTime() : Infinity);
+                  return new Date(a.expiry_date).getTime() - new Date(b.expiry_date).getTime();
               case 'expiryDesc':
-                  return (b.expiry_date ? new Date(b.expiry_date).getTime() : -Infinity) - (a.expiry_date ? new Date(a.expiry_date).getTime() : -Infinity);
+                  return new Date(b.expiry_date).getTime() - new Date(a.expiry_date).getTime();
               case 'nameAsc':
                   return a.product_name.localeCompare(b.product_name);
               case 'nameDesc':
@@ -109,13 +132,9 @@ const Dashboard: React.FC = () => {
                   return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
           }
       })
-      .map(w => ({ ...w, status: getWarrantyStatus(w.expiry_date) })) // Pass nullable expiry_date
       .filter(w => {
         const matchesSearch = w.product_name.toLowerCase().includes(searchTerm.toLowerCase());
-        
-        const status = getWarrantyStatus(w.expiry_date); // Pass nullable expiry_date
-        const matchesStatus = statusFilter === 'all' || (statusFilter === 'safe' ? status === 'safe' : status === statusFilter);
-
+        const matchesStatus = statusFilter === 'all' || (statusFilter === 'safe' ? w.status === 'safe' : w.status === statusFilter);
         const matchesCategory = categoryFilter === 'all' || w.category === categoryFilter;
 
         return matchesSearch && matchesStatus && matchesCategory;
@@ -124,7 +143,7 @@ const Dashboard: React.FC = () => {
   
   const stats = useMemo(() => {
       const source = warranties; // Always calculate real stats
-      const statuses = source.map(w => getWarrantyStatus(w.expiry_date));
+      const statuses = source.map(w => getWarrantyStatusInfo(w.purchase_date, w.expiry_date).status);
       const expiredCount = statuses.filter(s => s === 'expired').length;
       const expiringCount = statuses.filter(s => s === 'expiring').length;
       const activeCount = source.length - expiredCount - expiringCount;
@@ -154,9 +173,9 @@ const Dashboard: React.FC = () => {
     const rows = filteredWarranties.map(w => [
         `"${w.product_name.replace(/"/g, '""')}"`,
         w.category || 'N/A',
-        w.purchase_date || '', // Handle null
-        w.warranty_duration !== null && w.warranty_duration !== undefined ? w.warranty_duration : '', // Handle null/undefined
-        w.expiry_date || '', // Handle null
+        w.purchase_date,
+        w.warranty_duration,
+        w.expiry_date,
         w.status,
     ].join(','));
 
@@ -230,21 +249,13 @@ const Dashboard: React.FC = () => {
             <h1 className="text-3xl font-bold text-content-primary">Dashboard</h1>
             {user && <p className="text-content-secondary mt-1">Hello, {user.email}</p>}
           </div>
-           <div className="flex gap-4 items-center">
-             {warranties.length === 0 && !loading && (
-               <ToggleSwitch
-                  label="Demo Mode"
-                  enabled={isDemoMode}
-                  onChange={setIsDemoMode}
-               />
-             )}
-             {typeof process !== 'undefined' && process.env.NODE_ENV === 'development' && (
-               <div className="p-3 bg-blue-900/30 rounded-lg border border-blue-500/30 flex gap-3 items-center">
-                <SentryTestButton />
-                <ErrorButton />
-               </div>
-             )}
-           </div>
+           {warranties.length === 0 && !loading && (
+             <ToggleSwitch
+                label="Demo Mode"
+                enabled={isDemoMode}
+                onChange={setIsDemoMode}
+             />
+           )}
         </header>
 
         <section 
@@ -289,16 +300,16 @@ const Dashboard: React.FC = () => {
 
             {(warranties.length > 0 || isDemoMode) && (
                 <div className="bg-base-200/50 backdrop-blur-sm p-4 rounded-lg mb-6 flex flex-wrap items-center gap-4 border border-base-300/50">
-                    <div className="flex-grow min-w-[200px]"><input type="text" placeholder="Search by product name..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"/></div>
-                    <div className="flex-grow sm:flex-grow-0"><select value={statusFilter} onChange={e => setStatusFilter(e.target.value as any)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"><option value="all">All Statuses</option><option value="safe">Active</option><option value="expiring">Expiring Soon</option><option value="expired">Expired</option></select></div>
-                    <div className="flex-grow sm:flex-grow-0"><select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value as any)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"><option value="all">All Categories</option>{categories.map(c => <option key={c} value={c} className="capitalize">{c}</option>)}</select></div>
+                    <div className="flex-grow min-w-[200px]"><input type="text" placeholder="Search by product name..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 text-content-primary rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"/></div>
+                    <div className="flex-grow sm:flex-grow-0"><select value={statusFilter} onChange={e => setStatusFilter(e.target.value as any)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 text-content-primary rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"><option value="all" className="bg-base-200 text-content-primary">All Statuses</option><option value="safe" className="bg-base-200 text-content-primary">Active</option><option value="expiring" className="bg-base-200 text-content-primary">Expiring Soon</option><option value="expired" className="bg-base-200 text-content-primary">Expired</option></select></div>
+                    <div className="flex-grow sm:flex-grow-0"><select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value as any)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 text-content-primary rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"><option value="all" className="bg-base-200 text-content-primary">All Categories</option>{categories.map(c => <option key={c} value={c} className="capitalize bg-base-200 text-content-primary">{c}</option>)}</select></div>
                     <div className="flex-grow sm:flex-grow-0">
-                        <select value={sortOrder} onChange={e => setSortOrder(e.target.value as SortOrder)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary" aria-label="Sort warranties">
-                            <option value="expiryAsc">Expiry Date (Soonest First)</option>
-                            <option value="expiryDesc">Expiry Date (Latest First)</option>
-                            <option value="latest">Date Added (Newest First)</option>
-                            <option value="nameAsc">Product Name (A-Z)</option>
-                            <option value="nameDesc">Product Name (Z-A)</option>
+                        <select value={sortOrder} onChange={e => setSortOrder(e.target.value as SortOrder)} className="w-full px-3 py-2 bg-base-100/70 border border-base-300 text-content-primary rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary" aria-label="Sort warranties">
+                            <option value="expiryAsc" className="bg-base-200 text-content-primary">Expiry Date (Soonest First)</option>
+                            <option value="expiryDesc" className="bg-base-200 text-content-primary">Expiry Date (Latest First)</option>
+                            <option value="latest" className="bg-base-200 text-content-primary">Date Added (Newest First)</option>
+                            <option value="nameAsc" className="bg-base-200 text-content-primary">Product Name (A-Z)</option>
+                            <option value="nameDesc" className="bg-base-200 text-content-primary">Product Name (Z-A)</option>
                         </select>
                     </div>
                     <div className="flex items-center bg-base-200 rounded-md p-1"><button onClick={() => setView('grid')} className={`p-1.5 rounded ${view === 'grid' ? 'bg-brand-primary text-white' : 'text-content-secondary'}`} aria-label="Grid View"><ViewGridIcon className="h-5 w-5"/></button><button onClick={() => setView('list')} className={`p-1.5 rounded ${view === 'list' ? 'bg-brand-primary text-white' : 'text-content-secondary'}`} aria-label="List View"><ViewListIcon className="h-5 w-5" /></button></div>

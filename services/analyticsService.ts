@@ -22,6 +22,7 @@ export const trackPageView = (path: string): void => {
         page_path: path,
       });
     } catch (error) {
-          }
+      console.error("Error tracking page view with Google Analytics:", error);
+    }
   }
 };

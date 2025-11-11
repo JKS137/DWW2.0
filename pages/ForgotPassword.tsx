@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
 import { useAuth } from '../context/AuthContext';
 import { recordAuthAttempt, checkRateLimit } from '../services/rateLimiter';
-import AuthLayout from '../components/AuthLayout';
 
 interface ForgotPasswordProps {
   onSwitchToLogin: () => void;
@@ -55,8 +54,10 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSwitchToLogin, onNavi
   );
 
   return (
-    <AuthLayout>
-      <div className="p-8 space-y-8 bg-base-200/50 backdrop-blur-lg rounded-2xl shadow-2xl border border-base-300/50 animate-slide-up">
+    <main className="flex items-center justify-center min-h-screen p-4">
+      <div 
+        className="w-full max-w-md p-8 space-y-8 bg-base-200/50 backdrop-blur-lg rounded-2xl shadow-2xl border border-base-300/50 animate-slide-up"
+      >
         <div className="text-center">
           <button onClick={onNavigateHome} className="inline-block">
             <ShieldCheckIcon className="mx-auto h-12 w-12 text-brand-primary" />
@@ -73,7 +74,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSwitchToLogin, onNavi
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div>
-                <label htmlFor="email-address-reset" className="block text-sm font-medium text-content-secondary mb-1">Email address</label>
+                <label htmlFor="email-address-reset" className="sr-only">Email address</label>
                 <input
                   id="email-address-reset"
                   name="email"
@@ -112,7 +113,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSwitchToLogin, onNavi
           </form>
         )}
       </div>
-    </AuthLayout>
+    </main>
   );
 };
 

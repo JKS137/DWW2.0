@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF--8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DigitalWarrantyVault</title>
+    <title>Digital Warranty Vault</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -25,16 +26,90 @@
       gtag('config', 'G-EVQTZBJLWH');
     </script>
 
-  <!-- Import map removed: Vite bundles dependencies; CDN mappings are unnecessary and could conflict in production. -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              'brand-primary': '#3b82f6', // Blue
+              'brand-secondary': '#14b8a6', // Teal
+              'brand-pink': '#ec4899', // Pink
+              'base-100': '#111827', // Even Darker Gray
+              'base-200': '#1f2937', // Dark Gray
+              'base-300': '#374151', // Medium Gray
+              'content-primary': '#f9fafb', // Off-White
+              'content-secondary': '#9ca3af', // Lighter Gray
+            },
+            boxShadow: {
+              'glow-blue': '0 0 20px rgba(59, 130, 246, 0.6), 0 0 8px rgba(59, 130, 246, 0.5)',
+              'glow-pink': '0 0 20px rgba(236, 72, 153, 0.6), 0 0 8px rgba(236, 72, 153, 0.5)',
+              'glow-teal': '0 0 20px rgba(20, 184, 166, 0.6), 0 0 8px rgba(20, 184, 166, 0.5)',
+              'glow-purple': '0 0 20px rgba(139, 92, 246, 0.6), 0 0 8px rgba(139, 92, 246, 0.5)',
+            },
+            backgroundImage: {
+              'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+              'hero-pattern': "url('https://www.transparenttextures.com/patterns/stardust.png')",
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-out forwards',
+              'slide-up': 'slideUp 0.5s ease-out forwards',
+              'pulse-glow': 'pulseGlow 2.5s infinite ease-in-out',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              slideUp: {
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              pulseGlow: {
+                '0%, 100%': { 
+                  transform: 'scale(1)', 
+                  boxShadow: '0 0 0px rgba(59, 130, 246, 0)'
+                },
+                '50%': { 
+                  transform: 'scale(1.03)', 
+                  boxShadow: '0 0 20px rgba(59, 130, 246, 0.6)'
+                }
+              }
+            },
+          }
+        }
+      }
+    </script>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "@google/genai": "https://esm.sh/*@google/genai@0.14.0",
+    "@supabase/supabase-js": "https://esm.sh/*@supabase/supabase-js@2.45.0",
+    "@supabase/auth-js": "https://esm.sh/*@supabase/auth-js@2.62.0",
+    "@supabase/functions-js": "https://esm.sh/*@supabase/functions-js@2.4.1",
+    "@supabase/node-fetch": "https://esm.sh/*@supabase/node-fetch@3.1.0",
+    "@supabase/postgrest-js": "https://esm.sh/*@supabase/postgrest-js@1.15.5",
+    "@supabase/realtime-js": "https://esm.sh/*@supabase/realtime-js@2.11.0",
+    "@supabase/storage-js": "https://esm.sh/*@supabase/storage-js@2.6.0",
+    "react-dom/": "https://esm.sh/react-dom@18.3.1/",
+    "react/": "https://esm.sh/react@18.3.1/",
+    "framer-motion": "https://aistudiocdn.com/framer-motion@^12.23.12"
+  }
+}
+</script>
 </head>
-  <body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
+  <body class="bg-base-100 hero-pattern">
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-56S94G6T"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    <div id="root" class="relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
-       <div class="fixed top-0 left-0 w-full h-full bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-teal-900/20 z-0 pointer-events-none"></div>
+    <div id="root" class="relative">
+       <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-base-100 via-transparent to-base-100 z-[-1]"></div>
     </div>
-    <script type="module" src="./index.tsx"></script>
   </body>
 </html>

@@ -11,7 +11,8 @@ const getRateLimitData = (): RateLimitData => {
     const data = localStorage.getItem(STORAGE_KEY);
     return data ? JSON.parse(data) : {};
   } catch (e) {
-        return {};
+    console.error("Could not read rate limit data from localStorage", e);
+    return {};
   }
 };
 
@@ -19,7 +20,8 @@ const setRateLimitData = (data: RateLimitData) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
-      }
+    console.error("Failed to save rate limit data to localStorage", e);
+  }
 };
 
 /**

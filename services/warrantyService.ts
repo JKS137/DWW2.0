@@ -1,36 +1,32 @@
-import { supabase } from '../utils/supabaseClient';
+import { supabase } from './supabaseClient';
 import type { Warranty, Category } from '../types';
-import { captureApiError, addBreadcrumb } from './sentryService';
 
-const RECEIPTS_BUCKET = (process.env.SUPABASE_BUCKET as string) || 'receipts';
+const RECEIPTS_BUCKET = 'receipts';
 
 // Helper to calculate expiry date
-const calculateExpiryDate = (purchaseDate: string | null, months: number | null): string | null => {
-    if (!purchaseDate || months === null || months === undefined) return null; // Can't calculate without both
-
+const calculateExpiryDate = (purchaseDate: string, months: number): string => {
     const date = new Date(purchaseDate);
-    if (isNaN(date.getTime())) return null; // Invalid purchase date
-
+    // Handle invalid date string
+    if (isNaN(date.getTime())) {
+        return new Date().toISOString().split('T')[0];
+    }
     date.setMonth(date.getMonth() + months);
     return date.toISOString().split('T')[0];
 };
 
+/**
+ * Fetches all warranties for a given user.
+ */
 export const fetchWarranties = async (userId: string): Promise<Warranty[]> => {
     if (!supabase) throw new Error("Supabase client is not initialized.");
-    try {
-        addBreadcrumb(`Fetching warranties for user ${userId}`, 'warranty');
-        const { data, error } = await supabase
-            .from('warranties')
-            .select('*')
-            .eq('user_id', userId)
-            .order('created_at', { ascending: false });
+    const { data, error } = await supabase
+        .from('warranties')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
 
-        if (error) throw error;
-        return data as Warranty[];
-    } catch (error) {
-        captureApiError(error, '/warranties', 'GET');
-        throw error;
-    }
+    if (error) throw new Error(error.message);
+    return data as Warranty[];
 };
 
 /**
@@ -46,13 +42,7 @@ const uploadReceipt = async (userId: string, file: File): Promise<string> => {
         .from(RECEIPTS_BUCKET)
         .upload(fileName, file);
 
-    if (uploadError) {
-        const msg = uploadError.message?.toLowerCase?.() ?? '';
-        if (msg.includes('bucket') && msg.includes('not')) {
-            throw new Error(`Storage upload failed: Bucket '${RECEIPTS_BUCKET}' not found. Create this bucket in Supabase Storage (public recommended) or set SUPABASE_BUCKET to an existing bucket name in your environment.`);
-        }
-        throw new Error(`Storage upload failed: ${uploadError.message}`);
-    }
+    if (uploadError) throw new Error(`Storage upload failed: ${uploadError.message}`);
 
     const { data } = supabase.storage
         .from(RECEIPTS_BUCKET)
@@ -66,24 +56,19 @@ const uploadReceipt = async (userId: string, file: File): Promise<string> => {
  */
 export const createWarranty = async (
     userId: string,
-    warrantyData: Partial<Omit<Warranty, 'id' | 'user_id' | 'created_at' | 'receipt_url' | 'expiry_date'>>, // Adjusted Omit
-    receiptFile: File | null
+    warrantyData: Omit<Warranty, 'id' | 'user_id' | 'expiry_date' | 'created_at' | 'ocr_raw' | 'file_url'>,
+    receiptFile: File
 ): Promise<Warranty> => {
     if (!supabase) throw new Error("Supabase client is not initialized.");
 
-    let receipt_url: string | null = null;
-    if (receiptFile) {
-        receipt_url = await uploadReceipt(userId, receiptFile);
-    }
+    const file_url = await uploadReceipt(userId, receiptFile);
+    const expiry_date = calculateExpiryDate(warrantyData.purchase_date, warrantyData.warranty_duration);
     
-    const expiry_date = calculateExpiryDate(warrantyData.purchase_date || null, warrantyData.warranty_duration || null);
-    
-    const newWarranty: Partial<Warranty> = {
+    const newWarranty = {
         ...warrantyData,
         user_id: userId,
-        receipt_url,
+        file_url,
         expiry_date,
-        created_at: new Date().toISOString(), // SQL default, but good to add for consistency
     };
 
     const { data, error } = await supabase
@@ -101,17 +86,16 @@ export const createWarranty = async (
  */
 export const uploadReceiptAndCreateWarranty = async (userId: string, file: File): Promise<Warranty> => {
     if (!supabase) throw new Error("Supabase client is not initialized.");
-    const receipt_url = await uploadReceipt(userId, file);
+    const file_url = await uploadReceipt(userId, file);
     
     const today = new Date().toISOString().split('T')[0];
-    const newWarrantyStub: Partial<Warranty> = {
+    const newWarrantyStub = {
         user_id: userId,
-        receipt_url,
+        file_url,
         product_name: 'Processing Receipt...',
         purchase_date: today,
-        warranty_duration: 0, // Placeholder
-        expiry_date: calculateExpiryDate(today, 0), // Placeholder
-        created_at: new Date().toISOString(),
+        warranty_duration: 0,
+        expiry_date: today,
     };
 
     const { data, error } = await supabase
@@ -129,28 +113,11 @@ export const uploadReceiptAndCreateWarranty = async (userId: string, file: File)
  */
 export const updateWarranty = async (
     warrantyId: string,
-    updates: Partial<Pick<Warranty, 'product_name' | 'purchase_date' | 'warranty_duration' | 'category' | 'store_name' | 'notes' | 'tags' | 'device_id'>>
+    updates: Partial<Pick<Warranty, 'product_name' | 'purchase_date' | 'warranty_duration' | 'category' | 'ocr_raw'>>
 ): Promise<Warranty> => {
     if (!supabase) throw new Error("Supabase client is not initialized.");
 
     const finalUpdates: Partial<Warranty> = { ...updates };
-
-    // If purchase date or duration changes, recalculate expiry date
-    if (updates.purchase_date !== undefined || updates.warranty_duration !== undefined) {
-        // We need the other value to perform the calculation. Fetch the original warranty.
-        const { data: currentWarranty, error: fetchError } = await supabase
-            .from('warranties')
-            .select('purchase_date, warranty_duration')
-            .eq('id', warrantyId)
-            .single();
-
-        if (fetchError) throw new Error(fetchError.message);
-        
-        const purchase_date = updates.purchase_date ?? currentWarranty?.purchase_date ?? null;
-        const warranty_duration = updates.warranty_duration ?? currentWarranty?.warranty_duration ?? null;
-        
-        finalUpdates.expiry_date = calculateExpiryDate(purchase_date, warranty_duration);
-    }
 
     // If purchase date or duration changes, recalculate expiry date
     if (updates.purchase_date || updates.warranty_duration !== undefined) {
@@ -185,7 +152,7 @@ export const updateWarranty = async (
 /**
  * Deletes a warranty and its associated file from storage.
  */
-export const deleteWarranty = async (warrantyId: string, receiptUrl: string | null): Promise<void> => {
+export const deleteWarranty = async (warrantyId: string, fileUrl: string): Promise<void> => {
     if (!supabase) throw new Error("Supabase client is not initialized.");
     
     // 1. Delete the record from the database
@@ -194,26 +161,23 @@ export const deleteWarranty = async (warrantyId: string, receiptUrl: string | nu
         .delete()
         .eq('id', warrantyId);
 
-    if (dbError) throw new Error(`Failed to delete warranty record: ${dbError.message}`);
+    if (dbError) throw new Error(dbError.message);
 
-    // 2. Delete the file from storage if receiptUrl is provided
-    if (receiptUrl) {
-        try {
-            const urlParts = receiptUrl.split('/');
-            const fileName = urlParts.slice(urlParts.indexOf(RECEIPTS_BUCKET) + 1).join('/');
+    // 2. Delete the file from storage
+    try {
+        const urlParts = fileUrl.split('/');
+        const fileName = urlParts.slice(urlParts.indexOf(RECEIPTS_BUCKET) + 1).join('/');
 
-            const { error: storageError } = await supabase.storage
-                .from(RECEIPTS_BUCKET)
-                .remove([fileName]);
+        const { error: storageError } = await supabase.storage
+            .from(RECEIPTS_BUCKET)
+            .remove([fileName]);
 
-            if (storageError) {
-                console.warn(`Failed to delete receipt file '${fileName}' from storage: ${storageError.message}`);
-                // Don't throw error here, as DB record is already deleted
-            }
-        } catch (e: any) {
-            console.warn(`Error during receipt file deletion: ${e.message}`);
-            // Don't throw error, record is cleared.
+        if (storageError) {
+             // Log the error but don't throw, as the DB record is already gone.
+            console.error("Failed to delete file from storage:", storageError.message);
         }
+    } catch (e: any) {
+        console.error("Error parsing file URL for deletion:", e.message);
     }
 };
 
@@ -280,7 +244,7 @@ export const getSharedWarranty = async (shareToken: string): Promise<Partial<War
 
     const { data: sharedLink, error: linkError } = await supabase
         .from('shared_warranties')
-        .select('warranties ( id, product_name, purchase_date, warranty_duration, expiry_date, store_name, receipt_url, notes, tags, created_at, category, user_id, device_id )')
+        .select('warranties ( product_name, purchase_date, expiry_date, category, file_url )')
         .eq('share_token', shareToken)
         .single();
 

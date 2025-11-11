@@ -56,7 +56,8 @@ const ShareWarrantyModal: React.FC<ShareWarrantyModalProps> = ({ isOpen, onClose
             setCopied(true);
             setTimeout(() => setCopied(false), 2500);
         }).catch(err => {
-                    });
+            console.error('Failed to copy text: ', err);
+        });
     };
 
     if (!isOpen) return null;

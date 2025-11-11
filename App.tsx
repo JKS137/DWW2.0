@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import * as Sentry from '@sentry/react';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -8,16 +7,13 @@ import ForgotPassword from './pages/ForgotPassword';
 import UpdatePassword from './pages/UpdatePassword';
 import Account from './pages/Account';
 import WarrantyDetailPage from './pages/WarrantyDetailPage';
-import SharePage from './pages/SharePage';
-import NotFoundPage from './components/NotFoundPage';
+import SharePage from './pages/SharePage'; // New page
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { WarrantyProvider } from './context/WarrantyContext';
 import { Spinner } from './components/icons/Spinner';
-import { supabaseConfigurationError } from './utils/supabaseClient';
+import { supabaseConfigurationError } from './services/supabaseClient';
 import { ShieldCheckIcon } from './components/icons/ShieldCheckIcon';
 import { trackPageView } from './services/analyticsService';
-import SpeedInsights from './components/SpeedInsights';
-import ErrorBoundary from './components/ErrorBoundary';
 
 const ConfigurationErrorScreen: React.FC<{ message: string }> = ({ message }) => (
     <div className="flex items-center justify-center min-h-screen bg-red-900/50 text-red-200 p-4">
@@ -40,32 +36,11 @@ const App: React.FC = () => {
   }
 
   return (
-    <ErrorBoundary>
-      <AuthProvider>
-        <WarrantyProvider>
-          <Sentry.ErrorBoundary
-            fallback={({ error, resetError }) => (
-              <div className="flex items-center justify-center min-h-screen bg-red-900/50 text-red-200 p-4">
-                <div className="w-full max-w-2xl p-8 space-y-4 bg-base-200 rounded-xl shadow-lg border border-red-500/50">
-                  <h2 className="text-2xl font-bold">Application Error</h2>
-                  <p className="text-base">Something went wrong. Error has been reported to our team.</p>
-                  <button
-                    onClick={resetError}
-                    className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition"
-                  >
-                    Try Again
-                  </button>
-                </div>
-              </div>
-            )}
-            showDialog
-          >
-            <MainContent />
-            <SpeedInsights />
-          </Sentry.ErrorBoundary>
-        </WarrantyProvider>
-      </AuthProvider>
-    </ErrorBoundary>
+    <AuthProvider>
+      <WarrantyProvider>
+        <MainContent />
+      </WarrantyProvider>
+    </AuthProvider>
   );
 };
 
@@ -132,12 +107,15 @@ const MainContent: React.FC = () => {
                 content = <UpdatePassword onPasswordUpdated={() => navigate('/dashboard')} />;
                 break;
             default:
-                content = <NotFoundPage />;
+                // If route is unknown for a logged-in user, redirect to dashboard.
+                navigate('/dashboard');
+                content = <Dashboard />;
                 break;
         }
     }
   } else {
-        const isProtectedRoute = route === '/dashboard' || route.startsWith('/account') || route.startsWith('/warranty/');
+    // Unauthenticated user routing
+    const isProtectedRoute = route === '/dashboard' || route.startsWith('/account') || route.startsWith('/warranty/');
     if (isProtectedRoute) {
         navigate('/login');
         return <Login onSwitchToSignup={() => navigate('/signup')} onNavigateHome={() => navigate('/')} onNavigateForgotPassword={() => navigate('/forgot-password')} />;
@@ -157,18 +135,15 @@ const MainContent: React.FC = () => {
         content = <UpdatePassword onPasswordUpdated={() => navigate('/login')} />;
         break;
       case '/':
-        content = <LandingPage onNavigateLogin={() => navigate('/login')} onNavigateSignup={() => navigate('/signup')} />;
-        break;
       default:
-        content = <NotFoundPage />;
+        content = <LandingPage onNavigateLogin={() => navigate('/login')} onNavigateSignup={() => navigate('/signup')} />;
         break;
     }
   }
 
   return (
-    <div className="min-h-screen text-content-primary font-sans bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 relative">
-      <div className="fixed inset-0 bg-gradient-to-br from-purple-900/10 via-blue-900/10 to-teal-900/10 pointer-events-none z-0"></div>
-      <div key={route} className="animate-fade-in relative z-10">
+    <div className="min-h-screen bg-transparent text-content-primary font-sans">
+      <div key={route} className="animate-fade-in">
         {content}
       </div>
     </div>

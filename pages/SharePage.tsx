@@ -5,7 +5,6 @@ import type { Warranty } from '../types';
 import { CalendarIcon } from '../components/icons/CalendarIcon';
 import { TagIcon } from '../components/icons/TagIcon';
 import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
-import SafeImage from '../components/SafeImage';
 
 interface SharePageProps {
     shareToken: string;
@@ -51,12 +50,10 @@ const SharePage: React.FC<SharePageProps> = ({ shareToken }) => {
         return (
             <div className="bg-base-200/50 backdrop-blur-sm rounded-lg border border-base-300/50 overflow-hidden">
                 <div className="p-4 sm:p-6 lg:p-8">
-                    <SafeImage
-                        src={warranty.file_url || '/image-fallback.svg'}
-                        fallbackSrc="/image-fallback.svg"
+                    <img
+                        src={warranty.file_url}
                         alt={`Receipt for ${warranty.product_name}`}
                         className="w-full max-h-[500px] object-contain rounded-lg bg-base-100/50 p-2"
-                        loading="lazy"
                     />
                 </div>
                 <div className="p-6 border-t border-base-300/50 space-y-6">

@@ -1,5 +1,5 @@
 
-import { supabase } from '../utils/supabaseClient';
+import { supabase } from './supabaseClient';
 import type { User } from '@supabase/supabase-js';
 
 export interface Profile {
@@ -31,6 +31,7 @@ export const getProfile = async (user: User): Promise<Profile | null> => {
 
         return data as Profile | null;
     } catch (err: any) {
-                throw err;
+        console.error("Error fetching profile:", err);
+        throw err;
     }
 };
