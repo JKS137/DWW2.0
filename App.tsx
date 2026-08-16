@@ -57,8 +57,33 @@ const MainContent: React.FC = () => {
     const handlePopState = () => {
       setRoute(window.location.pathname);
     };
+    
+    // Handle OAuth callback with hash params
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash.includes('access_token') && hash.includes('type=')) {
+        // Supabase will handle the token via onAuthStateChange
+        // Just ensure we're on a clean path
+        const typeMatch = hash.match(/type=(\w+)/);
+        if (typeMatch && typeMatch[1] === 'recovery') {
+          navigate('/update-password');
+        } else if (typeMatch && (typeMatch[1] === 'signup' || typeMatch[1] === 'email')) {
+          // Email confirmation - redirect to dashboard
+          navigate('/dashboard');
+        }
+      }
+    };
+    
     window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    window.addEventListener('hashchange', handleHashChange);
+    
+    // Check hash on initial load
+    handleHashChange();
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('hashchange', handleHashChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -66,8 +91,17 @@ const MainContent: React.FC = () => {
   }, [route]);
 
   useEffect(() => {
+    // Handle password recovery event from Supabase
     if (authEvent === 'PASSWORD_RECOVERY') {
         navigate('/update-password');
+    }
+    
+    // Also check URL hash for recovery params (Supabase redirects here with #access_token=...&type=recovery)
+    const hash = window.location.hash;
+    if (hash.includes('type=recovery')) {
+        navigate('/update-password');
+        // Clean up the hash after navigation
+        window.history.replaceState({}, '', window.location.pathname);
     }
   }, [authEvent]);
 
