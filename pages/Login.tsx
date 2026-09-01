@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
 import { useAuth } from '../context/AuthContext';
 import { GoogleIcon } from '../components/icons/GoogleIcon';
+import { GithubIcon } from '../components/icons/GithubIcon';
 import { recordAuthAttempt, checkRateLimit } from '../services/rateLimiter';
 
 interface LoginProps {
@@ -11,7 +12,7 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavigateForgotPassword }) => {
-  const { signIn, signInWithGoogle } = useAuth();
+  const { signIn, signInWithGoogle, signInWithGithub } = useAuth();
   const [email, setEmail] = useState('demo@example.com');
   const [password, setPassword] = useState('password');
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +48,15 @@ const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavig
     }
   };
 
+  const handleGithubSignIn = async () => {
+    setError(null);
+    setRateLimitError(null);
+    const { error } = await signInWithGithub();
+    if (error) {
+        setError(error.message);
+    }
+  };
+
   return (
     <main className="flex items-center justify-center min-h-screen p-4">
       <div 
@@ -70,13 +80,20 @@ const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onNavigateHome, onNavig
             </p>
         </div>
         
-        <div>
+        <div className="space-y-4">
             <button
                 onClick={handleGoogleSignIn}
                 className="w-full flex justify-center items-center space-x-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-all hover:scale-105 active:scale-95"
             >
                 <GoogleIcon className="h-5 w-5" />
                 <span>Sign in with Google</span>
+            </button>
+            <button
+                onClick={handleGithubSignIn}
+                className="w-full flex justify-center items-center space-x-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-all hover:scale-105 active:scale-95"
+            >
+                <GithubIcon className="h-5 w-5" />
+                <span>Sign in with GitHub</span>
             </button>
         </div>
 

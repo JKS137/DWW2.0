@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ShieldCheckIcon } from '../components/icons/ShieldCheckIcon';
 import { useAuth } from '../context/AuthContext';
 import { GoogleIcon } from '../components/icons/GoogleIcon';
+import { GithubIcon } from '../components/icons/GithubIcon';
 import { recordAuthAttempt, checkRateLimit } from '../services/rateLimiter';
 
 interface SignupProps {
@@ -10,7 +11,7 @@ interface SignupProps {
 }
 
 const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
-  const { signUp, signInWithGoogle } = useAuth();
+  const { signUp, signInWithGoogle, signInWithGithub } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -56,6 +57,15 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
         setError(error.message);
     }
   };
+
+  const handleGithubSignIn = async () => {
+    setError(null);
+    setRateLimitError(null);
+    const { error } = await signInWithGithub();
+    if (error) {
+        setError(error.message);
+    }
+  };
   
   const SuccessMessage = () => (
     <div className="text-center">
@@ -97,13 +107,20 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onNavigateHome }) => {
         
         {success ? <SuccessMessage /> : (
           <>
-            <div>
+            <div className="space-y-4">
               <button
                   onClick={handleGoogleSignIn}
                   className="w-full flex justify-center items-center space-x-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-all hover:scale-105 active:scale-95"
               >
                   <GoogleIcon className="h-5 w-5" />
                   <span>Sign up with Google</span>
+              </button>
+              <button
+                  onClick={handleGithubSignIn}
+                  className="w-full flex justify-center items-center space-x-2 py-3 px-4 border border-base-300 bg-base-100/70 text-content-primary font-medium rounded-md hover:bg-base-200/50 transition-all hover:scale-105 active:scale-95"
+              >
+                  <GithubIcon className="h-5 w-5" />
+                  <span>Sign up with GitHub</span>
               </button>
             </div>
 
