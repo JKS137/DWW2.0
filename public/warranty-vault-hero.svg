@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Warranty Vault dashboard illustration</title>
+  <desc id="desc">A digital warranty vault with receipts, warranty cards, product records and expiry reminders.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07111f"/>
+      <stop offset="0.55" stop-color="#0b1930"/>
+      <stop offset="1" stop-color="#10152a"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#2dd4bf"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#17263e"/>
+      <stop offset="1" stop-color="#101b31"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="22" stdDeviation="24" flood-color="#000" flood-opacity=".35"/>
+    </filter>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" rx="34" fill="url(#bg)"/>
+  <circle cx="1310" cy="160" r="180" fill="#2563eb" opacity=".09" filter="url(#glow)"/>
+  <circle cx="270" cy="740" r="220" fill="#14b8a6" opacity=".06" filter="url(#glow)"/>
+
+  <!-- floating receipt -->
+  <g transform="translate(105 205) rotate(-7)" filter="url(#shadow)">
+    <rect width="285" height="365" rx="18" fill="#f8fafc"/>
+    <rect x="24" y="28" width="92" height="16" rx="8" fill="#0f172a" opacity=".82"/>
+    <text x="24" y="78" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#334155">PURCHASE RECEIPT</text>
+    <text x="24" y="116" font-family="Arial,sans-serif" font-size="13" fill="#64748b">Laptop • Electronics</text>
+    <text x="24" y="151" font-family="Arial,sans-serif" font-size="13" fill="#64748b">Purchase date</text>
+    <text x="196" y="151" font-family="Arial,sans-serif" font-size="13" text-anchor="end" fill="#0f172a">08 Oct 2026</text>
+    <line x1="24" y1="170" x2="261" y2="170" stroke="#cbd5e1"/>
+    <text x="24" y="205" font-family="Arial,sans-serif" font-size="13" fill="#64748b">Total</text>
+    <text x="261" y="205" font-family="Arial,sans-serif" font-size="17" font-weight="700" text-anchor="end" fill="#0f172a">$1,249.00</text>
+    <rect x="24" y="238" width="237" height="74" rx="12" fill="#e0f2fe"/>
+    <path d="M48 262h22v22H48z" fill="#2563eb" opacity=".9"/>
+    <path d="M53 273h12M59 267v12" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+    <text x="84" y="268" font-family="Arial,sans-serif" font-size="12" font-weight="700" fill="#1e3a8a">WARRANTY FOUND</text>
+    <text x="84" y="289" font-family="Arial,sans-serif" font-size="12" fill="#475569">Valid for 24 months</text>
+  </g>
+
+  <!-- main laptop -->
+  <g filter="url(#shadow)">
+    <rect x="415" y="125" width="925" height="575" rx="28" fill="#0a0f1b" stroke="#334155" stroke-width="3"/>
+    <rect x="438" y="148" width="879" height="529" rx="17" fill="#0d1729"/>
+    <rect x="438" y="148" width="210" height="529" rx="17" fill="#0a1324"/>
+    <circle cx="540" cy="190" r="25" fill="url(#accent)"/>
+    <path d="M529 190l8 8 15-18" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="580" y="198" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#f8fafc">Warranty Vault</text>
+
+    <g font-family="Arial,sans-serif" font-size="15">
+      <rect x="463" y="246" width="160" height="48" rx="12" fill="#2563eb" opacity=".25"/>
+      <text x="500" y="276" fill="#fff" font-weight="700">My Vault</text>
+      <text x="500" y="330" fill="#94a3b8">Products</text>
+      <text x="500" y="382" fill="#94a3b8">Documents</text>
+      <text x="500" y="434" fill="#94a3b8">Reminders</text>
+      <text x="500" y="486" fill="#94a3b8">Settings</text>
+    </g>
+
+    <!-- dashboard -->
+    <text x="690" y="208" font-family="Arial,sans-serif" font-size="27" font-weight="700" fill="#f8fafc">Your purchases, protected.</text>
+    <rect x="690" y="232" width="590" height="50" rx="14" fill="#111f35" stroke="#243652"/>
+    <circle cx="718" cy="257" r="8" fill="#64748b"/>
+    <text x="740" y="263" font-family="Arial,sans-serif" font-size="13" fill="#64748b">Search products, receipts or warranties...</text>
+
+    <!-- product cards -->
+    <g font-family="Arial,sans-serif">
+      <rect x="690" y="310" width="280" height="142" rx="18" fill="url(#card)" stroke="#243652"/>
+      <rect x="710" y="333" width="48" height="48" rx="12" fill="#1d4ed8" opacity=".25"/>
+      <rect x="720" y="343" width="28" height="20" rx="3" fill="#60a5fa"/>
+      <text x="775" y="349" font-size="16" font-weight="700" fill="#f8fafc">Laptop</text>
+      <text x="775" y="371" font-size="12" fill="#94a3b8">Dell Inspiron • SN 84A2</text>
+      <rect x="775" y="393" width="83" height="24" rx="12" fill="#064e3b"/>
+      <text x="816" y="409" font-size="11" text-anchor="middle" fill="#6ee7b7">ACTIVE</text>
+      <text x="710" y="427" font-size="11" fill="#64748b">Warranty until Jun 15, 2028</text>
+
+      <rect x="990" y="310" width="290" height="142" rx="18" fill="url(#card)" stroke="#243652"/>
+      <rect x="1010" y="333" width="48" height="48" rx="12" fill="#0f766e" opacity=".3"/>
+      <path d="M1022 345h24v25h-24z" fill="none" stroke="#2dd4bf" stroke-width="3"/>
+      <path d="M1027 340v10M1041 340v10" stroke="#2dd4bf" stroke-width="3" stroke-linecap="round"/>
+      <text x="1075" y="349" font-size="16" font-weight="700" fill="#f8fafc">Warranty Status</text>
+      <text x="1075" y="371" font-size="12" fill="#94a3b8">12 active • 3 expiring</text>
+      <rect x="1075" y="393" width="132" height="24" rx="12" fill="#78350f"/>
+      <text x="1141" y="409" font-size="11" text-anchor="middle" fill="#fbbf24">3 NEED ATTENTION</text>
+      <text x="1010" y="427" font-size="11" fill="#64748b">Never miss a claim window</text>
+
+      <!-- documents -->
+      <rect x="690" y="475" width="590" height="165" rx="18" fill="#101b30" stroke="#243652"/>
+      <text x="714" y="508" font-size="15" font-weight="700" fill="#f8fafc">Recent documents</text>
+      <g>
+        <rect x="714" y="529" width="150" height="88" rx="12" fill="#17263e"/>
+        <rect x="731" y="546" width="40" height="49" rx="5" fill="#f8fafc"/>
+        <path d="M738 558h25M738 567h25M738 576h18" stroke="#64748b" stroke-width="3"/>
+        <text x="785" y="559" font-size="11" fill="#cbd5e1">Receipt</text>
+        <text x="785" y="578" font-size="10" fill="#64748b">PDF • 2.4 MB</text>
+      </g>
+      <g>
+        <rect x="880" y="529" width="150" height="88" rx="12" fill="#17263e"/>
+        <rect x="897" y="546" width="40" height="49" rx="5" fill="#2563eb"/>
+        <path d="M907 565l10 10 13-17" fill="none" stroke="#fff" stroke-width="3"/>
+        <text x="951" y="559" font-size="11" fill="#cbd5e1">Warranty</text>
+        <text x="951" y="578" font-size="10" fill="#64748b">Card • 1.1 MB</text>
+      </g>
+      <g>
+        <rect x="1046" y="529" width="210" height="88" rx="12" fill="#0f2430" stroke="#1e7490"/>
+        <circle cx="1082" cy="573" r="20" fill="#14b8a6" opacity=".2"/>
+        <path d="M1082 562v22M1071 573h22" stroke="#2dd4bf" stroke-width="3" stroke-linecap="round"/>
+        <text x="1114" y="569" font-size="12" font-weight="700" fill="#f8fafc">Add document</text>
+        <text x="1114" y="589" font-size="10" fill="#64748b">Receipt, invoice or PDF</text>
+      </g>
+    </g>
+    <path d="M300 720H1450l-80 35H380z" fill="#1e293b"/>
+    <path d="M380 755h990" stroke="#475569" stroke-width="5" stroke-linecap="round"/>
+  </g>
+
+  <!-- warranty card -->
+  <g transform="translate(1280 570) rotate(6)" filter="url(#shadow)">
+    <rect width="245" height="155" rx="18" fill="#172b49" stroke="#3b82f6" stroke-width="2"/>
+    <circle cx="42" cy="43" r="22" fill="#2563eb" opacity=".28"/>
+    <path d="M33 43l7 7 13-16" fill="none" stroke="#60a5fa" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="78" y="41" font-family="Arial,sans-serif" font-size="13" fill="#94a3b8">WARRANTY</text>
+    <text x="78" y="61" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#fff">Protected</text>
+    <text x="25" y="101" font-family="Arial,sans-serif" font-size="11" fill="#94a3b8">Coverage remaining</text>
+    <text x="25" y="126" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#2dd4bf">247 days</text>
+    <circle cx="204" cy="112" r="24" fill="none" stroke="#2dd4bf" stroke-width="6" stroke-dasharray="105 45" transform="rotate(-90 204 112)"/>
+  </g>
+
+  <!-- reminder notification -->
+  <g transform="translate(1030 55)" filter="url(#shadow)">
+    <rect width="385" height="92" rx="18" fill="#111d32" stroke="#334155"/>
+    <circle cx="48" cy="46" r="24" fill="#0f766e" opacity=".25"/>
+    <path d="M48 30v16l10 7" fill="none" stroke="#2dd4bf" stroke-width="4" stroke-linecap="round"/>
+    <text x="86" y="40" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#f8fafc">Warranty reminder</text>
+    <text x="86" y="62" font-family="Arial,sans-serif" font-size="12" fill="#94a3b8">Smartphone warranty expires in 12 days</text>
+  </g>
+</svg>
