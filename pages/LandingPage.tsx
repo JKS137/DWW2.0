@@ -143,7 +143,7 @@ const Hero: React.FC<LandingPageProps> = ({ onNavigateSignup, onNavigateLogin })
              <div className="mt-16 w-full max-w-4xl mx-auto animate-slide-up" style={{ animationDelay: '0.3s' }}>
                 <div className="relative rounded-xl p-1 bg-gradient-to-br from-blue-500 to-teal-400">
                     <div className="bg-base-200 rounded-lg shadow-2xl p-4">
-                        <img src="https://images.unsplash.com/photo-1635186238046-40771478f17e?auto=format&fit=crop&fm=jpg&q=85&w=1600" alt="Dashboard Preview" className="rounded-md w-full" />
+                        <img src="/warranty-vault-hero.svg" alt="Warranty Vault dashboard with receipts, warranty tracking and reminders" className="rounded-md w-full" />
                     </div>
                 </div>
             </div>
