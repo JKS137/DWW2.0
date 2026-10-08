@@ -12,7 +12,7 @@ import UploadForm from '../components/UploadForm';
 import { PlusIcon } from '../components/icons/PlusIcon';
 import { ViewGridIcon } from '../components/icons/ViewGridIcon';
 import { ViewListIcon } from '../components/icons/ViewListIcon';
-import { useWarranties } from '../context/WarrantiesContext';
+import { useWarranties } from '../context/WarrantyContext';
 import { useAuth } from '../context/AuthContext';
 import { Spinner } from '../components/icons/Spinner';
 import type { Warranty, Category } from '../types';
