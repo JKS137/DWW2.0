@@ -22,13 +22,11 @@ export default defineConfig(({ mode }) => {
       },
       build: {
         outDir: 'dist',
-        sourcemap: true,
+        sourcemap: false,
+        minify: 'esbuild',
         rollupOptions: {
           output: {
-            manualChunks: {
-              vendor: ['react', 'react-dom'],
-              supabase: ['@supabase/supabase-js'],
-            },
+            manualChunks: undefined,
           },
         },
       },
