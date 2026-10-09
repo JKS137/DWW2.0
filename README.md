@@ -146,3 +146,13 @@ SENDGRID_API_KEY=...
 SENDER_EMAIL=...
 APP_URL=http://localhost:3000
 ```
+
+## Production secrets
+
+For Vercel deployments, add these under **Project Settings → Environment Variables**:
+
+- `GEMINI_API_KEY` — Gemini API key; server-side only, never use a `VITE_` prefix.
+- `SUPABASE_URL` — the Supabase project URL used to validate signed-in users.
+- `SUPABASE_ANON_KEY` — the Supabase anon/public key used by the server to validate signed-in users.
+
+The `/api/ocr` endpoint requires a valid Supabase session before calling Gemini. Do not add the Gemini key to frontend code or expose it through Vite `define` settings.
