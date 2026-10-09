@@ -1,36 +1,8 @@
-
-import { GoogleGenAI, Type } from "@google/genai";
 import type { OcrData } from '../types';
-
-// Lazily initialize the AI client to prevent app crash on load if API key is missing.
-let ai: GoogleGenAI | null = null;
-let initError: string | null = null;
-
-const getAiClient = (): GoogleGenAI => {
-    if (ai) {
-        return ai;
-    }
-    if (initError) {
-        throw new Error(initError);
-    }
-    try {
-        const API_KEY = process.env.API_KEY;
-        if (!API_KEY) {
-            throw new Error("API_KEY environment variable not set. Gemini API calls cannot be made.");
-        }
-        ai = new GoogleGenAI({ apiKey: API_KEY });
-        return ai;
-    } catch (e: any) {
-        initError = `Failed to initialize Gemini AI Client: ${e.message}`;
-        console.error(initError);
-        throw new Error(initError);
-    }
-};
+import { supabase } from './supabaseClient';
 
 /**
  * Converts a File object to a base64 encoded string.
- * @param file The file to convert.
- * @returns A promise that resolves with the base64 string.
  */
 export const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -42,74 +14,44 @@ export const fileToBase64 = (file: File): Promise<string> => {
 };
 
 /**
- * Extracts warranty information from an image using Gemini API.
- * @param base64Image The base64 encoded image string.
- * @param mimeType The MIME type of the image.
- * @returns A promise that resolves with the extracted OCR data.
+ * Sends receipt OCR requests to the authenticated server endpoint.
+ * The Gemini API key must only exist in server-side environment variables.
  */
 export const extractWarrantyInfoFromImage = async (base64Image: string, mimeType: string): Promise<OcrData> => {
+    if (!supabase) {
+        throw new Error("Authentication is not configured. Please contact the administrator.");
+    }
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+        throw new Error("Please sign in before analyzing a receipt.");
+    }
+
     try {
-        const aiClient = getAiClient(); // This will throw if initialization fails
-
-        const imagePart = {
-            inlineData: {
-                data: base64Image,
-                mimeType: mimeType,
+        const response = await fetch('/api/ocr', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session.access_token}`,
             },
-        };
-
-        const prompt = `
-You are an expert Optical Character Recognition (OCR) system specializing in extracting structured data from receipts and warranty documents. Analyze the provided image and extract the following information:
-1. productName: The name of the product purchased. Be concise.
-2. purchaseDate: The date of purchase in YYYY-MM-DD format.
-3. warrantyLengthInMonths: The duration of the warranty in months (as an integer). If you see "1 year", use 12. If you see "90 days", use 3. If it's not found, return null.
-
-Return ONLY a single, valid JSON object matching the specified schema. Do not include any explanatory text, markdown formatting, or anything outside of the JSON structure.
-        `;
-
-        const response = await aiClient.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: { parts: [imagePart, { text: prompt }] },
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: Type.OBJECT,
-                    properties: {
-                        productName: {
-                            type: Type.STRING,
-                            description: "The name of the product."
-                        },
-                        purchaseDate: {
-                            type: Type.STRING,
-                            description: "The purchase date in YYYY-MM-DD format."
-                        },
-                        warrantyLengthInMonths: {
-                            type: Type.INTEGER,
-                            description: "The warranty duration in months. Can be null.",
-                            nullable: true,
-                        }
-                    },
-                    required: ["productName", "purchaseDate", "warrantyLengthInMonths"]
-                }
-            }
+            body: JSON.stringify({ base64Image, mimeType }),
         });
-        
-        const jsonText = response.text.trim();
-        const parsedData = JSON.parse(jsonText) as OcrData;
-
-        // Basic validation
-        if (!parsedData.productName || !parsedData.purchaseDate) {
-            throw new Error("Parsed data is missing required fields.");
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(typeof result.error === 'string' ? result.error : 'Receipt analysis failed.');
         }
 
+        const parsedData = result.data as OcrData | undefined;
+        if (!parsedData || typeof parsedData.productName !== 'string' || typeof parsedData.purchaseDate !== 'string') {
+            throw new Error('The AI response could not be validated.');
+        }
+        if (!parsedData.productName || !parsedData.purchaseDate) {
+            throw new Error('Receipt details were not clear enough. Please enter them manually.');
+        }
         return parsedData;
-
-    } catch (error: any) {
-        console.error("Error extracting warranty info:", error.message);
-        // Provide a more user-friendly message
-        const errorMessage = error.message.includes("API_KEY") 
-            ? "Gemini API Key is not configured. OCR functionality is disabled."
-            : "Failed to analyze receipt. Please try a clearer image or enter details manually.";
-        throw new Error(errorMessage);
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : '';
+        console.error('Error extracting warranty info:', message);
+        throw new Error(message || 'Failed to analyze receipt. Please try a clearer image or enter details manually.');
     }
 };
