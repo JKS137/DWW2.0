@@ -58,6 +58,7 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
+          <a href="https://jana890.lemonsqueezy.com/checkout/buy/f5befcf7-63cb-4759-8a85-5edeb2f6b951?logo=0&discount=0" target="_blank" rel="noopener noreferrer" className="rounded-xl border border-cyan-300/40 px-4 py-2.5 text-sm font-bold text-cyan-100 transition hover:bg-cyan-300/10">Buy</a>
           <button onClick={onNavigateLogin} className="rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/5 hover:text-white">
             Log in
           </button>
@@ -91,9 +92,10 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
               </a>
             ))}
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-3 border-t border-white/10 pt-4">
+          <div className="mt-3 grid grid-cols-3 gap-2 border-t border-white/10 pt-4">
             <button onClick={() => { onNavigateLogin(); setIsOpen(false); }} className="rounded-xl border border-white/10 px-3 py-3 text-sm font-semibold text-white">Log in</button>
             <button onClick={() => { onNavigateSignup(); setIsOpen(false); }} className="rounded-xl bg-cyan-300 px-3 py-3 text-sm font-bold text-slate-950">Get started</button>
+            <a href="https://jana890.lemonsqueezy.com/checkout/buy/f5befcf7-63cb-4759-8a85-5edeb2f6b951?logo=0&discount=0" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center rounded-xl border border-cyan-300/40 px-3 py-3 text-sm font-bold text-cyan-100">Buy</a>
           </div>
         </div>
       )}
@@ -136,6 +138,9 @@ const Hero: React.FC<LandingPageProps> = ({ onNavigateSignup, onNavigateLogin })
           <button onClick={onNavigateLogin} className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/[0.04] px-6 py-3.5 text-sm font-bold text-white transition hover:border-white/25 hover:bg-white/[0.08]">
             I already have an account
           </button>
+          <a href="https://jana890.lemonsqueezy.com/checkout/buy/f5befcf7-63cb-4759-8a85-5edeb2f6b951?logo=0&discount=0" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-xl border border-cyan-300/40 px-6 py-3.5 text-sm font-extrabold text-cyan-100 transition hover:-translate-y-0.5 hover:bg-cyan-300/10">
+            Buy now <ArrowIcon className="h-4 w-4" />
+          </a>
         </div>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-3 text-xs font-medium text-slate-400 sm:text-sm lg:justify-start">
