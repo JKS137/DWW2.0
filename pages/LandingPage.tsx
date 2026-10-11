@@ -58,7 +58,7 @@ const LandingNavbar: React.FC<LandingPageProps> = ({ onNavigateLogin, onNavigate
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
-          <a href="https://jana890.lemonsqueezy.com/checkout/buy/f5befcf7-63cb-4759-8a85-5edeb2f6b951?logo=0&discount=0" target="_blank" rel="noopener noreferrer" className="rounded-xl border border-cyan-300/40 px-4 py-2.5 text-sm font-bold text-cyan-100 transition hover:bg-cyan-300/10">Buy</a>
+          <a href="https://jana890.lemonsqueezy.com/checkout/buy/f5befcf7-63cb-4759-8a85-5edeb2f6b951?logo=0&discount=0" target="_blank" rel="noopener noreferrer" className="rounded-xl border border-cyan-300/40 px-4 py-2.5 text-sm font-bold text-cyan-100 transition hover:bg-cyan-300/10">Subscribe</a>
           <button onClick={onNavigateLogin} className="rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/5 hover:text-white">
             Log in
           </button>
